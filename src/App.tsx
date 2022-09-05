@@ -4,11 +4,9 @@ import * as R from "ramda"
 
 import { ReactComponent as Arrow } from "./assets/arrow-right.svg"
 
-
 const logo = require("./assets/mygif.gif") as string
 
 export const App = () => {
-
   const [padof2, setPadof2] = useState(4)
   const [padof3, setPadof3] = useState(4)
   const [padof4, setPadof4] = useState(5)
@@ -61,7 +59,6 @@ export const App = () => {
   const changeCurrentPad = (nbTrous: number, orientation: number) => {
     setCurrentPad({ label: 0, nbHole: nbTrous, orientation: orientation })
   }
-  
 
   const holdClick = (key: any) => {
     if (currentPad.nbHole === 0 || key.isFilled === 1) return
@@ -77,6 +74,8 @@ export const App = () => {
       const ay = [key.y + 1, key.y, key.y - 1, key.y][
         currentPad.orientation - 1
       ]
+
+      if (boardArray[ax][ay].isFilled) return
 
       switch (currentPad.orientation) {
         case 1:
@@ -116,6 +115,8 @@ export const App = () => {
       const ay2 = [key.y + 2, key.y, key.y - 2, key.y][
         currentPad.orientation - 1
       ]
+
+      if (boardArray[ax1][ay1].isFilled || boardArray[ax2][ay2].isFilled) return
 
       switch (currentPad.orientation) {
         case 1:
@@ -163,6 +164,13 @@ export const App = () => {
         currentPad.orientation - 1
       ]
       const ay3 = [key.y, key.y, key.y, key.y][currentPad.orientation - 1]
+
+      if (
+        boardArray[ax1][ay1].isFilled ||
+        boardArray[ax2][ay2].isFilled ||
+        boardArray[ax3][ay3].isFilled
+      )
+        return
 
       switch (currentPad.orientation) {
         case 1:
@@ -242,6 +250,16 @@ export const App = () => {
       const ay5 = [key.y + 2, key.y - 1, key.y - 2, key.y + 1][
         currentPad.orientation - 1
       ]
+
+      if (
+        boardArray[ax1][ay1].isFilled ||
+        boardArray[ax2][ay2].isFilled ||
+        boardArray[ax3][ay3].isFilled ||
+        boardArray[ax4][ay4].isFilled ||
+        boardArray[ax5][ay5].isFilled
+      )
+        return
+
       updatedBoard[ax1][ay1] = {
         x: ax1,
         y: ay1,
