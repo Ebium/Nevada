@@ -2,17 +2,24 @@ import React, { useState } from "react"
 import styled from "styled-components"
 import * as R from "ramda"
 
-const logo = require("./mygif.gif") as string
+import { ReactComponent as Arrow } from "./assets/arrow-right.svg"
+
+const logo = require("./assets/mygif.gif") as string
 
 export const App = () => {
+  const [padof2, setPadof2] = useState(4)
+  const [padof3, setPadof3] = useState(4)
+  const [padof4, setPadof4] = useState(5)
+  const [padof6, setPadof6] = useState(4)
+
   const [currentPad, setCurrentPad] = useState({
     label: 0,
     nbHole: 0,
     orientation: 1,
   })
 
-  var x = 0
-  var y = 0
+  var x = -1
+  var y = -1
 
   const [boardArray, setboardArray] = useState(
     Array(10)
@@ -21,8 +28,8 @@ export const App = () => {
         x++
         return new Array(10).fill(0).map(() => {
           y++
-          if (y === 11) {
-            y = 1
+          if (y === 10) {
+            y = 0
           }
           return { x: x, y: y, isFilled: 0 }
         })
@@ -54,13 +61,200 @@ export const App = () => {
   }
 
   const holdClick = (key: any) => {
+    if (currentPad.nbHole === 0 || key.isFilled === 1) return
+
     const updatedBoard = R.clone(boardArray)
-    updatedBoard[key.x - 1][key.y - 1] = { x: key.x, y: key.y, isFilled: 1 }
+
+    if (currentPad.nbHole === 2) {
+      if (padof2 === 0) return
+      const ax = [key.x, key.x + 1, key.x, key.x - 1][
+        currentPad.orientation - 1
+      ]
+      const ay = [key.y + 1, key.y, key.y - 1, key.y][
+        currentPad.orientation - 1
+      ]
+      switch (currentPad.orientation) {
+        case 1:
+          if (key.y === 9) return
+          break
+        case 2:
+          if (key.x === 9) return
+          break
+        case 3:
+          if (key.y === 0) return
+          break
+        case 4:
+          if (key.x === 0) return
+          break
+      }
+      updatedBoard[ax][ay] = {
+        x: ax,
+        y: ay,
+        isFilled: 1,
+      }
+      setPadof2(padof2 - 1)
+    }
+
+    if (currentPad.nbHole === 3) {
+      if (padof3 === 0) return
+
+      const ax1 = [key.x, key.x + 1, key.x, key.x - 1][
+        currentPad.orientation - 1
+      ]
+      const ax2 = [key.x, key.x + 2, key.x, key.x - 2][
+        currentPad.orientation - 1
+      ]
+      const ay1 = [key.y + 1, key.y, key.y - 1, key.y][
+        currentPad.orientation - 1
+      ]
+      const ay2 = [key.y + 2, key.y, key.y - 2, key.y][
+        currentPad.orientation - 1
+      ]
+
+      switch (currentPad.orientation) {
+        case 1:
+          if ([8, 9].includes(key.y)) return
+          break
+        case 2:
+          if ([8, 9].includes(key.x)) return
+          break
+        case 3:
+          if ([0, 1].includes(key.y)) return
+          break
+        case 4:
+          if ([0, 1].includes(key.x)) return
+          break
+      }
+
+      updatedBoard[ax1][ay1] = {
+        x: ax1,
+        y: ay1,
+        isFilled: 1,
+      }
+      updatedBoard[ax2][ay2] = {
+        x: ax2,
+        y: ay2,
+        isFilled: 1,
+      }
+
+      setPadof3(padof3 - 1)
+    }
+
+    if (currentPad.nbHole === 4) {
+      if (padof4 === 0) return
+
+      if (currentPad.orientation === 1) {
+        if (key.y === 9 || key.x === 9) return
+        updatedBoard[key.x][key.y + 1] = {
+          x: key.x,
+          y: key.y + 1,
+          isFilled: 1,
+        }
+        updatedBoard[key.x + 1][key.y + 1] = {
+          x: key.x + 1,
+          y: key.y + 1,
+          isFilled: 1,
+        }
+        updatedBoard[key.x + 1][key.y] = {
+          x: key.x + 1,
+          y: key.y,
+          isFilled: 1,
+        }
+      }
+
+      if (currentPad.orientation === 2) {
+        if (key.x === 9 || key.y === 0) return
+        updatedBoard[key.x][key.y - 1] = {
+          x: key.x,
+          y: key.y - 1,
+          isFilled: 1,
+        }
+        updatedBoard[key.x + 1][key.y - 1] = {
+          x: key.x + 1,
+          y: key.y - 1,
+          isFilled: 1,
+        }
+        updatedBoard[key.x + 1][key.y] = {
+          x: key.x + 1,
+          y: key.y,
+          isFilled: 1,
+        }
+      }
+      if (currentPad.orientation === 3) {
+        if (key.y === 0 || key.x === 0) return
+        updatedBoard[key.x][key.y - 1] = {
+          x: key.x,
+          y: key.y - 1,
+          isFilled: 1,
+        }
+        updatedBoard[key.x - 1][key.y - 1] = {
+          x: key.x - 1,
+          y: key.y - 1,
+          isFilled: 1,
+        }
+        updatedBoard[key.x - 1][key.y] = {
+          x: key.x - 1,
+          y: key.y,
+          isFilled: 1,
+        }
+      }
+
+      if (currentPad.orientation === 4) {
+        if (key.x === 0 || key.y === 9) return
+        updatedBoard[key.x][key.y + 1] = {
+          x: key.x,
+          y: key.y + 1,
+          isFilled: 1,
+        }
+        updatedBoard[key.x - 1][key.y + 1] = {
+          x: key.x - 1,
+          y: key.y + 1,
+          isFilled: 1,
+        }
+        updatedBoard[key.x - 1][key.y] = {
+          x: key.x - 1,
+          y: key.y,
+          isFilled: 1,
+        }
+      }
+      updatedBoard[key.x][key.y] = {
+        x: key.x,
+        y: key.y,
+        isFilled: 1,
+      }
+      setPadof4(padof4 - 1)
+    }
+
+    if (currentPad.nbHole === 6) {
+      console.log(6)
+    }
+
+    updatedBoard[key.x][key.y] = {
+      x: key.x,
+      y: key.y,
+      isFilled: 1,
+    }
     setboardArray(updatedBoard)
+
+    console.log(currentPad)
+  }
+
+  const changeOrientation = () => {
+    console.log(currentPad.orientation)
+    const setOrientation =
+      currentPad.orientation === 4 ? 1 : currentPad.orientation + 1
+    setCurrentPad({
+      label: currentPad.label,
+      nbHole: currentPad.nbHole,
+      orientation: setOrientation,
+    })
   }
 
   return (
     <Page>
+      <StyledButton onClick={() => changeOrientation()}>
+        Change Orientation
+      </StyledButton>
       <ColumnStyle>
         <div>
           CurrentPad - Trous : {currentPad.nbHole} Orientation :{" "}
@@ -86,6 +280,7 @@ export const App = () => {
             </RowStyle>
           </ColumnStyle>
         </Plaquette>
+        {padof6}
 
         <HeightSpacer></HeightSpacer>
 
@@ -105,6 +300,8 @@ export const App = () => {
             </RowStyle>
           </ColumnStyle>
         </Plaquette>
+        {padof4}
+
         <HeightSpacer></HeightSpacer>
 
         <Plaquette
@@ -120,6 +317,7 @@ export const App = () => {
             </RowStyle>
           </ColumnStyle>
         </Plaquette>
+        {padof3}
 
         <HeightSpacer></HeightSpacer>
 
@@ -135,6 +333,7 @@ export const App = () => {
             </RowStyle>
           </ColumnStyle>
         </Plaquette>
+        {padof2}
       </ColumnStyle>
       <div>
         <HeightSpacer></HeightSpacer>
@@ -155,11 +354,10 @@ export const App = () => {
   )
 }
 
-
 const Page = styled.div`
   width: 100vw;
   height: 100vh;
-  // background-image: url(${logo})
+  //background-image: url(${logo})
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
@@ -207,4 +405,9 @@ const ColumnStyle = styled.div`
 `
 const HeightSpacer = styled.div`
   height: 1rem;
+`
+
+const StyledButton = styled.button`
+  width: 5rem;
+  height: 5rem;
 `
