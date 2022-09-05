@@ -143,90 +143,73 @@ export const App = () => {
     if (currentPad.nbHole === 4) {
       if (padof4 === 0) return
 
-      if (currentPad.orientation === 1) {
-        if (key.y === 9 || key.x === 9) return
-        updatedBoard[key.x][key.y + 1] = {
-          x: key.x,
-          y: key.y + 1,
-          isFilled: 1,
-        }
-        updatedBoard[key.x + 1][key.y + 1] = {
-          x: key.x + 1,
-          y: key.y + 1,
-          isFilled: 1,
-        }
-        updatedBoard[key.x + 1][key.y] = {
-          x: key.x + 1,
-          y: key.y,
-          isFilled: 1,
-        }
+      const ax1 = [key.x, key.x, key.x, key.x][currentPad.orientation - 1]
+      const ax2 = [key.x + 1, key.x + 1, key.x - 1, key.x - 1][
+        currentPad.orientation - 1
+      ]
+      const ax3 = [key.x + 1, key.x + 1, key.x - 1, key.x - 1][
+        currentPad.orientation - 1
+      ]
+      const ay1 = [key.y + 1, key.y - 1, key.y - 1, key.y + 1][
+        currentPad.orientation - 1
+      ]
+      const ay2 = [key.y + 1, key.y - 1, key.y - 1, key.y + 1][
+        currentPad.orientation - 1
+      ]
+      const ay3 = [key.y, key.y, key.y, key.y][currentPad.orientation - 1]
+
+      switch (currentPad.orientation) {
+        case 1:
+          if (key.y === 9 || key.x === 9) return
+          break
+        case 2:
+          if (key.x === 9 || key.y === 0) return
+          break
+        case 3:
+          if (key.y === 0 || key.x === 0) return
+          break
+        case 4:
+          if (key.x === 0 || key.y === 9) return
+          break
       }
 
-      if (currentPad.orientation === 2) {
-        if (key.x === 9 || key.y === 0) return
-        updatedBoard[key.x][key.y - 1] = {
-          x: key.x,
-          y: key.y - 1,
-          isFilled: 1,
-        }
-        updatedBoard[key.x + 1][key.y - 1] = {
-          x: key.x + 1,
-          y: key.y - 1,
-          isFilled: 1,
-        }
-        updatedBoard[key.x + 1][key.y] = {
-          x: key.x + 1,
-          y: key.y,
-          isFilled: 1,
-        }
-      }
-      if (currentPad.orientation === 3) {
-        if (key.y === 0 || key.x === 0) return
-        updatedBoard[key.x][key.y - 1] = {
-          x: key.x,
-          y: key.y - 1,
-          isFilled: 1,
-        }
-        updatedBoard[key.x - 1][key.y - 1] = {
-          x: key.x - 1,
-          y: key.y - 1,
-          isFilled: 1,
-        }
-        updatedBoard[key.x - 1][key.y] = {
-          x: key.x - 1,
-          y: key.y,
-          isFilled: 1,
-        }
-      }
-
-      if (currentPad.orientation === 4) {
-        if (key.x === 0 || key.y === 9) return
-        updatedBoard[key.x][key.y + 1] = {
-          x: key.x,
-          y: key.y + 1,
-          isFilled: 1,
-        }
-        updatedBoard[key.x - 1][key.y + 1] = {
-          x: key.x - 1,
-          y: key.y + 1,
-          isFilled: 1,
-        }
-        updatedBoard[key.x - 1][key.y] = {
-          x: key.x - 1,
-          y: key.y,
-          isFilled: 1,
-        }
-      }
-      updatedBoard[key.x][key.y] = {
-        x: key.x,
-        y: key.y,
+      updatedBoard[ax1][ay1] = {
+        x: ax1,
+        y: ay1,
         isFilled: 1,
       }
+      updatedBoard[ax2][ay2] = {
+        x: ax2,
+        y: ay2,
+        isFilled: 1,
+      }
+      updatedBoard[ax3][ay3] = {
+        x: ax3,
+        y: ay3,
+        isFilled: 1,
+      }
+
       setPadof4(padof4 - 1)
     }
 
     if (currentPad.nbHole === 6) {
-      console.log(6)
+      if (padof4 === 0) return
+
+      switch (currentPad.orientation) {
+        case 1:
+          if ([8,9].includes(y) || key.x === 9) return
+          break
+        case 2:
+          if ([8,9].includes(x) || key.y === 9) return
+          break
+        case 3:
+          if ([0,1].includes(y) || key.x === 0) return
+          break
+        case 4:
+          if ([0,1].includes(x) || key.y === 0) return
+          break
+      }
+      
     }
 
     updatedBoard[key.x][key.y] = {
@@ -234,13 +217,11 @@ export const App = () => {
       y: key.y,
       isFilled: 1,
     }
-    setboardArray(updatedBoard)
 
-    console.log(currentPad)
+    setboardArray(updatedBoard)
   }
 
   const changeOrientation = () => {
-    console.log(currentPad.orientation)
     const setOrientation =
       currentPad.orientation === 4 ? 1 : currentPad.orientation + 1
     setCurrentPad({
