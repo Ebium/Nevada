@@ -400,6 +400,11 @@ export const App = () => {
     setboardArray(updatedBoard)
     setdroppedPadCounter(droppedPadCounter - 1)
   }
+
+  const startGame = () => {
+    console.log("game started")
+  }
+
   return (
     <Page>
       <ColumnStyle>
@@ -415,6 +420,10 @@ export const App = () => {
         <StyledButton onClick={() => resetBoard()}>reset Board</StyledButton>
         <HeightSpacer></HeightSpacer>
         <StyledButton onClick={() => undoBoard()}>Undo</StyledButton>
+        <HeightSpacer></HeightSpacer>
+        <StyledButton
+        disabled={!gameCanStart}
+        onClick={() => startGame()}>Start Game</StyledButton>
       </ColumnStyle>
       <ColumnStyle>
         <div>
