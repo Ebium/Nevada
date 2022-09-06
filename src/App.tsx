@@ -421,9 +421,9 @@ export const App = () => {
         <HeightSpacer></HeightSpacer>
         <StyledButton onClick={() => undoBoard()}>Undo</StyledButton>
         <HeightSpacer></HeightSpacer>
-        <StyledButton
-        disabled={!gameCanStart}
-        onClick={() => startGame()}>Start Game</StyledButton>
+        <StyledButton disabled={!gameCanStart} onClick={() => startGame()}>
+          Start Game
+        </StyledButton>
       </ColumnStyle>
       <ColumnStyle>
         <div>
@@ -577,7 +577,6 @@ const Plaquette = styled.div`
     box-shadow: 0px 0px 10px red;
   }
 `
-
 const RowStyle = styled.div`
   display: flex;
   flex-direction: row;
@@ -589,9 +588,9 @@ const ColumnStyle = styled.div`
 const HeightSpacer = styled.div`
   height: 1rem;
 `
-
 const StyledButton = styled.button`
   cursor: pointer;
   width: 5rem;
   height: 5rem;
+  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
 `
