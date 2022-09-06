@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import * as R from "ramda"
 
@@ -7,13 +7,40 @@ import { ReactComponent as Arrow } from "./assets/arrow-right.svg"
 const logo = require("./assets/mygif.gif") as string
 
 export const App = () => {
+  const initialePadStore = [
+    { left: 0, current: 0 },
+    { left: 4, current: 0 },
+    { left: 4, current: 0 },
+    { left: 5, current: 0 },
+    { left: 0, current: 0 },
+    { left: 4, current: 0 },
+  ]
 
+  const [droppedPadCounter, setdroppedPadCounter] = useState(0)
 
-  // {till: 4, current: 1}
-  const [padof2, setPadof2] = useState(4)
-  const [padof3, setPadof3] = useState(4)
-  const [padof4, setPadof4] = useState(5)
-  const [padof6, setPadof6] = useState(4)
+  const [gameCanStart, setGameCanStart] = useState(false)
+
+  useEffect(() => {
+    if (droppedPadCounter === 17) {
+      setGameCanStart(true)
+    } else {
+      if (gameCanStart) {
+        setGameCanStart(false)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [droppedPadCounter])
+
+  const [padStore, setPadStore] = useState(initialePadStore)
+
+  const updatePadStore = (padToUpdate: number, by: number) => {
+    var updatedPadStore = R.clone(padStore)
+    updatedPadStore[padToUpdate - 1].left =
+      updatedPadStore[padToUpdate - 1].left + by
+    setPadStore(updatedPadStore)
+  }
+
+  const [historyBoard, setHistoryBoard] = useState(Array<Array<any>>)
 
   const [currentPad, setCurrentPad] = useState({
     label: 0,
@@ -25,22 +52,20 @@ export const App = () => {
   var x = -1
   var y = -1
 
-  const [boardArray, setboardArray] = useState(
-    Array(10)
-      .fill(0)
-      .map(() => {
-        x++
-        return new Array(10).fill(0).map(() => {
-          y++
-          if (y === 10) {
-            y = 0
-          }
-          return { x: x, y: y, isFilled: 0, color: "" }
-        })
+  const initialeBoardArray = Array(10)
+    .fill(0)
+    .map(() => {
+      x++
+      return new Array(10).fill(0).map(() => {
+        y++
+        if (y === 10) {
+          y = 0
+        }
+        return { x: x, y: y, isFilled: 0, color: "" }
       })
-  )
+    })
 
-  const [originalBoardArray, useless1] = useState(R.clone(boardArray))
+  const [boardArray, setboardArray] = useState(initialeBoardArray)
 
   const [padArray, setPadArray] = useState([
     { label: 1, nbHole: 6, values: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 } },
@@ -75,14 +100,13 @@ export const App = () => {
     })
   }
 
-  const holdClick = (key: any) => {
+  const handleClick = (key: any) => {
     if (currentPad.nbHole === 0 || key.isFilled === 1) return
-
+    const padNum = currentPad.nbHole
     const updatedBoard = R.clone(boardArray)
 
-    if (currentPad.nbHole === 2) {
-      if (padof2 === 0) return
-
+    if (padStore[padNum - 1].left === 0) return
+    if (padNum === 2) {
       const ax = [key.x, key.x + 1, key.x, key.x - 1][
         currentPad.orientation - 1
       ]
@@ -113,12 +137,15 @@ export const App = () => {
         isFilled: 1,
         color: currentPad.color,
       }
-      setPadof2(padof2 - 1)
+
+      historyBoard.push([
+        [key.x, key.y],
+        [ax, ay],
+      ])
+      setHistoryBoard(historyBoard)
     }
 
-    if (currentPad.nbHole === 3) {
-      if (padof3 === 0) return
-
+    if (padNum === 3) {
       const ax1 = [key.x, key.x + 1, key.x, key.x - 1][
         currentPad.orientation - 1
       ]
@@ -162,12 +189,15 @@ export const App = () => {
         color: currentPad.color,
       }
 
-      setPadof3(padof3 - 1)
+      historyBoard.push([
+        [key.x, key.y],
+        [ax1, ay1],
+        [ax2, ay2],
+      ])
+      setHistoryBoard(historyBoard)
     }
 
-    if (currentPad.nbHole === 4) {
-      if (padof4 === 0) return
-
+    if (padNum === 4) {
       const ax1 = [key.x, key.x, key.x, key.x][currentPad.orientation - 1]
       const ax2 = [key.x + 1, key.x + 1, key.x - 1, key.x - 1][
         currentPad.orientation - 1
@@ -224,12 +254,16 @@ export const App = () => {
         color: currentPad.color,
       }
 
-      setPadof4(padof4 - 1)
+      historyBoard.push([
+        [key.x, key.y],
+        [ax1, ay1],
+        [ax2, ay2],
+        [ax3, ay3],
+      ])
+      setHistoryBoard(historyBoard)
     }
 
-    if (currentPad.nbHole === 6) {
-      if (padof6 === 0) return
-
+    if (padNum === 6) {
       switch (currentPad.orientation) {
         case 1:
           if ([8, 9].includes(key.y) || key.x === 9) return
@@ -311,7 +345,16 @@ export const App = () => {
         isFilled: 1,
         color: currentPad.color,
       }
-      setPadof6(padof6 - 1)
+
+      historyBoard.push([
+        [key.x, key.y],
+        [ax1, ay1],
+        [ax2, ay2],
+        [ax3, ay3],
+        [ax4, ay4],
+        [ax5, ay5],
+      ])
+      setHistoryBoard(historyBoard)
     }
 
     updatedBoard[key.x][key.y] = {
@@ -321,6 +364,8 @@ export const App = () => {
       color: currentPad.color,
     }
 
+    updatePadStore(padNum, -1)
+    setdroppedPadCounter(droppedPadCounter + 1)
     setboardArray(updatedBoard)
   }
 
@@ -336,22 +381,45 @@ export const App = () => {
   }
 
   const resetBoard = () => {
-    setboardArray(originalBoardArray)
-    setPadof2(4)
-    setPadof3(4)
-    setPadof4(5)
-    setPadof6(4)
+    setboardArray(initialeBoardArray)
+    setPadStore(initialePadStore)
+    setdroppedPadCounter(0)
+    setHistoryBoard([])
   }
 
+  const undoBoard = () => {
+    if (historyBoard.length === 0) return
+    const updatedBoard = R.clone(boardArray)
+    historyBoard[historyBoard.length - 1].map(
+      (key) =>
+        (updatedBoard[key[0]][key[1]] = initialeBoardArray[key[0]][key[1]])
+    )
+    updatePadStore(historyBoard[historyBoard.length - 1].length, +1)
+    historyBoard.pop()
+    setHistoryBoard(historyBoard)
+    setboardArray(updatedBoard)
+    setdroppedPadCounter(droppedPadCounter - 1)
+  }
   return (
     <Page>
-      <StyledButton onClick={() => changeOrientation()}>
-        Change Orientation
-      </StyledButton>
-      <StyledButton onClick={() => resetBoard()}>reset Board</StyledButton>
+      <ColumnStyle>
+        <HeightSpacer></HeightSpacer>
+        <StyledButton onClick={() => changeOrientation()}>
+          Change Orientation
+        </StyledButton>
+        <HeightSpacer></HeightSpacer>
+        <StyledButton onClick={() => updatePadStore(1, 1)}>
+          update pad
+        </StyledButton>
+        <HeightSpacer></HeightSpacer>
+        <StyledButton onClick={() => resetBoard()}>reset Board</StyledButton>
+        <HeightSpacer></HeightSpacer>
+        <StyledButton onClick={() => undoBoard()}>Undo</StyledButton>
+      </ColumnStyle>
       <ColumnStyle>
         <div>
-          CurrentPad - Trous : {currentPad.nbHole} Orientation :{" "}
+          dropped pad : {droppedPadCounter} <br />
+          CurrentPad - Trous : {currentPad.nbHole} <br /> Orientation :{" "}
           {currentPad.orientation}
         </div>
         <HeightSpacer></HeightSpacer>
@@ -375,7 +443,7 @@ export const App = () => {
             </RowStyle>
           </ColumnStyle>
         </Plaquette>
-        {padof6}
+        {padStore[5].left}
 
         <HeightSpacer></HeightSpacer>
 
@@ -395,7 +463,7 @@ export const App = () => {
             </RowStyle>
           </ColumnStyle>
         </Plaquette>
-        {padof4}
+        {padStore[3].left}
 
         <HeightSpacer></HeightSpacer>
 
@@ -412,7 +480,7 @@ export const App = () => {
             </RowStyle>
           </ColumnStyle>
         </Plaquette>
-        {padof3}
+        {padStore[2].left}
 
         <HeightSpacer></HeightSpacer>
 
@@ -428,15 +496,23 @@ export const App = () => {
             </RowStyle>
           </ColumnStyle>
         </Plaquette>
-        {padof2}
+        {padStore[1].left}
       </ColumnStyle>
+      <div>
+        <HeightSpacer></HeightSpacer>
+        board history
+        {historyBoard.map((key, index) => {
+          if (historyBoard.length === 0) return <></>
+          else return <Cellule>{key}</Cellule>
+        })}
+      </div>
       <div>
         <HeightSpacer></HeightSpacer>
         <Board>
           {boardArray.map((key, index) =>
             key.map((key, index) => (
               <Cellule
-                onClick={() => holdClick(key)}
+                onClick={() => handleClick(key)}
                 style={{
                   backgroundColor: key.isFilled ? key.color : "#D3D3D3",
                 }}
@@ -506,6 +582,7 @@ const HeightSpacer = styled.div`
 `
 
 const StyledButton = styled.button`
+  cursor: pointer;
   width: 5rem;
   height: 5rem;
 `
