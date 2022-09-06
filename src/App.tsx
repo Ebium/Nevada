@@ -7,6 +7,9 @@ import { ReactComponent as Arrow } from "./assets/arrow-right.svg"
 const logo = require("./assets/mygif.gif") as string
 
 export const App = () => {
+
+
+  // {till: 4, current: 1}
   const [padof2, setPadof2] = useState(4)
   const [padof3, setPadof3] = useState(4)
   const [padof4, setPadof4] = useState(5)
@@ -16,6 +19,7 @@ export const App = () => {
     label: 0,
     nbHole: 0,
     orientation: 1,
+    color: "",
   })
 
   var x = -1
@@ -31,10 +35,12 @@ export const App = () => {
           if (y === 10) {
             y = 0
           }
-          return { x: x, y: y, isFilled: 0 }
+          return { x: x, y: y, isFilled: 0, color: "" }
         })
       })
   )
+
+  const [originalBoardArray, useless1] = useState(R.clone(boardArray))
 
   const [padArray, setPadArray] = useState([
     { label: 1, nbHole: 6, values: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 } },
@@ -56,8 +62,17 @@ export const App = () => {
     { label: 4, nbHole: 2, values: { 1: 0, 2: 0 } },
   ])
 
-  const changeCurrentPad = (nbTrous: number, orientation: number) => {
-    setCurrentPad({ label: 0, nbHole: nbTrous, orientation: orientation })
+  const changeCurrentPad = (
+    nbTrous: number,
+    orientation: number,
+    color: string
+  ) => {
+    setCurrentPad({
+      label: 0,
+      nbHole: nbTrous,
+      orientation: orientation,
+      color: color,
+    })
   }
 
   const holdClick = (key: any) => {
@@ -96,6 +111,7 @@ export const App = () => {
         x: ax,
         y: ay,
         isFilled: 1,
+        color: currentPad.color,
       }
       setPadof2(padof2 - 1)
     }
@@ -137,11 +153,13 @@ export const App = () => {
         x: ax1,
         y: ay1,
         isFilled: 1,
+        color: currentPad.color,
       }
       updatedBoard[ax2][ay2] = {
         x: ax2,
         y: ay2,
         isFilled: 1,
+        color: currentPad.color,
       }
 
       setPadof3(padof3 - 1)
@@ -191,16 +209,19 @@ export const App = () => {
         x: ax1,
         y: ay1,
         isFilled: 1,
+        color: currentPad.color,
       }
       updatedBoard[ax2][ay2] = {
         x: ax2,
         y: ay2,
         isFilled: 1,
+        color: currentPad.color,
       }
       updatedBoard[ax3][ay3] = {
         x: ax3,
         y: ay3,
         isFilled: 1,
+        color: currentPad.color,
       }
 
       setPadof4(padof4 - 1)
@@ -264,26 +285,31 @@ export const App = () => {
         x: ax1,
         y: ay1,
         isFilled: 1,
+        color: currentPad.color,
       }
       updatedBoard[ax2][ay2] = {
         x: ax2,
         y: ay2,
         isFilled: 1,
+        color: currentPad.color,
       }
       updatedBoard[ax3][ay3] = {
         x: ax3,
         y: ay3,
         isFilled: 1,
+        color: currentPad.color,
       }
       updatedBoard[ax4][ay4] = {
         x: ax4,
         y: ay4,
         isFilled: 1,
+        color: currentPad.color,
       }
       updatedBoard[ax5][ay5] = {
         x: ax5,
         y: ay5,
         isFilled: 1,
+        color: currentPad.color,
       }
       setPadof6(padof6 - 1)
     }
@@ -292,6 +318,7 @@ export const App = () => {
       x: key.x,
       y: key.y,
       isFilled: 1,
+      color: currentPad.color,
     }
 
     setboardArray(updatedBoard)
@@ -304,7 +331,16 @@ export const App = () => {
       label: currentPad.label,
       nbHole: currentPad.nbHole,
       orientation: setOrientation,
+      color: currentPad.color,
     })
+  }
+
+  const resetBoard = () => {
+    setboardArray(originalBoardArray)
+    setPadof2(4)
+    setPadof3(4)
+    setPadof4(5)
+    setPadof6(4)
   }
 
   return (
@@ -312,6 +348,7 @@ export const App = () => {
       <StyledButton onClick={() => changeOrientation()}>
         Change Orientation
       </StyledButton>
+      <StyledButton onClick={() => resetBoard()}>reset Board</StyledButton>
       <ColumnStyle>
         <div>
           CurrentPad - Trous : {currentPad.nbHole} Orientation :{" "}
@@ -321,8 +358,9 @@ export const App = () => {
 
         <Plaquette
           onClick={() => {
-            changeCurrentPad(6, 1)
+            changeCurrentPad(6, 1, "salmon")
           }}
+          className="p1"
         >
           <ColumnStyle>
             <RowStyle>
@@ -343,7 +381,7 @@ export const App = () => {
 
         <Plaquette
           onClick={() => {
-            changeCurrentPad(4, 1)
+            changeCurrentPad(4, 1, "blue")
           }}
         >
           <ColumnStyle>
@@ -363,7 +401,7 @@ export const App = () => {
 
         <Plaquette
           onClick={() => {
-            changeCurrentPad(3, 1)
+            changeCurrentPad(3, 1, "yellow")
           }}
         >
           <ColumnStyle>
@@ -380,7 +418,7 @@ export const App = () => {
 
         <Plaquette
           onClick={() => {
-            changeCurrentPad(2, 1)
+            changeCurrentPad(2, 1, "green")
           }}
         >
           <ColumnStyle>
@@ -399,7 +437,9 @@ export const App = () => {
             key.map((key, index) => (
               <Cellule
                 onClick={() => holdClick(key)}
-                style={{ backgroundColor: key.isFilled ? "cyan" : "#D3D3D3" }}
+                style={{
+                  backgroundColor: key.isFilled ? key.color : "#D3D3D3",
+                }}
               >
                 {key.x},{key.y}
               </Cellule>
@@ -449,9 +489,10 @@ const Plaquette = styled.div`
   width: fit-content;
   padding: 1rem;
   :hover {
-    background-color: cyan;
+    box-shadow: 0px 0px 10px red;
   }
 `
+
 const RowStyle = styled.div`
   display: flex;
   flex-direction: row;
