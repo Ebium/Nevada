@@ -4,9 +4,8 @@ import * as R from "ramda"
 
 import { ReactComponent as Arrow } from "./assets/arrow-right.svg"
 
-const logo = require("./assets/mygif.gif") as string
-const rightVine = require("./assets/vine-to-right.png") as string
-const leftVine = require("./assets/vine-to-left.png") as string
+const backgroundGif = require("./assets/mygif.gif") as string
+const arizonaLogo = require("./assets/logo1.png") as string
 
 export const App = () => {
   const initialePadStore = [
@@ -409,20 +408,35 @@ export const App = () => {
 
   return (
     <Content>
+      <HeaderButton
+        onClick={() => {
+          console.log("bouton")
+        }}
+      ></HeaderButton>
       <Page>
         <ColumnStyle>
           <HeightSpacer></HeightSpacer>
-          <StyledButton onClick={() => changeOrientation()}>
+          <StyledButton disabled={currentPad.nbHole===0} onClick={() => changeOrientation()}>
             Change Orientation
           </StyledButton>
           <HeightSpacer></HeightSpacer>
-          <StyledButton onClick={() => updatePadStore(1, 1)}>
-            update pad
+          <StyledButton
+            disabled={droppedPadCounter === 0}
+            onClick={() => resetBoard()}
+          >
+            reset Board
           </StyledButton>
           <HeightSpacer></HeightSpacer>
-          <StyledButton onClick={() => resetBoard()}>reset Board</StyledButton>
+          <StyledButton
+            disabled={droppedPadCounter === 0}
+            onClick={() => undoBoard()}
+          >
+            Undo
+          </StyledButton>
           <HeightSpacer></HeightSpacer>
-          <StyledButton onClick={() => undoBoard()}>Undo</StyledButton>
+          <StyledButton disabled={!gameCanStart} onClick={() => startGame()}>
+            StartGame
+          </StyledButton>
         </ColumnStyle>
         <ColumnStyle>
           <div style={{ color: "white" }}>
@@ -544,19 +558,29 @@ export const App = () => {
           </Board>
         </div>
       </Page>
-      <StartBar>
-        <LeftStartBarPart></LeftStartBarPart>
-        <StartButton disabled={!gameCanStart} onClick={() => startGame()}>
-          StartGame
-        </StartButton>
-        <RightStartBarPart></RightStartBarPart>
-      </StartBar>
     </Content>
   )
 }
 
+const HeaderButton = styled.button`
+  cursor: pointer;
+  position: fixed;
+  right: 2px;
+  top: 2px;
+  background-image: url(${arizonaLogo});
+  background-size: cover;
+  background-color: unset;
+  border: none;
+  height: 3rem;
+  width: 3rem;
+  :hover {
+    height: 4rem;
+    width: 4rem;
+  }
+`
+
 const Content = styled.div`
-  background-image: url(${logo});
+  background-image: url(${backgroundGif});
 `
 const Page = styled.div`
   color: cyan;
@@ -572,7 +596,8 @@ const Board = styled.div`
   grid-template-columns: repeat(10, 1fr);
   justify-content: center;
   height: fit-content;
-  border: black 2px solid;
+  border: cyan 2px solid;
+  box-shadow: 0px 0px 20px cyan;
   padding: 1rem;
 `
 const HistoryBoard = styled.div`
@@ -599,13 +624,13 @@ const HoleForCellule = styled.div`
 const Plaquette = styled.div`
   color: white;
   cursor: pointer;
-  border: grey 1px solid;
+  border: cyan 1px solid;
   border-radius: 10px;
   height: fit-content;
   width: fit-content;
   padding: 1rem;
   :hover {
-    box-shadow: 0px 0px 10px red;
+    box-shadow: 0px 0px 20px cyan;
   }
 `
 const RowStyle = styled.div`
@@ -620,35 +645,14 @@ const HeightSpacer = styled.div`
   height: 1rem;
 `
 const StyledButton = styled.button`
-  cursor: pointer;
+  background-color: white;
+  border: cyan 1px solid;
+  border-radius: 5px;
   width: 5rem;
   height: 5rem;
-`
-
-const StartBar = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  justfiy-content: center;
-`
-const StartButton = styled.button`
-  height: 32px;
   cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
-  min-width: 10vw;
-  background-color: ${({ disabled }) =>
-    disabled ? "rgba(255, 255, 255, .4)" : "#f7c946"};
-  border: 2px #1e7e00 solid;
-  border-radius: 15px 15px 2px 2px;
-  color: black;
-`
-const RightStartBarPart = styled.div`
-  background-image: url(${rightVine});
-  width: 100%;
-  height: 32px;
-`
-const LeftStartBarPart = styled.div`
-  background-image: url(${leftVine});
-  width: 100%;
-  height: 32px;
+  :hover {
+    box-shadow: ${({ disabled }) =>
+      disabled ? "0px 0px 20px red" : "0px 0px 20px cyan"};
+  }
 `
