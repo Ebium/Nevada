@@ -5,6 +5,8 @@ import * as R from "ramda"
 import { ReactComponent as Arrow } from "./assets/arrow-right.svg"
 
 const logo = require("./assets/mygif.gif") as string
+const rightVine = require("./assets/vine-to-right.png") as string
+const leftVine = require("./assets/vine-to-left.png") as string
 
 export const App = () => {
   const initialePadStore = [
@@ -406,140 +408,160 @@ export const App = () => {
   }
 
   return (
-    <Page>
-      <ColumnStyle>
-        <HeightSpacer></HeightSpacer>
-        <StyledButton onClick={() => changeOrientation()}>
-          Change Orientation
-        </StyledButton>
-        <HeightSpacer></HeightSpacer>
-        <StyledButton onClick={() => updatePadStore(1, 1)}>
-          update pad
-        </StyledButton>
-        <HeightSpacer></HeightSpacer>
-        <StyledButton onClick={() => resetBoard()}>reset Board</StyledButton>
-        <HeightSpacer></HeightSpacer>
-        <StyledButton onClick={() => undoBoard()}>Undo</StyledButton>
-        <HeightSpacer></HeightSpacer>
-        <StyledButton disabled={!gameCanStart} onClick={() => startGame()}>
-          Start Game
-        </StyledButton>
-      </ColumnStyle>
-      <ColumnStyle>
+    <Content>
+      <Page>
+        <ColumnStyle>
+          <HeightSpacer></HeightSpacer>
+          <StyledButton onClick={() => changeOrientation()}>
+            Change Orientation
+          </StyledButton>
+          <HeightSpacer></HeightSpacer>
+          <StyledButton onClick={() => updatePadStore(1, 1)}>
+            update pad
+          </StyledButton>
+          <HeightSpacer></HeightSpacer>
+          <StyledButton onClick={() => resetBoard()}>reset Board</StyledButton>
+          <HeightSpacer></HeightSpacer>
+          <StyledButton onClick={() => undoBoard()}>Undo</StyledButton>
+        </ColumnStyle>
+        <ColumnStyle>
+          <div style={{ color: "white" }}>
+            dropped pad : {droppedPadCounter} <br />
+            CurrentPad - Trous : {currentPad.nbHole} <br /> Orientation :{" "}
+            {currentPad.orientation}
+          </div>
+          <HeightSpacer></HeightSpacer>
+
+          <Plaquette
+            onClick={() => {
+              changeCurrentPad(6, 1, "salmon")
+            }}
+            className="p1"
+          >
+            <ColumnStyle>
+              <RowStyle>
+                <Cellule></Cellule>
+                <Cellule></Cellule>
+                <Cellule></Cellule>
+              </RowStyle>
+              <RowStyle>
+                <Cellule></Cellule>
+                <Cellule></Cellule>
+                <Cellule></Cellule>
+              </RowStyle>
+            </ColumnStyle>
+          </Plaquette>
+          {padStore[5].left}
+
+          <HeightSpacer></HeightSpacer>
+
+          <Plaquette
+            onClick={() => {
+              changeCurrentPad(4, 1, "blue")
+            }}
+          >
+            <ColumnStyle>
+              <RowStyle>
+                <Cellule></Cellule>
+                <Cellule></Cellule>
+              </RowStyle>
+              <RowStyle>
+                <Cellule></Cellule>
+                <Cellule></Cellule>
+              </RowStyle>
+            </ColumnStyle>
+          </Plaquette>
+          {padStore[3].left}
+
+          <HeightSpacer></HeightSpacer>
+
+          <Plaquette
+            onClick={() => {
+              changeCurrentPad(3, 1, "yellow")
+            }}
+          >
+            <ColumnStyle>
+              <RowStyle>
+                <Cellule></Cellule>
+                <Cellule></Cellule>
+                <Cellule></Cellule>
+              </RowStyle>
+            </ColumnStyle>
+          </Plaquette>
+          {padStore[2].left}
+
+          <HeightSpacer></HeightSpacer>
+
+          <Plaquette
+            onClick={() => {
+              changeCurrentPad(2, 1, "green")
+            }}
+          >
+            <ColumnStyle>
+              <RowStyle>
+                <Cellule></Cellule>
+                <Cellule></Cellule>
+              </RowStyle>
+            </ColumnStyle>
+          </Plaquette>
+          {padStore[1].left}
+        </ColumnStyle>
+        <HistoryBoard style={{ color: "white" }}>
+          <HeightSpacer></HeightSpacer>
+          board history
+          {historyBoard.map((key, index) => {
+            if (historyBoard.length === 0) return <></>
+            else return <Cellule>{key.length}</Cellule>
+          })}
+        </HistoryBoard>
         <div>
-          dropped pad : {droppedPadCounter} <br />
-          CurrentPad - Trous : {currentPad.nbHole} <br /> Orientation :{" "}
-          {currentPad.orientation}
+          <HeightSpacer></HeightSpacer>
+          <Board>
+            {boardArray.map((key) =>
+              key.map((key) => (
+                <Cellule
+                  onClick={() => handleClick(key)}
+                  style={{
+                    backgroundColor: key.isFilled
+                      ? key.color
+                      : gameCanStart
+                      ? "transparent"
+                      : "#D3D3D3",
+                    border:
+                      gameCanStart && !key.isFilled ? "none" : "1px red solid",
+                  }}
+                >
+                  {key.isFilled ? (
+                    <HoleForCellule></HoleForCellule>
+                  ) : (
+                    <>
+                      {key.x},{key.y}
+                    </>
+                  )}
+                </Cellule>
+              ))
+            )}
+          </Board>
         </div>
-        <HeightSpacer></HeightSpacer>
-
-        <Plaquette
-          onClick={() => {
-            changeCurrentPad(6, 1, "salmon")
-          }}
-          className="p1"
-        >
-          <ColumnStyle>
-            <RowStyle>
-              <Cellule></Cellule>
-              <Cellule></Cellule>
-              <Cellule></Cellule>
-            </RowStyle>
-            <RowStyle>
-              <Cellule></Cellule>
-              <Cellule></Cellule>
-              <Cellule></Cellule>
-            </RowStyle>
-          </ColumnStyle>
-        </Plaquette>
-        {padStore[5].left}
-
-        <HeightSpacer></HeightSpacer>
-
-        <Plaquette
-          onClick={() => {
-            changeCurrentPad(4, 1, "blue")
-          }}
-        >
-          <ColumnStyle>
-            <RowStyle>
-              <Cellule></Cellule>
-              <Cellule></Cellule>
-            </RowStyle>
-            <RowStyle>
-              <Cellule></Cellule>
-              <Cellule></Cellule>
-            </RowStyle>
-          </ColumnStyle>
-        </Plaquette>
-        {padStore[3].left}
-
-        <HeightSpacer></HeightSpacer>
-
-        <Plaquette
-          onClick={() => {
-            changeCurrentPad(3, 1, "yellow")
-          }}
-        >
-          <ColumnStyle>
-            <RowStyle>
-              <Cellule></Cellule>
-              <Cellule></Cellule>
-              <Cellule></Cellule>
-            </RowStyle>
-          </ColumnStyle>
-        </Plaquette>
-        {padStore[2].left}
-
-        <HeightSpacer></HeightSpacer>
-
-        <Plaquette
-          onClick={() => {
-            changeCurrentPad(2, 1, "green")
-          }}
-        >
-          <ColumnStyle>
-            <RowStyle>
-              <Cellule></Cellule>
-              <Cellule></Cellule>
-            </RowStyle>
-          </ColumnStyle>
-        </Plaquette>
-        {padStore[1].left}
-      </ColumnStyle>
-      <div>
-        <HeightSpacer></HeightSpacer>
-        board history
-        {historyBoard.map((key, index) => {
-          if (historyBoard.length === 0) return <></>
-          else return <Cellule>{key}</Cellule>
-        })}
-      </div>
-      <div>
-        <HeightSpacer></HeightSpacer>
-        <Board>
-          {boardArray.map((key, index) =>
-            key.map((key, index) => (
-              <Cellule
-                onClick={() => handleClick(key)}
-                style={{
-                  backgroundColor: key.isFilled ? key.color : "#D3D3D3",
-                }}
-              >
-                {key.x},{key.y}
-              </Cellule>
-            ))
-          )}
-        </Board>
-      </div>
-    </Page>
+      </Page>
+      <StartBar>
+        <LeftStartBarPart></LeftStartBarPart>
+        <StartButton disabled={!gameCanStart} onClick={() => startGame()}>
+          StartGame
+        </StartButton>
+        <RightStartBarPart></RightStartBarPart>
+      </StartBar>
+    </Content>
   )
 }
 
+const Content = styled.div`
+  background-image: url(${logo});
+`
 const Page = styled.div`
+  color: cyan;
   width: 100vw;
   height: 100vh;
-  //background-image: url(${logo})
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
@@ -553,10 +575,11 @@ const Board = styled.div`
   border: black 2px solid;
   padding: 1rem;
 `
-const CenterContent = styled.div`
-  display: flex;
+const HistoryBoard = styled.div`
+  display: grid;
   justify-content: center;
-  align-items: center;
+  height: fit-content;
+  grid-template-columns: repeat(2, 1fr);
 `
 const Cellule = styled.div`
   color: grey;
@@ -566,7 +589,15 @@ const Cellule = styled.div`
   padding: 1rem;
   border: 1px red solid;
 `
+const HoleForCellule = styled.div`
+  width: 2rem;
+  height: 2rem;
+  border: 1px red solid;
+  border-radius: 2rem;
+  background-color: red;
+`
 const Plaquette = styled.div`
+  color: white;
   cursor: pointer;
   border: grey 1px solid;
   border-radius: 10px;
@@ -592,5 +623,32 @@ const StyledButton = styled.button`
   cursor: pointer;
   width: 5rem;
   height: 5rem;
+`
+
+const StartBar = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  justfiy-content: center;
+`
+const StartButton = styled.button`
+  height: 32px;
   cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  min-width: 10vw;
+  background-color: ${({ disabled }) =>
+    disabled ? "rgba(255, 255, 255, .4)" : "#f7c946"};
+  border: 2px #1e7e00 solid;
+  border-radius: 15px 15px 2px 2px;
+  color: black;
+`
+const RightStartBarPart = styled.div`
+  background-image: url(${rightVine});
+  width: 100%;
+  height: 32px;
+`
+const LeftStartBarPart = styled.div`
+  background-image: url(${leftVine});
+  width: 100%;
+  height: 32px;
 `
