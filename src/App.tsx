@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import * as R from "ramda"
+import { useArizonaSelector } from "./store/rootReducer"
 
 import { ReactComponent as Arrow } from "./assets/arrow-right.svg"
+
+import { useDispatch } from "react-redux"
+import { GetTestThunk } from "./store/ducks/Board.ducks"
 
 const backgroundGif = require("./assets/mygif.gif") as string
 const arizonaLogo = require("./assets/logo1.png") as string
 
 export const App = () => {
+  GetTestThunk("aez")
+
+  useEffect(() => {
+    GetTestThunk("aez")
+  }, [])
+
   const initialePadStore = [
     { left: 0, current: 0 },
     { left: 4, current: 0 },
@@ -382,6 +392,9 @@ export const App = () => {
   }
 
   const resetBoard = () => {
+    const stf = GetTestThunk("aez")
+    console.log("reseted")
+console.log(stf)
     setboardArray(initialeBoardArray)
     setPadStore(initialePadStore)
     setdroppedPadCounter(0)
@@ -410,13 +423,16 @@ export const App = () => {
     <Content>
       <HeaderButton
         onClick={() => {
-          console.log("bouton")
+          console.log("bouton en haut a droite LOL haha trop funny")
         }}
       ></HeaderButton>
       <Page>
         <ColumnStyle>
           <HeightSpacer></HeightSpacer>
-          <StyledButton disabled={currentPad.nbHole===0} onClick={() => changeOrientation()}>
+          <StyledButton
+            disabled={currentPad.nbHole === 0}
+            onClick={() => changeOrientation()}
+          >
             Change Orientation
           </StyledButton>
           <HeightSpacer></HeightSpacer>
