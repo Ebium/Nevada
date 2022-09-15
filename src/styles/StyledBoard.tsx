@@ -12,4 +12,5 @@ export const Board = styled.div`
   box-shadow: 0px 0px 20px cyan;
   padding: 1rem;
   background-image: url(${boardBackground});
+  width: fit-content;
 `

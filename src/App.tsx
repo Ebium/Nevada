@@ -3,7 +3,7 @@ import styled from "styled-components"
 import * as R from "ramda"
 import { Counter } from "./features/counter/Counter"
 import { ReactComponent as Arrow } from "./assets/arrow-right.svg"
-import { Boarda } from "./features/board/Board"
+import { BoardFeature } from "./features/board/Board"
 import { Board } from "./styles/StyledBoard"
 
 const backgroundGif = require("./assets/mygif.gif") as string
@@ -410,7 +410,7 @@ export const App = () => {
 
   return (
     <Content>
-      <Boarda />
+      <BoardFeature />
       <Counter />
       <HeaderButton
         onClick={() => {
