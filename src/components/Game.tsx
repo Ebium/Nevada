@@ -1,22 +1,20 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import styled from "styled-components"
 import * as R from "ramda"
-import { Counter } from "../features/counter/Counter"
-import { ReactComponent as Arrow } from "./assets/arrow-right.svg"
-import { BoardFeature } from "./Board"
-import { Board } from "../styles/StyledBoard"
+import { Board } from "./Board"
+import { StyledBoard } from "../styles/StyledBoard"
 
 const backgroundGif = require("../assets/mygif.gif") as string
 const arizonaLogo = require("../assets/logo1.png") as string
 
 export const Game = () => {
   const initialePadStore = [
-    { left: 0, current: 0 },
-    { left: 4, current: 0 },
-    { left: 4, current: 0 },
-    { left: 5, current: 0 },
-    { left: 0, current: 0 },
-    { left: 4, current: 0 },
+    { remaining: 0, current: 0 },
+    { remaining: 4, current: 0 },
+    { remaining: 4, current: 0 },
+    { remaining: 5, current: 0 },
+    { remaining: 0, current: 0 },
+    { remaining: 4, current: 0 },
   ]
 
   const [droppedPadCounter, setdroppedPadCounter] = useState(0)
@@ -38,8 +36,8 @@ export const Game = () => {
 
   const updatePadStore = (padToUpdate: number, by: number) => {
     var updatedPadStore = R.clone(padStore)
-    updatedPadStore[padToUpdate - 1].left =
-      updatedPadStore[padToUpdate - 1].left + by
+    updatedPadStore[padToUpdate - 1].remaining =
+      updatedPadStore[padToUpdate - 1].remaining + by
     setPadStore(updatedPadStore)
   }
 
@@ -108,7 +106,7 @@ export const Game = () => {
     const padNum = currentPad.nbHole
     const updatedBoard = R.clone(boardArray)
 
-    if (padStore[padNum - 1].left === 0) return
+    if (padStore[padNum - 1].remaining === 0) return
     if (padNum === 2) {
       const ax = [key.x, key.x + 1, key.x, key.x - 1][
         currentPad.orientation - 1
@@ -410,8 +408,7 @@ export const Game = () => {
 
   return (
     <Content>
-      {/* <BoardFeature />
-      <Counter /> */}
+      <Board />
       <HeaderButton
         onClick={() => {
           console.log("bouton en haut a droite LOL haha trop funny")
@@ -472,7 +469,7 @@ export const Game = () => {
               </RowStyle>
             </ColumnStyle>
           </Plaquette>
-          {padStore[5].left}
+          {padStore[5].remaining}
 
           <HeightSpacer></HeightSpacer>
 
@@ -492,7 +489,7 @@ export const Game = () => {
               </RowStyle>
             </ColumnStyle>
           </Plaquette>
-          {padStore[3].left}
+          {padStore[3].remaining}
 
           <HeightSpacer></HeightSpacer>
 
@@ -509,7 +506,7 @@ export const Game = () => {
               </RowStyle>
             </ColumnStyle>
           </Plaquette>
-          {padStore[2].left}
+          {padStore[2].remaining}
 
           <HeightSpacer></HeightSpacer>
 
@@ -525,7 +522,7 @@ export const Game = () => {
               </RowStyle>
             </ColumnStyle>
           </Plaquette>
-          {padStore[1].left}
+          {padStore[1].remaining}
         </ColumnStyle>
         <HistoryBoard style={{ color: "white" }}>
           <HeightSpacer></HeightSpacer>
@@ -537,7 +534,7 @@ export const Game = () => {
         </HistoryBoard>
         <div>
           <HeightSpacer></HeightSpacer>
-          <Board>
+          <StyledBoard>
             {boardArray.map((key) =>
               key.map((key) => (
                 <Cellule
@@ -562,7 +559,7 @@ export const Game = () => {
                 </Cellule>
               ))
             )}
-          </Board>
+          </StyledBoard>
         </div>
       </Page>
     </Content>

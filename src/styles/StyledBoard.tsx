@@ -1,6 +1,6 @@
 import styled from "styled-components"
 
-export const Board = styled.div`
+export const StyledBoard = styled.div`
   cursor: pointer;
   display: grid;
   grid-template-columns: repeat(10, 1fr);
