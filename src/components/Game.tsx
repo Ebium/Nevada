@@ -9,7 +9,7 @@ import { Board } from "../styles/StyledBoard"
 const backgroundGif = require("../assets/mygif.gif") as string
 const arizonaLogo = require("../assets/logo1.png") as string
 
-export const App = () => {
+export const Game = () => {
   const initialePadStore = [
     { left: 0, current: 0 },
     { left: 4, current: 0 },
