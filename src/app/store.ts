@@ -1,7 +1,7 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit"
-import boardReducer from "../features/board/board.ducks"
-import counterReducer from "../features/counter/counter.ducks"
-import gameReducer from "../features/game/Game.ducks"
+import boardReducer from "../ducks/board.ducks"
+import counterReducer from "../ducks/counter.ducks"
+import gameReducer from "../ducks/Game.ducks"
 
 export const store = configureStore({
   reducer: {

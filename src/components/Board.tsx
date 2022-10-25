@@ -1,6 +1,6 @@
 import styled from "styled-components"
-import { useNevadaSelector, useNevadaDispatch } from "../../app/hooks"
-import { Board } from "../../styles/StyledBoard"
+import { useNevadaSelector, useNevadaDispatch } from "../app/hooks"
+import { Board } from "../styles/StyledBoard"
 
 export const BoardFeature = () => {
   console.log("dedans")

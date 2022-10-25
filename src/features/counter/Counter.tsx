@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState } from "react"
 
-import { useNevadaSelector, useNevadaDispatch } from '../../app/hooks';
+import { useNevadaSelector, useNevadaDispatch } from "../../app/hooks"
 import {
   decrement,
   increment,
@@ -8,15 +8,15 @@ import {
   incrementAsync,
   incrementIfOdd,
   selectCount,
-} from './counter.ducks';
-import styles from './Counter.module.css';
+} from "../../ducks/counter.ducks"
+import styles from "./Counter.module.css"
 
 export function Counter() {
-  const count = useNevadaSelector(selectCount);
-  const dispatch = useNevadaDispatch();
-  const [incrementAmount, setIncrementAmount] = useState('2');
+  const count = useNevadaSelector(selectCount)
+  const dispatch = useNevadaDispatch()
+  const [incrementAmount, setIncrementAmount] = useState("2")
 
-  const incrementValue = Number(incrementAmount) || 0;
+  const incrementValue = Number(incrementAmount) || 0
 
   return (
     <div>
@@ -64,5 +64,5 @@ export function Counter() {
         </button>
       </div>
     </div>
-  );
+  )
 }

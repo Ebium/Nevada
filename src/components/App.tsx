@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import * as R from "ramda"
-import { Counter } from "./features/counter/Counter"
+import { Counter } from "../features/counter/Counter"
 import { ReactComponent as Arrow } from "./assets/arrow-right.svg"
-import { BoardFeature } from "./features/board/Board"
-import { Board } from "./styles/StyledBoard"
+import { BoardFeature } from "./Board"
+import { Board } from "../styles/StyledBoard"
 
-const backgroundGif = require("./assets/mygif.gif") as string
-const arizonaLogo = require("./assets/logo1.png") as string
+const backgroundGif = require("../assets/mygif.gif") as string
+const arizonaLogo = require("../assets/logo1.png") as string
 
 export const App = () => {
   const initialePadStore = [
@@ -410,8 +410,8 @@ export const App = () => {
 
   return (
     <Content>
-      <BoardFeature />
-      <Counter />
+      {/* <BoardFeature />
+      <Counter /> */}
       <HeaderButton
         onClick={() => {
           console.log("bouton en haut a droite LOL haha trop funny")
@@ -446,7 +446,7 @@ export const App = () => {
           </StyledButton>
         </ColumnStyle>
         <ColumnStyle>
-          <div style={{ color: "white" }}>
+          <div>
             dropped pad : {droppedPadCounter} <br />
             CurrentPad - Trous : {currentPad.nbHole} <br /> Orientation :{" "}
             {currentPad.orientation}
@@ -587,10 +587,10 @@ const HeaderButton = styled.button`
 `
 
 const Content = styled.div`
-  background-image: url(${backgroundGif});
+  //background-image: url(${backgroundGif});
 `
 const Page = styled.div`
-  color: cyan;
+  color: black;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -621,13 +621,13 @@ const HoleForCellule = styled.div`
 const Plaquette = styled.div`
   color: white;
   cursor: pointer;
-  border: cyan 1px solid;
+  border: black 1px solid;
   border-radius: 10px;
   height: fit-content;
   width: fit-content;
   padding: 1rem;
   :hover {
-    box-shadow: 0px 0px 20px cyan;
+    box-shadow: 0px 0px 20px black;
   }
 `
 const RowStyle = styled.div`
@@ -643,13 +643,13 @@ const HeightSpacer = styled.div`
 `
 const StyledButton = styled.button`
   background-color: white;
-  border: cyan 1px solid;
+  border: black 1px solid;
   border-radius: 5px;
   width: 5rem;
   height: 5rem;
   cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   :hover {
     box-shadow: ${({ disabled }) =>
-      disabled ? "0px 0px 20px red" : "0px 0px 20px cyan"};
+      disabled ? "0px 0px 20px red" : "0px 0px 20px black"};
   }
 `

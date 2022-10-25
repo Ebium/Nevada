@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import { AppThunk, RootState } from "../../app/store"
-import { incrementAsync } from "../counter/counter.ducks"
+import { AppThunk, RootState } from "../app/store"
+import { incrementAsync } from "./counter.ducks"
 
 export interface GameState {
   started: boolean
