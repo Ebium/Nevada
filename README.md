@@ -1,1 +1,1 @@
-Need to change this.
+Démarrer le server : se placer dans le repo nevada-app puis : npm run dev
