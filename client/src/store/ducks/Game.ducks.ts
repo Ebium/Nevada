@@ -53,7 +53,7 @@ export function GameReducer(
     case GameActionsEnum.TEST_SUCCESS:
       return { ...state }
     case GameActionsEnum.UPDATE_GAME_CAN_START:
-      return { ...state, started: action.bool}
+      return { ...state, started: action.bool }
     default:
       return { ...state }
   }

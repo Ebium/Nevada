@@ -11,7 +11,11 @@ import {
 } from "../store/ducks/Pad.ducks"
 import { useDispatch } from "react-redux"
 import { useNevadaSelector } from "../store/rootReducer"
-import { resetBoardArray, updateBoardArray, updateHistoryBoard } from "../store/ducks/Board.ducks"
+import {
+  resetBoardArray,
+  updateBoardArray,
+  updateHistoryBoard,
+} from "../store/ducks/Board.ducks"
 import { updateGameCanStart } from "../store/ducks/Game.ducks"
 
 const backgroundGif = require("../assets/mygif.gif") as string
@@ -34,7 +38,6 @@ export const Game = () => {
   const board = useNevadaSelector((state) => state.board.array)
   const padStoree = useNevadaSelector((state) => state.pad.padStore)
   const canStart = useNevadaSelector((state) => state.game.started)
-
 
   useEffect(() => {
     if (droppedCounter === 17) {
@@ -412,7 +415,7 @@ export const Game = () => {
     dispatch(resetBoardArray())
     dispatch(resetPadStore())
     dispatch(updateDroppedCounter(0))
-    dispatch(updateHistoryBoard([]))  
+    dispatch(updateHistoryBoard([]))
   }
 
   const undoBoard = () => {
