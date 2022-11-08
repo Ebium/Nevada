@@ -3,11 +3,15 @@ import styled from "styled-components"
 import * as R from "ramda"
 import { Board } from "./Board"
 import { StyledBoard } from "../styles/StyledBoard"
+import { updateCurrentPad, updatePadStore } from "../store/ducks/Pad.ducks"
+import { useDispatch } from "react-redux"
 
 const backgroundGif = require("../assets/mygif.gif") as string
 const arizonaLogo = require("../assets/logo1.png") as string
 
 export const Game = () => {
+
+  const dispatch = useDispatch()
   const initialePadStore = [
     { remaining: 0, current: 0 },
     { remaining: 4, current: 0 },
@@ -34,11 +38,12 @@ export const Game = () => {
 
   const [padStore, setPadStore] = useState(initialePadStore)
 
-  const updatePadStore = (padToUpdate: number, by: number) => {
+  const updatePadStoreFunction = (padToUpdate: number, by: number) => {
     var updatedPadStore = R.clone(padStore)
     updatedPadStore[padToUpdate - 1].remaining =
       updatedPadStore[padToUpdate - 1].remaining + by
     setPadStore(updatedPadStore)
+    dispatch(updatePadStore(updatedPadStore))
   }
 
   const [historyBoard, setHistoryBoard] = useState(Array<Array<any>>)
@@ -93,6 +98,12 @@ export const Game = () => {
     orientation: number,
     color: string
   ) => {
+    dispatch(updateCurrentPad({
+      label: 0,
+      nbHole: nbTrous,
+      orientation: orientation,
+      color: color,
+    }))
     setCurrentPad({
       label: 0,
       nbHole: nbTrous,
@@ -365,7 +376,7 @@ export const Game = () => {
       color: currentPad.color,
     }
 
-    updatePadStore(padNum, -1)
+    updatePadStoreFunction(padNum, -1)
     setdroppedPadCounter(droppedPadCounter + 1)
     setboardArray(updatedBoard)
   }
@@ -373,6 +384,12 @@ export const Game = () => {
   const changeOrientation = () => {
     const setOrientation =
       currentPad.orientation === 4 ? 1 : currentPad.orientation + 1
+      dispatch(updateCurrentPad({
+        label: currentPad.label,
+        nbHole: currentPad.nbHole,
+        orientation: setOrientation,
+        color: currentPad.color,
+      }))
     setCurrentPad({
       label: currentPad.label,
       nbHole: currentPad.nbHole,
@@ -395,7 +412,7 @@ export const Game = () => {
       (key) =>
         (updatedBoard[key[0]][key[1]] = initialeBoardArray[key[0]][key[1]])
     )
-    updatePadStore(historyBoard[historyBoard.length - 1].length, +1)
+    updatePadStoreFunction(historyBoard[historyBoard.length - 1].length, +1)
     historyBoard.pop()
     setHistoryBoard(historyBoard)
     setboardArray(updatedBoard)
