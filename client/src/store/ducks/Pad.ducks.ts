@@ -23,10 +23,8 @@ export const updatePadStore = (padarray: Array<any>) =>
   ({ type: PadActionsEnum.UPDATE_PAD_STORE, padarray } as const)
 export const resetPadStore = () =>
   ({ type: PadActionsEnum.RESET_PAD_STORE } as const)
-export const updateCurrentPad = (pad: currentPadType) => {
-  console.log("in")
-  return { type: PadActionsEnum.UPDATE_CURRENT_PAD, pad } as const
-}
+export const updateCurrentPad = (pad: currentPadType) =>
+  ({ type: PadActionsEnum.UPDATE_CURRENT_PAD, pad } as const)
 
 type PadActionsType = ReturnType<
   | typeof testAttempt
@@ -98,7 +96,6 @@ export function PadReducer(
     case PadActionsEnum.RESET_PAD_STORE:
       return { ...state, padStore: initialPadStore }
     case PadActionsEnum.UPDATE_CURRENT_PAD:
-      console.log("test")
       return { ...state, current: action.pad }
     default:
       return { ...state }

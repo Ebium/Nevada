@@ -21,7 +21,6 @@ export const Board = () => {
   )
 
   const handleBoardClick = (key: any) => {
-    console.log("key", key)
     if (currentPad.nbHole === 0 || key.isFilled === 1) return
     const padNum = currentPad.nbHole
     const updatedBoard = R.clone(boardArray)
