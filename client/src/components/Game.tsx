@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import styled from "styled-components"
 import * as R from "ramda"
 import { Board } from "./Board"
-import { StyledBoard } from "../styles/StyledBoard"
 import {
   resetPadStore,
   updateCurrentPad,
@@ -23,20 +22,12 @@ const arizonaLogo = require("../assets/logo1.png") as string
 
 export const Game = () => {
   const dispatch = useDispatch()
-  const initialePadStore = [
-    { remaining: 0, current: 0 },
-    { remaining: 4, current: 0 },
-    { remaining: 4, current: 0 },
-    { remaining: 5, current: 0 },
-    { remaining: 0, current: 0 },
-    { remaining: 4, current: 0 },
-  ]
 
   const droppedCounter = useNevadaSelector((state) => state.pad.droppedCounter)
-  const currentPa = useNevadaSelector((state) => state.pad.current)
+  const currentPad = useNevadaSelector((state) => state.pad.current)
   const hist = useNevadaSelector((state) => state.board.history)
   const board = useNevadaSelector((state) => state.board.array)
-  const padStoree = useNevadaSelector((state) => state.pad.padStore)
+  const padStore = useNevadaSelector((state) => state.pad.padStore)
   const canStart = useNevadaSelector((state) => state.game.started)
 
   useEffect(() => {
@@ -50,24 +41,12 @@ export const Game = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [droppedCounter])
 
-  const [padStore, setPadStore] = useState(initialePadStore)
-
   const updatePadStoreFunction = (padToUpdate: number, by: number) => {
     var updatedPadStore = R.clone(padStore)
     updatedPadStore[padToUpdate - 1].remaining =
       updatedPadStore[padToUpdate - 1].remaining + by
-    setPadStore(updatedPadStore)
     dispatch(updatePadStore(updatedPadStore))
   }
-
-  const [historyBoard, setHistoryBoard] = useState(Array<Array<any>>)
-
-  const [currentPad, setCurrentPad] = useState({
-    label: 0,
-    nbHole: 0,
-    orientation: 1,
-    color: "",
-  })
 
   var x = -1
   var y = -1
@@ -85,28 +64,6 @@ export const Game = () => {
       })
     })
 
-  const [boardArray, setboardArray] = useState(initialeBoardArray)
-
-  const [padArray, setPadArray] = useState([
-    { label: 1, nbHole: 6, values: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 } },
-    { label: 2, nbHole: 6, values: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 } },
-    { label: 3, nbHole: 6, values: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 } },
-    { label: 4, nbHole: 6, values: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 } },
-    { label: 1, nbHole: 4, values: { 1: 0, 2: 0, 3: 0, 4: 0 } },
-    { label: 2, nbHole: 4, values: { 1: 0, 2: 0, 3: 0, 4: 0 } },
-    { label: 3, nbHole: 4, values: { 1: 0, 2: 0, 3: 0, 4: 0 } },
-    { label: 4, nbHole: 4, values: { 1: 0, 2: 0, 3: 0, 4: 0 } },
-    { label: 5, nbHole: 4, values: { 1: 0, 2: 0, 3: 0, 4: 0 } },
-    { label: 1, nbHole: 3, values: { 1: 0, 2: 0, 3: 0 } },
-    { label: 2, nbHole: 3, values: { 1: 0, 2: 0, 3: 0 } },
-    { label: 3, nbHole: 3, values: { 1: 0, 2: 0, 3: 0 } },
-    { label: 4, nbHole: 3, values: { 1: 0, 2: 0, 3: 0 } },
-    { label: 1, nbHole: 2, values: { 1: 0, 2: 0 } },
-    { label: 2, nbHole: 2, values: { 1: 0, 2: 0 } },
-    { label: 3, nbHole: 2, values: { 1: 0, 2: 0 } },
-    { label: 4, nbHole: 2, values: { 1: 0, 2: 0 } },
-  ])
-
   const changeCurrentPad = (
     nbTrous: number,
     orientation: number,
@@ -120,282 +77,6 @@ export const Game = () => {
         color: color,
       })
     )
-    setCurrentPad({
-      label: 0,
-      nbHole: nbTrous,
-      orientation: orientation,
-      color: color,
-    })
-  }
-
-  const handleClick = (key: any) => {
-    if (currentPad.nbHole === 0 || key.isFilled === 1) return
-    const padNum = currentPad.nbHole
-    const updatedBoard = R.clone(boardArray)
-
-    if (padStore[padNum - 1].remaining === 0) return
-    if (padNum === 2) {
-      const ax = [key.x, key.x + 1, key.x, key.x - 1][
-        currentPad.orientation - 1
-      ]
-      const ay = [key.y + 1, key.y, key.y - 1, key.y][
-        currentPad.orientation - 1
-      ]
-
-      if (boardArray[ax][ay].isFilled) return
-
-      switch (currentPad.orientation) {
-        case 1:
-          if (key.y === 9) return
-          break
-        case 2:
-          if (key.x === 9) return
-          break
-        case 3:
-          if (key.y === 0) return
-          break
-        case 4:
-          if (key.x === 0) return
-          break
-      }
-
-      updatedBoard[ax][ay] = {
-        x: ax,
-        y: ay,
-        isFilled: 1,
-        color: currentPad.color,
-      }
-
-      historyBoard.push([
-        [key.x, key.y],
-        [ax, ay],
-      ])
-      setHistoryBoard(historyBoard)
-    }
-
-    if (padNum === 3) {
-      const ax1 = [key.x, key.x + 1, key.x, key.x - 1][
-        currentPad.orientation - 1
-      ]
-      const ax2 = [key.x, key.x + 2, key.x, key.x - 2][
-        currentPad.orientation - 1
-      ]
-      const ay1 = [key.y + 1, key.y, key.y - 1, key.y][
-        currentPad.orientation - 1
-      ]
-      const ay2 = [key.y + 2, key.y, key.y - 2, key.y][
-        currentPad.orientation - 1
-      ]
-
-      if (boardArray[ax1][ay1].isFilled || boardArray[ax2][ay2].isFilled) return
-
-      switch (currentPad.orientation) {
-        case 1:
-          if ([8, 9].includes(key.y)) return
-          break
-        case 2:
-          if ([8, 9].includes(key.x)) return
-          break
-        case 3:
-          if ([0, 1].includes(key.y)) return
-          break
-        case 4:
-          if ([0, 1].includes(key.x)) return
-          break
-      }
-
-      updatedBoard[ax1][ay1] = {
-        x: ax1,
-        y: ay1,
-        isFilled: 1,
-        color: currentPad.color,
-      }
-      updatedBoard[ax2][ay2] = {
-        x: ax2,
-        y: ay2,
-        isFilled: 1,
-        color: currentPad.color,
-      }
-
-      historyBoard.push([
-        [key.x, key.y],
-        [ax1, ay1],
-        [ax2, ay2],
-      ])
-      setHistoryBoard(historyBoard)
-    }
-
-    if (padNum === 4) {
-      const ax1 = [key.x, key.x, key.x, key.x][currentPad.orientation - 1]
-      const ax2 = [key.x + 1, key.x + 1, key.x - 1, key.x - 1][
-        currentPad.orientation - 1
-      ]
-      const ax3 = [key.x + 1, key.x + 1, key.x - 1, key.x - 1][
-        currentPad.orientation - 1
-      ]
-      const ay1 = [key.y + 1, key.y - 1, key.y - 1, key.y + 1][
-        currentPad.orientation - 1
-      ]
-      const ay2 = [key.y + 1, key.y - 1, key.y - 1, key.y + 1][
-        currentPad.orientation - 1
-      ]
-      const ay3 = [key.y, key.y, key.y, key.y][currentPad.orientation - 1]
-
-      if (
-        boardArray[ax1][ay1].isFilled ||
-        boardArray[ax2][ay2].isFilled ||
-        boardArray[ax3][ay3].isFilled
-      )
-        return
-
-      switch (currentPad.orientation) {
-        case 1:
-          if (key.y === 9 || key.x === 9) return
-          break
-        case 2:
-          if (key.x === 9 || key.y === 0) return
-          break
-        case 3:
-          if (key.y === 0 || key.x === 0) return
-          break
-        case 4:
-          if (key.x === 0 || key.y === 9) return
-          break
-      }
-
-      updatedBoard[ax1][ay1] = {
-        x: ax1,
-        y: ay1,
-        isFilled: 1,
-        color: currentPad.color,
-      }
-      updatedBoard[ax2][ay2] = {
-        x: ax2,
-        y: ay2,
-        isFilled: 1,
-        color: currentPad.color,
-      }
-      updatedBoard[ax3][ay3] = {
-        x: ax3,
-        y: ay3,
-        isFilled: 1,
-        color: currentPad.color,
-      }
-
-      historyBoard.push([
-        [key.x, key.y],
-        [ax1, ay1],
-        [ax2, ay2],
-        [ax3, ay3],
-      ])
-      setHistoryBoard(historyBoard)
-    }
-
-    if (padNum === 6) {
-      switch (currentPad.orientation) {
-        case 1:
-          if ([8, 9].includes(key.y) || key.x === 9) return
-          break
-        case 2:
-          if ([8, 9].includes(key.x) || key.y === 0) return
-          break
-        case 3:
-          if ([0, 1].includes(key.y) || key.x === 0) return
-          break
-        case 4:
-          if ([0, 1].includes(key.x) || key.y === 9) return
-          break
-      }
-
-      const ax1 = [key.x, key.x, key.x, key.x][currentPad.orientation - 1]
-      const ax2 = [key.x + 1, key.x + 1, key.x - 1, key.x - 1][
-        currentPad.orientation - 1
-      ]
-      const ax3 = [key.x + 1, key.x + 1, key.x - 1, key.x - 1][
-        currentPad.orientation - 1
-      ]
-      const ax4 = [key.x, key.x + 2, key.x, key.x - 2][
-        currentPad.orientation - 1
-      ]
-      const ax5 = [key.x + 1, key.x + 2, key.x - 1, key.x - 2][
-        currentPad.orientation - 1
-      ]
-      const ay1 = [key.y + 1, key.y - 1, key.y - 1, key.y + 1][
-        currentPad.orientation - 1
-      ]
-      const ay2 = [key.y + 1, key.y - 1, key.y - 1, key.y + 1][
-        currentPad.orientation - 1
-      ]
-      const ay3 = [key.y, key.y, key.y, key.y][currentPad.orientation - 1]
-      const ay4 = [key.y + 2, key.y, key.y - 2, key.y][
-        currentPad.orientation - 1
-      ]
-      const ay5 = [key.y + 2, key.y - 1, key.y - 2, key.y + 1][
-        currentPad.orientation - 1
-      ]
-
-      if (
-        boardArray[ax1][ay1].isFilled ||
-        boardArray[ax2][ay2].isFilled ||
-        boardArray[ax3][ay3].isFilled ||
-        boardArray[ax4][ay4].isFilled ||
-        boardArray[ax5][ay5].isFilled
-      )
-        return
-
-      updatedBoard[ax1][ay1] = {
-        x: ax1,
-        y: ay1,
-        isFilled: 1,
-        color: currentPad.color,
-      }
-      updatedBoard[ax2][ay2] = {
-        x: ax2,
-        y: ay2,
-        isFilled: 1,
-        color: currentPad.color,
-      }
-      updatedBoard[ax3][ay3] = {
-        x: ax3,
-        y: ay3,
-        isFilled: 1,
-        color: currentPad.color,
-      }
-      updatedBoard[ax4][ay4] = {
-        x: ax4,
-        y: ay4,
-        isFilled: 1,
-        color: currentPad.color,
-      }
-      updatedBoard[ax5][ay5] = {
-        x: ax5,
-        y: ay5,
-        isFilled: 1,
-        color: currentPad.color,
-      }
-
-      historyBoard.push([
-        [key.x, key.y],
-        [ax1, ay1],
-        [ax2, ay2],
-        [ax3, ay3],
-        [ax4, ay4],
-        [ax5, ay5],
-      ])
-      setHistoryBoard(historyBoard)
-    }
-
-    updatedBoard[key.x][key.y] = {
-      x: key.x,
-      y: key.y,
-      isFilled: 1,
-      color: currentPad.color,
-    }
-
-    updatePadStoreFunction(padNum, -1)
-    dispatch(updateDroppedCounter(droppedCounter + 1))
-
-    setboardArray(updatedBoard)
   }
 
   const changeOrientation = () => {
@@ -448,7 +129,7 @@ export const Game = () => {
         <ColumnStyle>
           <HeightSpacer></HeightSpacer>
           <StyledButton
-            disabled={currentPa.nbHole === 0}
+            disabled={currentPad.nbHole === 0}
             onClick={() => changeOrientation()}
           >
             Change Orientation
@@ -475,8 +156,8 @@ export const Game = () => {
         <ColumnStyle>
           <div>
             dropped pad : {droppedCounter} <br />
-            CurrentPad - Trous : {currentPa.nbHole} <br /> Orientation :{" "}
-            {currentPa.orientation}
+            CurrentPad - Trous : {currentPad.nbHole} <br /> Orientation :{" "}
+            {currentPad.orientation}
           </div>
           <HeightSpacer></HeightSpacer>
 
@@ -499,7 +180,7 @@ export const Game = () => {
               </RowStyle>
             </ColumnStyle>
           </Plaquette>
-          {padStoree[5].remaining}
+          {padStore[5].remaining}
 
           <HeightSpacer></HeightSpacer>
 
@@ -519,7 +200,7 @@ export const Game = () => {
               </RowStyle>
             </ColumnStyle>
           </Plaquette>
-          {padStoree[3].remaining}
+          {padStore[3].remaining}
 
           <HeightSpacer></HeightSpacer>
 
@@ -536,7 +217,7 @@ export const Game = () => {
               </RowStyle>
             </ColumnStyle>
           </Plaquette>
-          {padStoree[2].remaining}
+          {padStore[2].remaining}
 
           <HeightSpacer></HeightSpacer>
 
@@ -552,7 +233,7 @@ export const Game = () => {
               </RowStyle>
             </ColumnStyle>
           </Plaquette>
-          {padStoree[1].remaining}
+          {padStore[1].remaining}
         </ColumnStyle>
         <HistoryBoard style={{ color: "white" }}>
           <HeightSpacer></HeightSpacer>
@@ -612,13 +293,6 @@ const Cellule = styled.div`
   height: 2rem;
   padding: 1rem;
   border: 1px red solid;
-`
-const HoleForCellule = styled.div`
-  width: 2rem;
-  height: 2rem;
-  border: 1px red solid;
-  border-radius: 2rem;
-  background-color: red;
 `
 const Plaquette = styled.div`
   color: white;
