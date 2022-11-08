@@ -240,7 +240,7 @@ export const Game = () => {
           board history
           {hist.map((key, index) => {
             if (hist.length === 0) return <></>
-            else return <Cellule>{key.length}</Cellule>
+            else return <Cellule key={index}>{key.length}</Cellule>
           })}
         </HistoryBoard>
         <div>

@@ -296,33 +296,40 @@ export const Board = () => {
     dispatch(updatePadStore(updatedPadStore))
   }
 
+  let keyVar = 0
   return (
     <>
       <StyledBoard>
-        {boardArray.map((key) =>
-          key.map((key: { isFilled: any; color: any; x: any; y: any }) => (
-            <Cellule
-              onClick={() => handleBoardClick(key)}
-              style={{
-                backgroundColor: key.isFilled
-                  ? key.color
-                  : gameCanStart
-                  ? "transparent"
-                  : "#D3D3D3",
-                border:
-                  gameCanStart && !key.isFilled ? "none" : "1px red solid",
-              }}
-            >
-              {key.isFilled ? (
-                <HoleForCellule></HoleForCellule>
-              ) : (
-                <>
-                  {key.x},{key.y}
-                </>
-              )}
-            </Cellule>
-          ))
-        )}
+        {boardArray.map((key) => {
+          return key.map(
+            (key: { isFilled: any; color: any; x: any; y: any }) => {
+              keyVar++
+              return (
+                <Cellule
+                  key={keyVar}
+                  onClick={() => handleBoardClick(key)}
+                  style={{
+                    backgroundColor: key.isFilled
+                      ? key.color
+                      : gameCanStart
+                      ? "transparent"
+                      : "#D3D3D3",
+                    border:
+                      gameCanStart && !key.isFilled ? "none" : "1px red solid",
+                  }}
+                >
+                  {key.isFilled ? (
+                    <HoleForCellule></HoleForCellule>
+                  ) : (
+                    <>
+                      {key.x},{key.y}
+                    </>
+                  )}
+                </Cellule>
+              )
+            }
+          )
+        })}
       </StyledBoard>
     </>
   )
