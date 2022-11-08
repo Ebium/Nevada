@@ -5,10 +5,8 @@ export const enum BoardActionsEnum {
   TEST_ATTEMPT = "BOARD/testAttempt",
   TEST_SUCCESS = "BOARD/testSuccess",
   TEST_FAILURE = "BOARD/testFailure",
-  UPDATE_BOARD_ARRAY_ATTEMPT = "BOARD/updateBoardArrayAttempt",
-  UPDATE_BOARD_ARRAY_FAILURE = "BOARD/updateBoardArrayFailure",
-  UPDATE_BOARD_ARRAY_SUCCESS = "BOARD/updateBoardArraySuccess",
-  UPDATE_HISTORY_BOARD_ACTION = "BOARD/updateHistoryBoardAction",
+  UPDATE_BOARD_ARRAY = "BOARD/updateBoardArray",
+  UPDATE_HISTORY_BOARD = "BOARD/updateHistoryBoard",
 }
 
 export const testAttempt = () =>
@@ -17,22 +15,13 @@ export const testSuccess = () =>
   ({ type: BoardActionsEnum.TEST_SUCCESS } as const)
 export const testFailure = () =>
   ({ type: BoardActionsEnum.TEST_FAILURE } as const)
-export const updateBoardArrayAttempt = () =>
+export const updateBoardArray = (array:boardType) =>
   ({
-    type: BoardActionsEnum.UPDATE_BOARD_ARRAY_ATTEMPT,
+    type: BoardActionsEnum.UPDATE_BOARD_ARRAY,array
   } as const)
-export const updateBoardArraySuccess = (array: Array<any>) =>
+  export const updateHistoryBoard = (histo: Array<Array<any>>) =>
   ({
-    type: BoardActionsEnum.UPDATE_BOARD_ARRAY_SUCCESS,
-    array,
-  } as const)
-export const updateBoardArrayFailure = () =>
-  ({
-    type: BoardActionsEnum.UPDATE_BOARD_ARRAY_FAILURE,
-  } as const)
-  export const updateHistoryBoardAction = (histo: Array<Array<any>>) =>
-  ({
-    type: BoardActionsEnum.UPDATE_HISTORY_BOARD_ACTION,
+    type: BoardActionsEnum.UPDATE_HISTORY_BOARD,
     histo
   } as const)
 
@@ -40,14 +29,12 @@ type BoardActionsType = ReturnType<
   | typeof testAttempt
   | typeof testSuccess
   | typeof testFailure
-  | typeof updateBoardArrayAttempt
-  | typeof updateBoardArraySuccess
-  | typeof updateBoardArrayFailure
-  | typeof updateHistoryBoardAction
+  | typeof updateBoardArray
+  | typeof updateHistoryBoard
 >
 
-let x = 0
-let y = 0
+let x = -1
+let y = -1
 
 const initialeBoardArray = Array(10)
   .fill(0)
@@ -62,10 +49,12 @@ const initialeBoardArray = Array(10)
     })
   })
 
+export type boardType = Array<any>
+
 export interface BoardState {
   value: number
   status: "idle" | "loading" | "failed"
-  array: Array<any>
+  array: boardType
   history: Array<Array<any>>
 }
 
@@ -87,14 +76,10 @@ export function BoardReducer(
       return { ...state, status: "failed" }
     case BoardActionsEnum.TEST_SUCCESS:
       return { ...state, status: "idle" }
-    case BoardActionsEnum.UPDATE_BOARD_ARRAY_ATTEMPT:
-      return { ...state, status: "loading" }
-    case BoardActionsEnum.UPDATE_BOARD_ARRAY_SUCCESS:
-      return { ...state, status: "idle", array: action.array }
-    case BoardActionsEnum.UPDATE_BOARD_ARRAY_FAILURE:
-      return { ...state, status: "failed" }
-      case BoardActionsEnum.UPDATE_HISTORY_BOARD_ACTION:
-        return { ...state, status: "failed" }
+    case BoardActionsEnum.UPDATE_BOARD_ARRAY:
+      return { ...state, array: action.array }
+      case BoardActionsEnum.UPDATE_HISTORY_BOARD:
+        return { ...state, history: action.histo }
     default:
       return { ...state }
   }
@@ -107,15 +92,4 @@ export const testThunk = () => (dispatch: Dispatch<AnyAction>) => {
   console.log("log du test thunk")
 }
 
-export const updateBoardArray = (array: Array<any>) => {
-  updateBoardArrayAttempt()
-  if (array.length === 0) {
-    updateBoardArrayFailure()
-    return
-  }
-  updateBoardArraySuccess(array)
-}
 
-export const updateHistoryBoard = (histo: Array<Array<any>>) => {
-  updateHistoryBoardAction(histo)
-}

@@ -8,19 +8,22 @@ import { StyledBoard } from "../styles/StyledBoard"
 
 export const Board = () => {
   
+  const dispatch = useDispatch()
   const boardArray = useNevadaSelector((state) => state.board.array)
   const gameCanStart = useNevadaSelector((state) => state.game.started)
   const currentPad = useNevadaSelector((state) => state.pad.current)
-  const padStore = useNevadaSelector((state) => state.pad.padArray)
+  const padStore = useNevadaSelector((state) => state.pad.padStore)
   const historyBoard = useNevadaSelector((state) => state.board.history)
   const droppedPadCounter = useNevadaSelector((state) => state.pad.droppedCounter)
-
+  console.log(boardArray)
+  
   const handleBoardClick = (key: any) => {
+    console.log("key",key)
     if (currentPad.nbHole === 0 || key.isFilled === 1) return
     const padNum = currentPad.nbHole
     const updatedBoard = R.clone(boardArray)
 
-    if (padStore[padNum - 1].left === 0) return
+    if (padStore[padNum - 1].remaining === 0) return
     if (padNum === 2) {
       const ax = [key.x, key.x + 1, key.x, key.x - 1][
         currentPad.orientation - 1
@@ -57,7 +60,7 @@ export const Board = () => {
         [key.x, key.y],
         [ax, ay],
       ])
-      updateHistoryBoard(historyBoard)
+      dispatch(updateHistoryBoard(historyBoard))
     }
 
     if (padNum === 3) {
@@ -109,7 +112,7 @@ export const Board = () => {
         [ax1, ay1],
         [ax2, ay2],
       ])
-      updateHistoryBoard(historyBoard)
+      dispatch(updateHistoryBoard(historyBoard))
     }
 
     if (padNum === 4) {
@@ -175,7 +178,7 @@ export const Board = () => {
         [ax2, ay2],
         [ax3, ay3],
       ])
-      updateHistoryBoard(historyBoard)
+      dispatch(updateHistoryBoard(historyBoard))
     }
 
     if (padNum === 6) {
@@ -269,7 +272,7 @@ export const Board = () => {
         [ax4, ay4],
         [ax5, ay5],
       ])
-      updateHistoryBoard(historyBoard)
+      dispatch(updateHistoryBoard(historyBoard))
     }
 
     updatedBoard[key.x][key.y] = {
@@ -280,15 +283,15 @@ export const Board = () => {
     }
 
     updatePadStoreFunction(padNum, -1)
-    updateDroppedCounter(droppedPadCounter + 1)
-    updateBoardArray(updatedBoard)
+    dispatch(updateDroppedCounter(droppedPadCounter + 1))
+    dispatch(updateBoardArray(updatedBoard))
   }
 
   const updatePadStoreFunction = (padToUpdate: number, by: number) => {
     var updatedPadStore = R.clone(padStore)
     updatedPadStore[padToUpdate - 1].remaining =
       updatedPadStore[padToUpdate - 1].remaining + by
-      updatePadStore(updatedPadStore)
+      dispatch(updatePadStore(updatedPadStore))
   }
 
   return (
