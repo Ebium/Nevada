@@ -1,24 +1,27 @@
 import * as R from "ramda"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { updateBoardArray, updateHistoryBoard } from "../store/ducks/Board.ducks"
+import {
+  updateBoardArray,
+  updateHistoryBoard,
+} from "../store/ducks/Board.ducks"
 import { updateDroppedCounter, updatePadStore } from "../store/ducks/Pad.ducks"
 import { useNevadaSelector } from "../store/rootReducer"
 import { StyledBoard } from "../styles/StyledBoard"
 
 export const Board = () => {
-  
   const dispatch = useDispatch()
   const boardArray = useNevadaSelector((state) => state.board.array)
   const gameCanStart = useNevadaSelector((state) => state.game.started)
   const currentPad = useNevadaSelector((state) => state.pad.current)
   const padStore = useNevadaSelector((state) => state.pad.padStore)
   const historyBoard = useNevadaSelector((state) => state.board.history)
-  const droppedPadCounter = useNevadaSelector((state) => state.pad.droppedCounter)
-  console.log(boardArray)
-  
+  const droppedPadCounter = useNevadaSelector(
+    (state) => state.pad.droppedCounter
+  )
+
   const handleBoardClick = (key: any) => {
-    console.log("key",key)
+    console.log("key", key)
     if (currentPad.nbHole === 0 || key.isFilled === 1) return
     const padNum = currentPad.nbHole
     const updatedBoard = R.clone(boardArray)
@@ -291,7 +294,7 @@ export const Board = () => {
     var updatedPadStore = R.clone(padStore)
     updatedPadStore[padToUpdate - 1].remaining =
       updatedPadStore[padToUpdate - 1].remaining + by
-      dispatch(updatePadStore(updatedPadStore))
+    dispatch(updatePadStore(updatedPadStore))
   }
 
   return (

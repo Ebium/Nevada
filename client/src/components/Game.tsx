@@ -3,14 +3,21 @@ import styled from "styled-components"
 import * as R from "ramda"
 import { Board } from "./Board"
 import { StyledBoard } from "../styles/StyledBoard"
-import { updateCurrentPad, updatePadStore } from "../store/ducks/Pad.ducks"
+import {
+  resetPadStore,
+  updateCurrentPad,
+  updateDroppedCounter,
+  updatePadStore,
+} from "../store/ducks/Pad.ducks"
 import { useDispatch } from "react-redux"
+import { useNevadaSelector } from "../store/rootReducer"
+import { resetBoardArray, updateBoardArray, updateHistoryBoard } from "../store/ducks/Board.ducks"
+import { updateGameCanStart } from "../store/ducks/Game.ducks"
 
 const backgroundGif = require("../assets/mygif.gif") as string
 const arizonaLogo = require("../assets/logo1.png") as string
 
 export const Game = () => {
-
   const dispatch = useDispatch()
   const initialePadStore = [
     { remaining: 0, current: 0 },
@@ -21,20 +28,24 @@ export const Game = () => {
     { remaining: 4, current: 0 },
   ]
 
-  const [droppedPadCounter, setdroppedPadCounter] = useState(0)
+  const droppedCounter = useNevadaSelector((state) => state.pad.droppedCounter)
+  const currentPa = useNevadaSelector((state) => state.pad.current)
+  const hist = useNevadaSelector((state) => state.board.history)
+  const board = useNevadaSelector((state) => state.board.array)
+  const padStoree = useNevadaSelector((state) => state.pad.padStore)
+  const canStart = useNevadaSelector((state) => state.game.started)
 
-  const [gameCanStart, setGameCanStart] = useState(false)
 
   useEffect(() => {
-    if (droppedPadCounter === 17) {
-      setGameCanStart(true)
+    if (droppedCounter === 17) {
+      dispatch(updateGameCanStart(true))
     } else {
-      if (gameCanStart) {
-        setGameCanStart(false)
+      if (canStart) {
+        dispatch(updateGameCanStart(false))
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [droppedPadCounter])
+  }, [droppedCounter])
 
   const [padStore, setPadStore] = useState(initialePadStore)
 
@@ -98,12 +109,14 @@ export const Game = () => {
     orientation: number,
     color: string
   ) => {
-    dispatch(updateCurrentPad({
-      label: 0,
-      nbHole: nbTrous,
-      orientation: orientation,
-      color: color,
-    }))
+    dispatch(
+      updateCurrentPad({
+        label: 0,
+        nbHole: nbTrous,
+        orientation: orientation,
+        color: color,
+      })
+    )
     setCurrentPad({
       label: 0,
       nbHole: nbTrous,
@@ -377,46 +390,44 @@ export const Game = () => {
     }
 
     updatePadStoreFunction(padNum, -1)
-    setdroppedPadCounter(droppedPadCounter + 1)
+    dispatch(updateDroppedCounter(droppedCounter + 1))
+
     setboardArray(updatedBoard)
   }
 
   const changeOrientation = () => {
     const setOrientation =
       currentPad.orientation === 4 ? 1 : currentPad.orientation + 1
-      dispatch(updateCurrentPad({
+    dispatch(
+      updateCurrentPad({
         label: currentPad.label,
         nbHole: currentPad.nbHole,
         orientation: setOrientation,
         color: currentPad.color,
-      }))
-    setCurrentPad({
-      label: currentPad.label,
-      nbHole: currentPad.nbHole,
-      orientation: setOrientation,
-      color: currentPad.color,
-    })
+      })
+    )
   }
 
   const resetBoard = () => {
-    setboardArray(initialeBoardArray)
-    setPadStore(initialePadStore)
-    setdroppedPadCounter(0)
-    setHistoryBoard([])
+    dispatch(resetBoardArray())
+    dispatch(resetPadStore())
+    dispatch(updateDroppedCounter(0))
+    dispatch(updateHistoryBoard([]))  
   }
 
   const undoBoard = () => {
-    if (historyBoard.length === 0) return
-    const updatedBoard = R.clone(boardArray)
-    historyBoard[historyBoard.length - 1].map(
+    if (hist.length === 0) return
+    const updatedBoard = R.clone(board)
+    let updatedHistory = R.clone(hist)
+    hist[hist.length - 1].map(
       (key) =>
         (updatedBoard[key[0]][key[1]] = initialeBoardArray[key[0]][key[1]])
     )
-    updatePadStoreFunction(historyBoard[historyBoard.length - 1].length, +1)
-    historyBoard.pop()
-    setHistoryBoard(historyBoard)
-    setboardArray(updatedBoard)
-    setdroppedPadCounter(droppedPadCounter - 1)
+    updatePadStoreFunction(hist[hist.length - 1].length, +1)
+    updatedHistory.pop()
+    dispatch(updateHistoryBoard(updatedHistory))
+    dispatch(updateBoardArray(updatedBoard))
+    dispatch(updateDroppedCounter(droppedCounter - 1))
   }
 
   const startGame = () => {
@@ -425,7 +436,6 @@ export const Game = () => {
 
   return (
     <Content>
-      <Board />
       <HeaderButton
         onClick={() => {
           console.log("bouton en haut a droite LOL haha trop funny")
@@ -435,35 +445,35 @@ export const Game = () => {
         <ColumnStyle>
           <HeightSpacer></HeightSpacer>
           <StyledButton
-            disabled={currentPad.nbHole === 0}
+            disabled={currentPa.nbHole === 0}
             onClick={() => changeOrientation()}
           >
             Change Orientation
           </StyledButton>
           <HeightSpacer></HeightSpacer>
           <StyledButton
-            disabled={droppedPadCounter === 0}
+            disabled={droppedCounter === 0}
             onClick={() => resetBoard()}
           >
             reset Board
           </StyledButton>
           <HeightSpacer></HeightSpacer>
           <StyledButton
-            disabled={droppedPadCounter === 0}
+            disabled={droppedCounter === 0}
             onClick={() => undoBoard()}
           >
             Undo
           </StyledButton>
           <HeightSpacer></HeightSpacer>
-          <StyledButton disabled={!gameCanStart} onClick={() => startGame()}>
+          <StyledButton disabled={!canStart} onClick={() => startGame()}>
             StartGame
           </StyledButton>
         </ColumnStyle>
         <ColumnStyle>
           <div>
-            dropped pad : {droppedPadCounter} <br />
-            CurrentPad - Trous : {currentPad.nbHole} <br /> Orientation :{" "}
-            {currentPad.orientation}
+            dropped pad : {droppedCounter} <br />
+            CurrentPad - Trous : {currentPa.nbHole} <br /> Orientation :{" "}
+            {currentPa.orientation}
           </div>
           <HeightSpacer></HeightSpacer>
 
@@ -486,7 +496,7 @@ export const Game = () => {
               </RowStyle>
             </ColumnStyle>
           </Plaquette>
-          {padStore[5].remaining}
+          {padStoree[5].remaining}
 
           <HeightSpacer></HeightSpacer>
 
@@ -506,7 +516,7 @@ export const Game = () => {
               </RowStyle>
             </ColumnStyle>
           </Plaquette>
-          {padStore[3].remaining}
+          {padStoree[3].remaining}
 
           <HeightSpacer></HeightSpacer>
 
@@ -523,7 +533,7 @@ export const Game = () => {
               </RowStyle>
             </ColumnStyle>
           </Plaquette>
-          {padStore[2].remaining}
+          {padStoree[2].remaining}
 
           <HeightSpacer></HeightSpacer>
 
@@ -539,44 +549,19 @@ export const Game = () => {
               </RowStyle>
             </ColumnStyle>
           </Plaquette>
-          {padStore[1].remaining}
+          {padStoree[1].remaining}
         </ColumnStyle>
         <HistoryBoard style={{ color: "white" }}>
           <HeightSpacer></HeightSpacer>
           board history
-          {historyBoard.map((key, index) => {
-            if (historyBoard.length === 0) return <></>
+          {hist.map((key, index) => {
+            if (hist.length === 0) return <></>
             else return <Cellule>{key.length}</Cellule>
           })}
         </HistoryBoard>
         <div>
           <HeightSpacer></HeightSpacer>
-          <StyledBoard>
-            {boardArray.map((key) =>
-              key.map((key) => (
-                <Cellule
-                  onClick={() => handleClick(key)}
-                  style={{
-                    backgroundColor: key.isFilled
-                      ? key.color
-                      : gameCanStart
-                      ? "transparent"
-                      : "#D3D3D3",
-                    border:
-                      gameCanStart && !key.isFilled ? "none" : "1px red solid",
-                  }}
-                >
-                  {key.isFilled ? (
-                    <HoleForCellule></HoleForCellule>
-                  ) : (
-                    <>
-                      {key.x},{key.y}
-                    </>
-                  )}
-                </Cellule>
-              ))
-            )}
-          </StyledBoard>
+          <Board />
         </div>
       </Page>
     </Content>
