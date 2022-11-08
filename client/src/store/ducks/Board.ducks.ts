@@ -6,6 +6,7 @@ export const enum BoardActionsEnum {
   TEST_SUCCESS = "BOARD/testSuccess",
   TEST_FAILURE = "BOARD/testFailure",
   UPDATE_BOARD_ARRAY = "BOARD/updateBoardArray",
+  RESET_BOARD_ARRAY = "BOARD/resetBoardArray",
   UPDATE_HISTORY_BOARD = "BOARD/updateHistoryBoard",
 }
 
@@ -15,14 +16,19 @@ export const testSuccess = () =>
   ({ type: BoardActionsEnum.TEST_SUCCESS } as const)
 export const testFailure = () =>
   ({ type: BoardActionsEnum.TEST_FAILURE } as const)
-export const updateBoardArray = (array:boardType) =>
+export const updateBoardArray = (array: boardType) =>
   ({
-    type: BoardActionsEnum.UPDATE_BOARD_ARRAY,array
+    type: BoardActionsEnum.UPDATE_BOARD_ARRAY,
+    array,
   } as const)
-  export const updateHistoryBoard = (histo: Array<Array<any>>) =>
+export const resetBoardArray = () =>
+  ({
+    type: BoardActionsEnum.RESET_BOARD_ARRAY,
+  } as const)
+export const updateHistoryBoard = (histo: Array<Array<any>>) =>
   ({
     type: BoardActionsEnum.UPDATE_HISTORY_BOARD,
-    histo
+    histo,
   } as const)
 
 type BoardActionsType = ReturnType<
@@ -30,6 +36,7 @@ type BoardActionsType = ReturnType<
   | typeof testSuccess
   | typeof testFailure
   | typeof updateBoardArray
+  | typeof resetBoardArray
   | typeof updateHistoryBoard
 >
 
@@ -78,8 +85,10 @@ export function BoardReducer(
       return { ...state, status: "idle" }
     case BoardActionsEnum.UPDATE_BOARD_ARRAY:
       return { ...state, array: action.array }
-      case BoardActionsEnum.UPDATE_HISTORY_BOARD:
-        return { ...state, history: action.histo }
+    case BoardActionsEnum.RESET_BOARD_ARRAY:
+      return { ...state, array: initialeBoardArray }
+    case BoardActionsEnum.UPDATE_HISTORY_BOARD:
+      return { ...state, history: action.histo }
     default:
       return { ...state }
   }
@@ -91,5 +100,3 @@ export const testThunk = () => (dispatch: Dispatch<AnyAction>) => {
   dispatch(testSuccess())
   console.log("log du test thunk")
 }
-
-

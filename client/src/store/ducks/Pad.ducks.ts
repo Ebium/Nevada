@@ -7,6 +7,7 @@ export const enum PadActionsEnum {
   TEST_FAILURE = "PAD/testFailure",
   UPDATE_DROPPED_COUNTER = "PAD/updateDroppedCounter",
   UPDATE_PAD_STORE = "PAD/updatePadStore",
+  RESET_PAD_STORE = "PAD/resetPadStore",
   UPDATE_CURRENT_PAD = "PAD/updateCurrentPad",
 }
 
@@ -20,9 +21,12 @@ export const updateDroppedCounter = (nb: number) =>
   ({ type: PadActionsEnum.UPDATE_DROPPED_COUNTER, nb } as const)
 export const updatePadStore = (padarray: Array<any>) =>
   ({ type: PadActionsEnum.UPDATE_PAD_STORE, padarray } as const)
-export const updateCurrentPad = (pad: currentPadType) =>{ 
+export const resetPadStore = () =>
+  ({ type: PadActionsEnum.RESET_PAD_STORE } as const)
+export const updateCurrentPad = (pad: currentPadType) => {
   console.log("in")
-  return ({ type: PadActionsEnum.UPDATE_CURRENT_PAD, pad } as const)}
+  return { type: PadActionsEnum.UPDATE_CURRENT_PAD, pad } as const
+}
 
 type PadActionsType = ReturnType<
   | typeof testAttempt
@@ -30,6 +34,7 @@ type PadActionsType = ReturnType<
   | typeof testFailure
   | typeof updateDroppedCounter
   | typeof updatePadStore
+  | typeof resetPadStore
   | typeof updateCurrentPad
 >
 
@@ -54,7 +59,7 @@ export interface PadState {
   droppedCounter: number
 }
 
-const initialPadArray = [
+const initialPadStore = [
   { remaining: 0, current: 0 },
   { remaining: 4, current: 0 },
   { remaining: 4, current: 0 },
@@ -65,7 +70,7 @@ const initialPadArray = [
 
 export const padInitialState: PadState = {
   status: "idle",
-  padStore: initialPadArray,
+  padStore: initialPadStore,
   current: {
     label: 0,
     nbHole: 0,
@@ -90,6 +95,8 @@ export function PadReducer(
       return { ...state, droppedCounter: action.nb }
     case PadActionsEnum.UPDATE_PAD_STORE:
       return { ...state, padStore: action.padarray }
+    case PadActionsEnum.RESET_PAD_STORE:
+      return { ...state, padStore: initialPadStore }
     case PadActionsEnum.UPDATE_CURRENT_PAD:
       console.log("test")
       return { ...state, current: action.pad }
