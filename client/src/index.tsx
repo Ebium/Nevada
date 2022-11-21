@@ -5,17 +5,19 @@ import { Game } from "./components/Game"
 import reportWebVitals from "./reportWebVitals"
 import "./index.css"
 import configureStore from "./store/store.config"
+import { BrowserRouter } from "react-router-dom"
+import NEVADA from "./NEVADA"
 
 const container = document.getElementById("root")!
 const root = createRoot(container)
 const store = configureStore()
 
 root.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <Game />
-    </Provider>
-  </React.StrictMode>
+    <BrowserRouter basename="/nevada">
+      <Provider store={store}>
+        <NEVADA />
+      </Provider>
+    </BrowserRouter>
 )
 
 reportWebVitals()

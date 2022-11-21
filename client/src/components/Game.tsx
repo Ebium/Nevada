@@ -16,12 +16,14 @@ import {
   updateHistoryBoard,
 } from "../store/ducks/Board.ducks"
 import { updateGameCanStart } from "../store/ducks/Game.ducks"
+import { useNavigate } from "react-router-dom"
 
 const backgroundGif = require("../assets/mygif.gif") as string
 const arizonaLogo = require("../assets/logo1.png") as string
 
 export const Game = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const droppedCounter = useNevadaSelector((state) => state.pad.droppedCounter)
   const currentPad = useNevadaSelector((state) => state.pad.current)
@@ -122,7 +124,7 @@ export const Game = () => {
     <Content>
       <HeaderButton
         onClick={() => {
-          console.log("bouton en haut a droite LOL haha trop funny")
+          navigate("/home")
         }}
       ></HeaderButton>
       <Page>
