@@ -1,4 +1,5 @@
 import * as R from "ramda"
+import { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import {
@@ -295,6 +296,18 @@ export const Board = () => {
       updatedPadStore[padToUpdate - 1].remaining + by
     dispatch(updatePadStore(updatedPadStore))
   }
+  const [testvalue,setTestValue] = useState(0);
+
+  useEffect(() => {
+    console.log("test",testvalue)
+  }, [testvalue])
+
+  const changeColor = (key :KeyType)=>{
+    console.log(key);
+    
+    
+    key.color = "blue";
+  }
 
   let keyVar = 0
   return (
@@ -302,7 +315,7 @@ export const Board = () => {
       <StyledBoard>
         {boardArray.map((key) => {
           return key.map(
-            (key: { isFilled: any; color: any; x: any; y: any }) => {
+            (key: KeyType) => {
               keyVar++
               return (
                 <Cellule
@@ -319,7 +332,20 @@ export const Board = () => {
                   }}
                 >
                   {key.isFilled ? (
-                    <HoleForCellule></HoleForCellule>
+                    
+                    <HoleForCellule onClick={()=>{
+                      setTestValue(testvalue+1)
+                      changeColor(key);
+                      console.log(key.color)
+                      console.log(key.x);
+                      console.log(key.y);
+                      
+                      console.log("test")
+                      key.holeColor = "grey"
+
+
+                    }}
+                    color = {key.holeColor}></HoleForCellule>
                   ) : (
                     <>
                       {key.x},{key.y}
@@ -343,10 +369,19 @@ const Cellule = styled.div`
   padding: 1rem;
   border: 1px red solid;
 `
-const HoleForCellule = styled.div`
+
+interface HoleForCelluleProps{
+  color?:string
+}
+
+interface KeyType{ isFilled: any; color: any; x: any; y: any , holeColor: any}
+
+const HoleForCellule = styled.div<HoleForCelluleProps>`
   width: 2rem;
   height: 2rem;
   border: 1px red solid;
   border-radius: 2rem;
-  background-color: red;
+  background-color: ${({ color }) => (color ? color : "red")};
+
+
 `
