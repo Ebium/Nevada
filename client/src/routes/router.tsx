@@ -1,5 +1,5 @@
 import { Navigate, RouteObject } from "react-router-dom"
-import { Game } from "../components/Game"
+import { Game } from "./game/Game"
 import { Layout } from "../Layout"
 import { Home } from "./Home"
 import { NotFound404 } from "./NotFound404"

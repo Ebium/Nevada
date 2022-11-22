@@ -1,21 +1,21 @@
 import { useEffect } from "react"
 import styled from "styled-components"
 import * as R from "ramda"
-import { Board } from "./Board"
+import { Board } from "../../components/Board"
 import {
   resetPadStore,
   updateCurrentPad,
   updateDroppedCounter,
   updatePadStore,
-} from "../store/ducks/Pad.ducks"
+} from "../../store/ducks/Pad.ducks"
 import { useDispatch } from "react-redux"
-import { useNevadaSelector } from "../store/rootReducer"
+import { useNevadaSelector } from "../../store/rootReducer"
 import {
   resetBoardArray,
   updateBoardArray,
   updateHistoryBoard,
-} from "../store/ducks/Board.ducks"
-import { updateGameCanStart } from "../store/ducks/Game.ducks"
+} from "../../store/ducks/Board.ducks"
+import { updateGameCanStart } from "../../store/ducks/Game.ducks"
 import { useNavigate } from "react-router-dom"
 
 const backgroundGif = require("../assets/mygif.gif") as string
