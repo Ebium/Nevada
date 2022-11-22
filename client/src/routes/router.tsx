@@ -10,6 +10,10 @@ export const routes: RouteObject[] = [
     element: <Layout />,
     children: [
       {
+        element: <Navigate to={"home"} />,
+        index: true,
+      },
+      {
         path: "home",
         element: <Home />,
       },
@@ -23,5 +27,6 @@ export const routes: RouteObject[] = [
       },
     ],
   },
+  
   
 ]
