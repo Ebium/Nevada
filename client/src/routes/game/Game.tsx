@@ -18,8 +18,11 @@ import {
 import { updateGameCanStart } from "../../store/ducks/Game.ducks"
 import { useNavigate } from "react-router-dom"
 
-const backgroundGif = require("../assets/mygif.gif") as string
-const arizonaLogo = require("../assets/logo1.png") as string
+
+
+
+const backgroundGif = require("../../assets/mygif.gif") as string
+const arizonaLogo = require("../../assets/logo1.png") as string
 
 export const Game = () => {
   const dispatch = useDispatch()

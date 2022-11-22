@@ -7,6 +7,25 @@ const PORT = 8080
 
 require("dotenv").config()
 
+
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
+
+
+  io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+});
+
+    io.on('test', (socket)=> {
+        console.log("test")
+    })
+
+    io.emit('test')
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
