@@ -1,8 +1,11 @@
+import {KeyType} from "../../components/Board"
 export const enum BoardActionsEnum {
   UPDATE_BOARD_ARRAY = "BOARD/updateBoardArray",
   RESET_BOARD_ARRAY = "BOARD/resetBoardArray",
 
   UPDATE_HISTORY_BOARD = "BOARD/updateHistoryBoard",
+
+  PLAY_MOVE = "BOARD/playMove"
 }
 
 export const updateBoardArray = (array: boardType) =>
@@ -20,8 +23,17 @@ export const updateHistoryBoard = (histo: Array<Array<any>>) =>
     histo,
   } as const)
 
+export const playMove = (array:boardType) =>
+  ({
+    type: BoardActionsEnum.PLAY_MOVE,
+    array
+  } as const)
+
 type BoardActionsType = ReturnType<
-  typeof updateBoardArray | typeof resetBoardArray | typeof updateHistoryBoard
+  | typeof updateBoardArray 
+  | typeof resetBoardArray 
+  | typeof updateHistoryBoard
+  | typeof playMove
 >
 
 let x = -1
@@ -67,6 +79,8 @@ export function BoardReducer(
       return { ...state, array: initialeBoardArray }
     case BoardActionsEnum.UPDATE_HISTORY_BOARD:
       return { ...state, history: action.histo }
+    case BoardActionsEnum.PLAY_MOVE:
+        return {...state,array: action.array}
     default:
       return { ...state }
   }

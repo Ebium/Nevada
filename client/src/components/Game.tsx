@@ -116,6 +116,7 @@ export const Game = () => {
 
   const startGame = () => {
     console.log("game started")
+    
   }
 
   return (
