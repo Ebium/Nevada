@@ -1,17 +1,23 @@
-const express = require('express')
-const mongoose = require('mongoose')
+const express = require("express")
+const mongoose = require("mongoose")
 const app = express()
-const products = require('./data.js')
-const products_routes = require('./routes/products.js')
+const products = require("./data.js")
+const products_routes = require("./routes/products.js")
+const PORT = 8080
 
-require('dotenv').config()
+require("dotenv").config()
 
-mongoose.connect(process.env.MONGO_URI)
-    .then((result) => {
-        console.log("Listening on port 5000")
-        app.listen(5000)})
-        
-    .catch((err) => console.log(Error))
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log(`Listening on port ${PORT}`)
+    app.listen(PORT)
+  })
+
+  .catch((err) => {
+    console.log("Impossible de démarrer le serveur !")
+    console.log(Error)
+  })
 
 app.use(express.json())
-app.use('/api/products', products_routes)
+app.use("/api/products", products_routes)
