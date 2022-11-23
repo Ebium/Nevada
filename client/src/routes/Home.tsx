@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
+import { useNevadaSelector } from "../store/rootReducer"
 
 export const Home = () => {
   const navigate = useNavigate()
+  const sockID = useNevadaSelector((state) => state.user.socketId)
+
   return (
     <Content>
       Home page
@@ -20,6 +23,7 @@ export const Home = () => {
       >
         Error 404
       </StyledButton>
+      Socket id for current connection = {sockID}
     </Content>
   )
 }
