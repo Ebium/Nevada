@@ -3,34 +3,38 @@ const mongoose = require("mongoose")
 const app = express()
 const products = require("./data.js")
 const products_routes = require("./routes/products.js")
-const PORT = 8080
+const PORT = 5000
 
 require("dotenv").config()
 
 
-const http = require('http');
-const server = http.createServer(app);
-const { Server } = require("socket.io");
-const io = new Server(server);
+const socketIo = require("socket.io")
+const http = require("http")
+const server = http.createServer(app)
+const io = socketIo(server,{ 
+    cors: {
+      origin: "http://localhost:3000"
+    }
+})
 
 
-  io.on('connection', (socket) => {
-  console.log('a user connected');
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
-});
 
-    io.on('test', (socket)=> {
-        console.log("test")
-    })
+io.on("connection",(socket)=>{
+  console.log("client connected: ",socket.id)
+  
+  socket.on("disconnect",(reason)=>{
+    console.log(reason)
+  })
+})
 
-    io.emit('test')
+
+
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log(`Listening on port ${PORT}`)
-    app.listen(PORT)
+    server.listen(PORT)
   })
 
   .catch((err) => {
