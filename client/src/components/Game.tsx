@@ -14,6 +14,7 @@ import {
   resetBoardArray,
   updateBoardArray,
   updateHistoryBoard,
+  updateMovesHistory,
 } from "../store/ducks/Board.ducks"
 import { updateGameCanStart } from "../store/ducks/Game.ducks"
 
@@ -29,6 +30,8 @@ export const Game = () => {
   const board = useNevadaSelector((state) => state.board.array)
   const padStore = useNevadaSelector((state) => state.pad.padStore)
   const canStart = useNevadaSelector((state) => state.game.started)
+  const movesHistory = useNevadaSelector((state) => state.board.movesHistory)
+  const movesCount = useNevadaSelector((state) => state.board.movesCount)
 
   useEffect(() => {
     if (droppedCounter === 17) {
@@ -100,22 +103,34 @@ export const Game = () => {
   }
 
   const undoBoard = () => {
-    if (hist.length === 0) return
+    if (hist.length === 0 && movesHistory.length === 0) return
     const updatedBoard = R.clone(board)
-    let updatedHistory = R.clone(hist)
-    hist[hist.length - 1].map(
-      (key) =>
-        (updatedBoard[key[0]][key[1]] = initialeBoardArray[key[0]][key[1]])
-    )
-    updatePadStoreFunction(hist[hist.length - 1].length, +1)
-    updatedHistory.pop()
-    dispatch(updateHistoryBoard(updatedHistory))
+    if(!canStart){
+      let updatedHistory = R.clone(hist)
+      hist[hist.length - 1].map(
+        (key) =>
+          (updatedBoard[key[0]][key[1]] = initialeBoardArray[key[0]][key[1]])
+      )
+      updatePadStoreFunction(hist[hist.length - 1].length, +1)
+      updatedHistory.pop()
+      dispatch(updateHistoryBoard(updatedHistory))
+      dispatch(updateDroppedCounter(droppedCounter - 1))
+    } 
+    // Annule un coup le dernier coup jouer en mettant à jour la dernière case jouée
+    else{
+      const move = movesHistory.pop()
+      if(!move) return
+      updatedBoard[move.x][move.y].holeColor = move.holeColor
+      updatedBoard[move.x][move.y].holeFilled = move.holeFilled 
+      dispatch(updateMovesHistory(movesHistory,movesCount-1))
+    }
     dispatch(updateBoardArray(updatedBoard))
-    dispatch(updateDroppedCounter(droppedCounter - 1))
+
   }
 
   const startGame = () => {
     console.log("game started")
+    dispatch(updateGameCanStart(true))
     
   }
 
@@ -150,7 +165,10 @@ export const Game = () => {
             Undo
           </StyledButton>
           <HeightSpacer></HeightSpacer>
-          <StyledButton disabled={!canStart} onClick={() => startGame()}>
+          <StyledButton 
+            // disabled={!canStart} 
+            onClick={() => startGame()}
+          >
             StartGame
           </StyledButton>
         </ColumnStyle>
