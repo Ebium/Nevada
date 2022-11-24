@@ -1,8 +1,12 @@
+import {Move} from "../../components/Board"
+
 export const enum BoardActionsEnum {
   UPDATE_BOARD_ARRAY = "BOARD/updateBoardArray",
   RESET_BOARD_ARRAY = "BOARD/resetBoardArray",
 
   UPDATE_HISTORY_BOARD = "BOARD/updateHistoryBoard",
+
+  UPDATE_MOVES_HISTORY = "BOARD/updateMovesHistory",
 }
 
 export const updateBoardArray = (array: boardType) =>
@@ -19,9 +23,18 @@ export const updateHistoryBoard = (histo: Array<Array<any>>) =>
     type: BoardActionsEnum.UPDATE_HISTORY_BOARD,
     histo,
   } as const)
+export const updateMovesHistory = (moves: Move[], count: number) =>
+({
+  type: BoardActionsEnum.UPDATE_MOVES_HISTORY,
+  moves,
+  count
+} as const)
 
 type BoardActionsType = ReturnType<
-  typeof updateBoardArray | typeof resetBoardArray | typeof updateHistoryBoard
+  | typeof updateBoardArray 
+  | typeof resetBoardArray 
+  | typeof updateHistoryBoard
+  | typeof updateMovesHistory
 >
 
 let x = -1
@@ -47,6 +60,8 @@ export interface BoardState {
   status: "idle" | "loading" | "failed"
   array: boardType
   history: Array<Array<any>>
+  movesHistory: Move[]
+  movesCount: number
 }
 
 export const boardInitialState: BoardState = {
@@ -54,6 +69,8 @@ export const boardInitialState: BoardState = {
   status: "idle",
   array: initialeBoardArray,
   history: [],
+  movesHistory: [],
+  movesCount: 0,
 }
 
 export function BoardReducer(
@@ -67,6 +84,8 @@ export function BoardReducer(
       return { ...state, array: initialeBoardArray }
     case BoardActionsEnum.UPDATE_HISTORY_BOARD:
       return { ...state, history: action.histo }
+    case BoardActionsEnum.UPDATE_MOVES_HISTORY:
+      return { ...state, movesHistory: action.moves, movesCount: action.count }
     default:
       return { ...state }
   }
