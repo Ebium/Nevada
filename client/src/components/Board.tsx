@@ -4,6 +4,7 @@ import styled from "styled-components"
 import {
   updateBoardArray,
   updateHistoryBoard,
+  updateMovesHistory,
 } from "../store/ducks/Board.ducks"
 import { updateDroppedCounter, updatePadStore } from "../store/ducks/Pad.ducks"
 import { useNevadaSelector } from "../store/rootReducer"
@@ -19,9 +20,15 @@ export const Board = () => {
   const droppedPadCounter = useNevadaSelector(
     (state) => state.pad.droppedCounter
   )
+  const movesHistory = useNevadaSelector((state) => state.board.movesHistory)
+  const movesCount = useNevadaSelector((state) => state.board.movesCount)
 
-  const handleBoardClick = (key: any) => {
-    if (currentPad.nbHole === 0 || key.isFilled === 1) return
+  const handleBoardClick = (key: KeyType) => {
+    // Si la partie a commencé, joue un coup
+    playMove(key)
+
+    // Sinon rentre dans la fonction qui permet de placer les pièces,
+    if (currentPad.nbHole === 0 || key.isFilled) return
     const padNum = currentPad.nbHole
     const updatedBoard = R.clone(boardArray)
 
@@ -56,6 +63,8 @@ export const Board = () => {
         y: ay,
         isFilled: 1,
         color: currentPad.color,
+        holeFilled: false,
+        holeColor: "black",
       }
 
       historyBoard.push([
@@ -101,12 +110,16 @@ export const Board = () => {
         y: ay1,
         isFilled: 1,
         color: currentPad.color,
+        holeFilled: false,
+        holeColor: "black",
       }
       updatedBoard[ax2][ay2] = {
         x: ax2,
         y: ay2,
         isFilled: 1,
         color: currentPad.color,
+        holeFilled: false,
+        holeColor: "black",
       }
 
       historyBoard.push([
@@ -160,18 +173,24 @@ export const Board = () => {
         y: ay1,
         isFilled: 1,
         color: currentPad.color,
+        holeFilled: false,
+        holeColor: "black",
       }
       updatedBoard[ax2][ay2] = {
         x: ax2,
         y: ay2,
         isFilled: 1,
         color: currentPad.color,
+        holeFilled: false,
+        holeColor: "black",
       }
       updatedBoard[ax3][ay3] = {
         x: ax3,
         y: ay3,
         isFilled: 1,
         color: currentPad.color,
+        holeFilled: false,
+        holeColor: "black",
       }
 
       historyBoard.push([
@@ -240,30 +259,40 @@ export const Board = () => {
         y: ay1,
         isFilled: 1,
         color: currentPad.color,
+        holeFilled: false,
+        holeColor: "black",
       }
       updatedBoard[ax2][ay2] = {
         x: ax2,
         y: ay2,
         isFilled: 1,
         color: currentPad.color,
+        holeFilled: false,
+        holeColor: "black",
       }
       updatedBoard[ax3][ay3] = {
         x: ax3,
         y: ay3,
         isFilled: 1,
         color: currentPad.color,
+        holeFilled: false,
+        holeColor: "black",
       }
       updatedBoard[ax4][ay4] = {
         x: ax4,
         y: ay4,
         isFilled: 1,
         color: currentPad.color,
+        holeFilled: false,
+        holeColor: "black",
       }
       updatedBoard[ax5][ay5] = {
         x: ax5,
         y: ay5,
         isFilled: 1,
         color: currentPad.color,
+        holeFilled: false,
+        holeColor: "black",
       }
 
       historyBoard.push([
@@ -282,6 +311,8 @@ export const Board = () => {
       y: key.y,
       isFilled: 1,
       color: currentPad.color,
+      holeFilled: false,
+      holeColor: "black",
     }
 
     updatePadStoreFunction(padNum, -1)
@@ -296,13 +327,36 @@ export const Board = () => {
     dispatch(updatePadStore(updatedPadStore))
   }
 
+  // Joue un coup remplissant le trou, et mettant une couleur, et ajoute dans movesHistory le coup joué
+  const playMove = (key: KeyType) => {
+    if (gameCanStart && !key?.holeFilled) {
+      const oldMove: Move = {
+        x: key.x,
+        y: key.y,
+        holeColor: key.holeColor,
+        holeFilled: key.holeFilled
+      }
+      const color = movesCount % 2 === 0 ? "red" : "blue"
+
+      boardArray[key.x][key.y].holeFilled = true;
+      boardArray[key.x][key.y].holeColor = color;
+
+      const newMovesHistory = movesHistory
+      newMovesHistory.push(oldMove)
+
+      dispatch(updateMovesHistory(newMovesHistory, movesCount + 1))
+      dispatch(updateBoardArray(boardArray))
+    }
+    return
+  }
+
   let keyVar = 0
   return (
     <>
       <StyledBoard>
         {boardArray.map((key) => {
           return key.map(
-            (key: { isFilled: any; color: any; x: any; y: any }) => {
+            (key: KeyType) => {
               keyVar++
               return (
                 <Cellule
@@ -312,18 +366,24 @@ export const Board = () => {
                     backgroundColor: key.isFilled
                       ? key.color
                       : gameCanStart
-                      ? "transparent"
-                      : "#D3D3D3",
+                        ? "transparent"
+                        : "#D3D3D3",
                     border:
                       gameCanStart && !key.isFilled ? "none" : "1px red solid",
                   }}
                 >
                   {key.isFilled ? (
-                    <HoleForCellule></HoleForCellule>
+                    <HoleForCellule color={key.holeColor}></HoleForCellule>
                   ) : (
-                    <>
-                      {key.x},{key.y}
-                    </>
+                    gameCanStart ? (
+                      <>
+                        {/* Couleur? */}
+                      </>
+                    ) : (
+                      <>
+                        {key.x},{key.y}
+                      </>
+                    )
                   )}
                 </Cellule>
               )
@@ -343,10 +403,30 @@ const Cellule = styled.div`
   padding: 1rem;
   border: 1px red solid;
 `
-const HoleForCellule = styled.div`
+
+const HoleForCellule = styled.div<HoleForCelluleProps>`
   width: 2rem;
   height: 2rem;
-  border: 1px red solid;
   border-radius: 2rem;
-  background-color: red;
+  background-color: ${({ color }) => (color ? color : "black")};
 `
+
+interface HoleForCelluleProps {
+  color?: string
+}
+
+export interface KeyType {
+  isFilled: boolean,
+  color: any,
+  x: number,
+  y: number,
+  holeColor: string,
+  holeFilled: boolean,
+}
+
+export interface Move {
+  x: number,
+  y: number,
+  holeColor: string,
+  holeFilled: boolean,
+}
