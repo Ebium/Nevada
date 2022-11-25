@@ -1,10 +1,17 @@
 const express = require("express")
 const mongoose = require("mongoose")
 const app = express()
-const products = require("./data.js")
+const cors = require("cors")
 const products_routes = require("./routes/products.js")
 
+
 const PORT = 5050
+
+const corsOptions = {
+  origin: "http://localhost:3000",
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+
 
 require("dotenv").config()
 
@@ -14,6 +21,7 @@ const socketIo = require("socket.io")
 const http = require("http")
 const { getProduct } = require("./controllers/products.js")
 const server = http.createServer(app)
+
 const io = socketIo(server,{ 
     cors: {
       origin: ["http://localhost:3000", "http://localhost:3000/nevada/game"]
@@ -64,12 +72,10 @@ io.on("connection",(socket)=>{
   })
   
   socket.on("disconnect",(reason)=>{
+
     console.log(reason)
   })
 })
-
-
-
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -84,4 +90,4 @@ mongoose
   })
 
 app.use(express.json())
-app.use("/api/products", products_routes)
+app.use("/api/products", cors(corsOptions), products_routes)
