@@ -101,6 +101,7 @@ export const Game = () => {
     dispatch(resetPadStore())
     dispatch(updateDroppedCounter(0))
     dispatch(updateHistoryBoard([]))
+    dispatch(updateGameCanStart(false))
   }
 
   const undoBoard = () => {
@@ -151,7 +152,7 @@ export const Game = () => {
           </StyledButton>
           <HeightSpacer></HeightSpacer>
           <StyledButton
-            disabled={droppedCounter === 0}
+            // disabled={droppedCounter === 0}
             onClick={() => resetBoard()}
           >
             reset Board

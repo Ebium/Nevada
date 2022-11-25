@@ -317,7 +317,7 @@ export const Board = () => {
     updatedBoard[cell.x][cell.y] = {
       x: cell.x,
       y: cell.y,
-      isFilled: 1,
+      isFilled: true,
       color: currentPad.color,
       holeFilled: false,
       holeColor: "black",

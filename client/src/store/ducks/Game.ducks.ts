@@ -42,7 +42,7 @@ export function GameReducer(
 ): GameState {
   switch (action.type) {
     case GameActionsEnum.UPDATE_GAME_CAN_START:
-      return { ...state, started: action.bool }
+      return { ...state, started: action.bool, movesCount: 0 }
     case GameActionsEnum.UPDATE_MOVES_HISTORY:
       return { ...state, movesHistory: action.moves, movesCount: action.count }
     default:
