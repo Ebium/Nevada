@@ -61,7 +61,7 @@ export const Board = () => {
       updatedBoard[ax][ay] = {
         x: ax,
         y: ay,
-        isFilled: 1,
+        isFilled: true,
         color: currentPad.color,
         holeFilled: false,
         holeColor: "black",
@@ -108,7 +108,7 @@ export const Board = () => {
       updatedBoard[ax1][ay1] = {
         x: ax1,
         y: ay1,
-        isFilled: 1,
+        isFilled: true,
         color: currentPad.color,
         holeFilled: false,
         holeColor: "black",
@@ -116,7 +116,7 @@ export const Board = () => {
       updatedBoard[ax2][ay2] = {
         x: ax2,
         y: ay2,
-        isFilled: 1,
+        isFilled: true,
         color: currentPad.color,
         holeFilled: false,
         holeColor: "black",
@@ -171,7 +171,7 @@ export const Board = () => {
       updatedBoard[ax1][ay1] = {
         x: ax1,
         y: ay1,
-        isFilled: 1,
+        isFilled: true,
         color: currentPad.color,
         holeFilled: false,
         holeColor: "black",
@@ -179,7 +179,7 @@ export const Board = () => {
       updatedBoard[ax2][ay2] = {
         x: ax2,
         y: ay2,
-        isFilled: 1,
+        isFilled: true,
         color: currentPad.color,
         holeFilled: false,
         holeColor: "black",
@@ -187,7 +187,7 @@ export const Board = () => {
       updatedBoard[ax3][ay3] = {
         x: ax3,
         y: ay3,
-        isFilled: 1,
+        isFilled: true,
         color: currentPad.color,
         holeFilled: false,
         holeColor: "black",
@@ -257,7 +257,7 @@ export const Board = () => {
       updatedBoard[ax1][ay1] = {
         x: ax1,
         y: ay1,
-        isFilled: 1,
+        isFilled: true,
         color: currentPad.color,
         holeFilled: false,
         holeColor: "black",
@@ -265,7 +265,7 @@ export const Board = () => {
       updatedBoard[ax2][ay2] = {
         x: ax2,
         y: ay2,
-        isFilled: 1,
+        isFilled: true,
         color: currentPad.color,
         holeFilled: false,
         holeColor: "black",
@@ -273,7 +273,7 @@ export const Board = () => {
       updatedBoard[ax3][ay3] = {
         x: ax3,
         y: ay3,
-        isFilled: 1,
+        isFilled: true,
         color: currentPad.color,
         holeFilled: false,
         holeColor: "black",
@@ -281,7 +281,7 @@ export const Board = () => {
       updatedBoard[ax4][ay4] = {
         x: ax4,
         y: ay4,
-        isFilled: 1,
+        isFilled: true,
         color: currentPad.color,
         holeFilled: false,
         holeColor: "black",
@@ -289,7 +289,7 @@ export const Board = () => {
       updatedBoard[ax5][ay5] = {
         x: ax5,
         y: ay5,
-        isFilled: 1,
+        isFilled: true,
         color: currentPad.color,
         holeFilled: false,
         holeColor: "black",
@@ -309,7 +309,7 @@ export const Board = () => {
     updatedBoard[key.x][key.y] = {
       x: key.x,
       y: key.y,
-      isFilled: 1,
+      isFilled: true,
       color: currentPad.color,
       holeFilled: false,
       holeColor: "black",

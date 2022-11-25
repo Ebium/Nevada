@@ -49,7 +49,7 @@ const initialeBoardArray = Array(10)
       if (y === 10) {
         y = 0
       }
-      return { x: x, y: y, isFilled: 0, color: "" }
+      return { x: x, y: y, isFilled: false, color: "" }
     })
   })
 
