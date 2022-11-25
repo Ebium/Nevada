@@ -14,13 +14,9 @@ import {
   resetBoardArray,
   updateBoardArray,
   updateHistoryBoard,
-  updateMovesHistory,
 } from "../../store/ducks/Board.ducks"
-import { updateGameCanStart } from "../../store/ducks/Game.ducks"
+import { updateGameCanStart, updateMovesHistory } from "../../store/ducks/Game.ducks"
 import { useNavigate } from "react-router-dom"
-
-
-
 
 const backgroundGif = require("../../assets/mygif.gif") as string
 const arizonaLogo = require("../../assets/logo1.png") as string
@@ -35,8 +31,8 @@ export const Game = () => {
   const board = useNevadaSelector((state) => state.board.array)
   const padStore = useNevadaSelector((state) => state.pad.padStore)
   const canStart = useNevadaSelector((state) => state.game.started)
-  const movesHistory = useNevadaSelector((state) => state.board.movesHistory)
-  const movesCount = useNevadaSelector((state) => state.board.movesCount)
+  const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
+  const movesCount = useNevadaSelector((state) => state.game.movesCount)
 
   useEffect(() => {
     if (droppedCounter === 17) {
@@ -105,6 +101,7 @@ export const Game = () => {
     dispatch(resetPadStore())
     dispatch(updateDroppedCounter(0))
     dispatch(updateHistoryBoard([]))
+    dispatch(updateGameCanStart(false))
   }
 
   const undoBoard = () => {
@@ -113,8 +110,8 @@ export const Game = () => {
     if(!canStart){
       let updatedHistory = R.clone(hist)
       hist[hist.length - 1].map(
-        (key) =>
-          (updatedBoard[key[0]][key[1]] = initialeBoardArray[key[0]][key[1]])
+        (cell) =>
+          (updatedBoard[cell[0]][cell[1]] = initialeBoardArray[cell[0]][cell[1]])
       )
       updatePadStoreFunction(hist[hist.length - 1].length, +1)
       updatedHistory.pop()
@@ -155,7 +152,7 @@ export const Game = () => {
           </StyledButton>
           <HeightSpacer></HeightSpacer>
           <StyledButton
-            disabled={droppedCounter === 0}
+            // disabled={droppedCounter === 0}
             onClick={() => resetBoard()}
           >
             reset Board

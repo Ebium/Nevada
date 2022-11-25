@@ -4,11 +4,12 @@ import styled from "styled-components"
 import {
   updateBoardArray,
   updateHistoryBoard,
-  updateMovesHistory,
 } from "../store/ducks/Board.ducks"
+import { CellType, playMove } from "../utils/Moves"
 import { updateDroppedCounter, updatePadStore } from "../store/ducks/Pad.ducks"
 import { useNevadaSelector } from "../store/rootReducer"
 import { StyledBoard } from "../styles/StyledBoard"
+import { updateMovesHistory } from "../store/ducks/Game.ducks"
 
 export const Board = () => {
   const dispatch = useDispatch()
@@ -20,24 +21,31 @@ export const Board = () => {
   const droppedPadCounter = useNevadaSelector(
     (state) => state.pad.droppedCounter
   )
-  const movesHistory = useNevadaSelector((state) => state.board.movesHistory)
-  const movesCount = useNevadaSelector((state) => state.board.movesCount)
+  const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
+  const movesCount = useNevadaSelector((state) => state.game.movesCount)
 
-  const handleBoardClick = (key: KeyType) => {
+  const handleBoardClick = (cell: CellType) => {
     // Si la partie a commencé, joue un coup
-    playMove(key)
+    if(gameCanStart){
+      const payload = playMove(cell, movesCount, movesHistory, boardArray)
+      if (payload!=null){
+        dispatch(updateMovesHistory(payload.newMovesHistory, payload.movesCount))
+        dispatch(updateBoardArray(payload.boardArray))
+      }
+      return
+    }
 
     // Sinon rentre dans la fonction qui permet de placer les pièces,
-    if (currentPad.nbHole === 0 || key.isFilled) return
+    if (currentPad.nbHole === 0 || cell.isFilled) return
     const padNum = currentPad.nbHole
     const updatedBoard = R.clone(boardArray)
 
     if (padStore[padNum - 1].remaining === 0) return
     if (padNum === 2) {
-      const ax = [key.x, key.x + 1, key.x, key.x - 1][
+      const ax = [cell.x, cell.x + 1, cell.x, cell.x - 1][
         currentPad.orientation - 1
       ]
-      const ay = [key.y + 1, key.y, key.y - 1, key.y][
+      const ay = [cell.y + 1, cell.y, cell.y - 1, cell.y][
         currentPad.orientation - 1
       ]
 
@@ -45,16 +53,16 @@ export const Board = () => {
 
       switch (currentPad.orientation) {
         case 1:
-          if (key.y === 9) return
+          if (cell.y === 9) return
           break
         case 2:
-          if (key.x === 9) return
+          if (cell.x === 9) return
           break
         case 3:
-          if (key.y === 0) return
+          if (cell.y === 0) return
           break
         case 4:
-          if (key.x === 0) return
+          if (cell.x === 0) return
           break
       }
 
@@ -68,23 +76,23 @@ export const Board = () => {
       }
 
       historyBoard.push([
-        [key.x, key.y],
+        [cell.x, cell.y],
         [ax, ay],
       ])
       dispatch(updateHistoryBoard(historyBoard))
     }
 
     if (padNum === 3) {
-      const ax1 = [key.x, key.x + 1, key.x, key.x - 1][
+      const ax1 = [cell.x, cell.x + 1, cell.x, cell.x - 1][
         currentPad.orientation - 1
       ]
-      const ax2 = [key.x, key.x + 2, key.x, key.x - 2][
+      const ax2 = [cell.x, cell.x + 2, cell.x, cell.x - 2][
         currentPad.orientation - 1
       ]
-      const ay1 = [key.y + 1, key.y, key.y - 1, key.y][
+      const ay1 = [cell.y + 1, cell.y, cell.y - 1, cell.y][
         currentPad.orientation - 1
       ]
-      const ay2 = [key.y + 2, key.y, key.y - 2, key.y][
+      const ay2 = [cell.y + 2, cell.y, cell.y - 2, cell.y][
         currentPad.orientation - 1
       ]
 
@@ -92,16 +100,16 @@ export const Board = () => {
 
       switch (currentPad.orientation) {
         case 1:
-          if ([8, 9].includes(key.y)) return
+          if ([8, 9].includes(cell.y)) return
           break
         case 2:
-          if ([8, 9].includes(key.x)) return
+          if ([8, 9].includes(cell.x)) return
           break
         case 3:
-          if ([0, 1].includes(key.y)) return
+          if ([0, 1].includes(cell.y)) return
           break
         case 4:
-          if ([0, 1].includes(key.x)) return
+          if ([0, 1].includes(cell.x)) return
           break
       }
 
@@ -123,7 +131,7 @@ export const Board = () => {
       }
 
       historyBoard.push([
-        [key.x, key.y],
+        [cell.x, cell.y],
         [ax1, ay1],
         [ax2, ay2],
       ])
@@ -131,20 +139,20 @@ export const Board = () => {
     }
 
     if (padNum === 4) {
-      const ax1 = [key.x, key.x, key.x, key.x][currentPad.orientation - 1]
-      const ax2 = [key.x + 1, key.x + 1, key.x - 1, key.x - 1][
+      const ax1 = [cell.x, cell.x, cell.x, cell.x][currentPad.orientation - 1]
+      const ax2 = [cell.x + 1, cell.x + 1, cell.x - 1, cell.x - 1][
         currentPad.orientation - 1
       ]
-      const ax3 = [key.x + 1, key.x + 1, key.x - 1, key.x - 1][
+      const ax3 = [cell.x + 1, cell.x + 1, cell.x - 1, cell.x - 1][
         currentPad.orientation - 1
       ]
-      const ay1 = [key.y + 1, key.y - 1, key.y - 1, key.y + 1][
+      const ay1 = [cell.y + 1, cell.y - 1, cell.y - 1, cell.y + 1][
         currentPad.orientation - 1
       ]
-      const ay2 = [key.y + 1, key.y - 1, key.y - 1, key.y + 1][
+      const ay2 = [cell.y + 1, cell.y - 1, cell.y - 1, cell.y + 1][
         currentPad.orientation - 1
       ]
-      const ay3 = [key.y, key.y, key.y, key.y][currentPad.orientation - 1]
+      const ay3 = [cell.y, cell.y, cell.y, cell.y][currentPad.orientation - 1]
 
       if (
         boardArray[ax1][ay1].isFilled ||
@@ -155,16 +163,16 @@ export const Board = () => {
 
       switch (currentPad.orientation) {
         case 1:
-          if (key.y === 9 || key.x === 9) return
+          if (cell.y === 9 || cell.x === 9) return
           break
         case 2:
-          if (key.x === 9 || key.y === 0) return
+          if (cell.x === 9 || cell.y === 0) return
           break
         case 3:
-          if (key.y === 0 || key.x === 0) return
+          if (cell.y === 0 || cell.x === 0) return
           break
         case 4:
-          if (key.x === 0 || key.y === 9) return
+          if (cell.x === 0 || cell.y === 9) return
           break
       }
 
@@ -194,7 +202,7 @@ export const Board = () => {
       }
 
       historyBoard.push([
-        [key.x, key.y],
+        [cell.x, cell.y],
         [ax1, ay1],
         [ax2, ay2],
         [ax3, ay3],
@@ -205,43 +213,43 @@ export const Board = () => {
     if (padNum === 6) {
       switch (currentPad.orientation) {
         case 1:
-          if ([8, 9].includes(key.y) || key.x === 9) return
+          if ([8, 9].includes(cell.y) || cell.x === 9) return
           break
         case 2:
-          if ([8, 9].includes(key.x) || key.y === 0) return
+          if ([8, 9].includes(cell.x) || cell.y === 0) return
           break
         case 3:
-          if ([0, 1].includes(key.y) || key.x === 0) return
+          if ([0, 1].includes(cell.y) || cell.x === 0) return
           break
         case 4:
-          if ([0, 1].includes(key.x) || key.y === 9) return
+          if ([0, 1].includes(cell.x) || cell.y === 9) return
           break
       }
 
-      const ax1 = [key.x, key.x, key.x, key.x][currentPad.orientation - 1]
-      const ax2 = [key.x + 1, key.x + 1, key.x - 1, key.x - 1][
+      const ax1 = [cell.x, cell.x, cell.x, cell.x][currentPad.orientation - 1]
+      const ax2 = [cell.x + 1, cell.x + 1, cell.x - 1, cell.x - 1][
         currentPad.orientation - 1
       ]
-      const ax3 = [key.x + 1, key.x + 1, key.x - 1, key.x - 1][
+      const ax3 = [cell.x + 1, cell.x + 1, cell.x - 1, cell.x - 1][
         currentPad.orientation - 1
       ]
-      const ax4 = [key.x, key.x + 2, key.x, key.x - 2][
+      const ax4 = [cell.x, cell.x + 2, cell.x, cell.x - 2][
         currentPad.orientation - 1
       ]
-      const ax5 = [key.x + 1, key.x + 2, key.x - 1, key.x - 2][
+      const ax5 = [cell.x + 1, cell.x + 2, cell.x - 1, cell.x - 2][
         currentPad.orientation - 1
       ]
-      const ay1 = [key.y + 1, key.y - 1, key.y - 1, key.y + 1][
+      const ay1 = [cell.y + 1, cell.y - 1, cell.y - 1, cell.y + 1][
         currentPad.orientation - 1
       ]
-      const ay2 = [key.y + 1, key.y - 1, key.y - 1, key.y + 1][
+      const ay2 = [cell.y + 1, cell.y - 1, cell.y - 1, cell.y + 1][
         currentPad.orientation - 1
       ]
-      const ay3 = [key.y, key.y, key.y, key.y][currentPad.orientation - 1]
-      const ay4 = [key.y + 2, key.y, key.y - 2, key.y][
+      const ay3 = [cell.y, cell.y, cell.y, cell.y][currentPad.orientation - 1]
+      const ay4 = [cell.y + 2, cell.y, cell.y - 2, cell.y][
         currentPad.orientation - 1
       ]
-      const ay5 = [key.y + 2, key.y - 1, key.y - 2, key.y + 1][
+      const ay5 = [cell.y + 2, cell.y - 1, cell.y - 2, cell.y + 1][
         currentPad.orientation - 1
       ]
 
@@ -296,7 +304,7 @@ export const Board = () => {
       }
 
       historyBoard.push([
-        [key.x, key.y],
+        [cell.x, cell.y],
         [ax1, ay1],
         [ax2, ay2],
         [ax3, ay3],
@@ -306,9 +314,9 @@ export const Board = () => {
       dispatch(updateHistoryBoard(historyBoard))
     }
 
-    updatedBoard[key.x][key.y] = {
-      x: key.x,
-      y: key.y,
+    updatedBoard[cell.x][cell.y] = {
+      x: cell.x,
+      y: cell.y,
       isFilled: true,
       color: currentPad.color,
       holeFilled: false,
@@ -327,36 +335,13 @@ export const Board = () => {
     dispatch(updatePadStore(updatedPadStore))
   }
 
-  // Joue un coup remplissant le trou, et mettant une couleur, et ajoute dans movesHistory le coup joué
-  const playMove = (key: KeyType) => {
-    if (gameCanStart && !key?.holeFilled) {
-      const oldMove: Move = {
-        x: key.x,
-        y: key.y,
-        holeColor: key.holeColor,
-        holeFilled: key.holeFilled
-      }
-      const color = movesCount % 2 === 0 ? "red" : "blue"
-
-      boardArray[key.x][key.y].holeFilled = true;
-      boardArray[key.x][key.y].holeColor = color;
-
-      const newMovesHistory = movesHistory
-      newMovesHistory.push(oldMove)
-
-      dispatch(updateMovesHistory(newMovesHistory, movesCount + 1))
-      dispatch(updateBoardArray(boardArray))
-    }
-    return
-  }
-
   let keyVar = 0
   return (
     <>
       <StyledBoard>
         {boardArray.map((key) => {
           return key.map(
-            (key: KeyType) => {
+            (key: CellType) => {
               keyVar++
               return (
                 <Cellule
@@ -415,18 +400,3 @@ interface HoleForCelluleProps {
   color?: string
 }
 
-export interface KeyType {
-  isFilled: boolean,
-  color: any,
-  x: number,
-  y: number,
-  holeColor: string,
-  holeFilled: boolean,
-}
-
-export interface Move {
-  x: number,
-  y: number,
-  holeColor: string,
-  holeFilled: boolean,
-}
