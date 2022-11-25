@@ -7,10 +7,22 @@ const getProducts = ((req, res) => {
 })
 
 const getProduct = ((req, res) => {
+    console.log(req)
     Product.findOne({ _id: req.params.productID })
         .then(result => res.status(200).json({ result }))
         .catch(() => res.status(404).json({msg: 'Product not found'}))
 })
+
+const getProductLocal = (product) => {
+    var productLocal;
+    var error;
+    Product.findOne({ _id: product.id })
+        .then(result => console.log(result))
+        .catch((e) => console.log(e) )
+    return {productLocal, error}
+}
+
+console.log(getProductLocal({id:"2"}))
 
 const createProduct = ((req, res) => {
     Product.create(req.body)
@@ -33,6 +45,7 @@ const deleteProduct = ((req, res) => {
 module.exports = {
     getProducts,
     getProduct,
+    getProductLocal,
     createProduct,
     updateProduct,
     deleteProduct

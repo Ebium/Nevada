@@ -6,17 +6,19 @@ import { useNevadaSelector } from "./store/rootReducer"
 import { io } from "socket.io-client"
 import { useDispatch } from "react-redux"
 import { updateSocketID } from "./store/ducks/User.ducks"
+import Payer from "./Paiement/payer"
+import { SocketContext } from "./socket-context"
 
 // Cette page est la racine de toutes les pages, il faudra ajouter le check si un utilisateur est connecté ou pas
 // si il est pas connecté ( on check ca avec un useEffect et dans le redux) alors on le redirige vers la page de connection
 // dans le cas contraire, on ne faire rien du tout
+const socket = io("http://localhost:5050")
 
 const UserPermission = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
   useEffect(() => {
-    const socket = io("http://localhost:5000")
     socket.on("connect", () => {
       console.log(socket.id)
       dispatch(updateSocketID(socket.id))
@@ -40,11 +42,12 @@ function NEVADA() {
   // on peut faire en sorte d'autoriser certaines requêtes néanmoins
   const element = useRoutes(routes)
   return (
-    <>
+    <SocketContext.Provider value={socket}>
       {element}
+      <Payer></Payer>
       <StyledToastContainer data-cy="toast-error" hideProgressBar={true} />
       <UserPermission />
-    </>
+      </SocketContext.Provider>
   )
 }
 
