@@ -18,10 +18,10 @@ export const Home = () => {
       </StyledButton>
       <StyledButton
         onClick={() => {
-          navigate("/payer")
+          navigate("/pay")
         }}
       >
-        Payer
+        Pay
       </StyledButton>
       <StyledButton
         onClick={() => {

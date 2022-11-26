@@ -4,7 +4,7 @@ const Stripe = require("stripe")
 const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY);
 
 /* 
- *  Obtiens l'url de paiement des produits
+ *  Get Payment Link of products
  */
 async function getStripeCheckoutSessionUrl(products) {
     var url;
@@ -19,18 +19,18 @@ async function getStripeCheckoutSessionUrl(products) {
 }
 
 /* 
- *  Cherche parmi les produits existants et créer l'objet de la requête
+ *  Searching among existants products 
+ *  and create the object request
  */
 async function requestSessionCheckoutStripeUrl(products) {
-    //Cherche tous les produits
   return Product.find().then( (data) => {
     const stripeObject = requestStripeCheckoutObject(products, data);
     return createStripeCheckoutSessionUrl(stripeObject);
   });
 }
 
-/* 
- *  Renvoie l'url donnée par stripe
+/*
+ *  Return Url sended by Stripe 
  */
 async function createStripeCheckoutSessionUrl(object) {
     return stripe.checkout.sessions.create(object).then((stripeData) => {
@@ -40,13 +40,13 @@ async function createStripeCheckoutSessionUrl(object) {
 
 
 /* 
- *  Requête type object à envoyer à Stripe
+ *  Object request to send to Stripe
  */
 function requestStripeCheckoutObject(buy_products, products_data) {
   return {
     payment_method_types: ["card"],
     mode: "payment",
-    //liste des produits à faire payer au consommateur
+    //Products list of consumer
     line_items: buy_products.map((product) => {
       return {
         price_data: {
@@ -54,13 +54,13 @@ function requestStripeCheckoutObject(buy_products, products_data) {
           product_data: {
             name: products_data[product.id].name,
           },
-          unit_amount: products_data[product.id].price, //unité en centime
+          unit_amount: products_data[product.id].price, //in cents
         },
         quantity: product.quantity,
       };
     }),
-    success_url: `http://localhost:3000/nevada/payment/success.html`, // A mettre à jour...
-    cancel_url: `http://localhost:3000/nevada/home`, // A mettre à jour... peut etre se faire envoyer côté client ?
+    success_url: `http://localhost:3000/nevada/payment/success.html`, // TODO : update URL
+    cancel_url: `http://localhost:3000/nevada/home`, // TODO : update URL (idea : sended by client side ?)
   };
 }
 
