@@ -1,5 +1,5 @@
 const User = require('../models/User.js')
-const { hashedPassword } = require("./password")
+const { hashedPassword, matchPassword } = require("./password")
 
 /* ========================================
     Search functions
@@ -63,6 +63,11 @@ const userEmailExist = async(email) => {
     return await findUserByEmail(email) == null ? false : true;
 }
 
+const userAccountPasswordMatch = async(email,password) => {
+    const userPasswordDB =  await findUserByEmail(email).then((result) => {return result.password});
+    return matchPassword(password, userPasswordDB);
+}
+
 const userExist = async(user) => {
     var errors = { exist:false }
 
@@ -98,6 +103,22 @@ const createValidUser = async(user) => {
     return createUser(userObject);
 }
 
+/*
+ *  Update socketId only if  
+ *  email and password  
+ *  match with the database
+ */
+const updateUserSocketId = async(user)=> {
+    if(!(await userEmailExist(user.email))){
+        return "Your email is not registered."
+    }
+    if(!(await userAccountPasswordMatch(user.email, user.password)))
+        return "Your password is incorrect."
+    
+    return User.updateOne({email : user.email}, {socketId:user.socketId})
+        .then((result) => {return result})
+}
+
 /*******************************************
     User Object type 
 ********************************************/
@@ -107,15 +128,11 @@ const createNewUserObject = (user) => {
         email:user.email,
         password:hashedPassword(user.password),
         pseudo:user.pseudo,
-        premium:false,
-        createdAt: new Date(),
-        played:0,
-        won:0,
-        watched:0
     }
 }
 
 
 module.exports = {
+    updateUserSocketId,
     createValidUser,
 }
