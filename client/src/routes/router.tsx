@@ -6,6 +6,8 @@ import { NotFound404 } from "./NotFound404"
 import { PaymentRefused } from "./payment/PaymentRefused"
 import { PaymentAccepted } from "./payment/PaymentAccepted"
 import { Payment } from "./payment/Payment"
+import SignUp from "./SignUp"
+import Pay from "../Paiement/Pay"
 
 export const routes: RouteObject[] = [
   {
@@ -23,6 +25,14 @@ export const routes: RouteObject[] = [
       {
         path: "game",
         element: <Game />,
+      },
+      {
+        path: "pay",
+        element: <Pay />,
+      },
+      {
+        path: "signup",
+        element: <SignUp />,
       },
       {
         path: "*",

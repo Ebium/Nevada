@@ -3,9 +3,10 @@ import { useNavigate, useRoutes } from "react-router-dom"
 import { StyledToastContainer } from "./components/other/Toaster"
 import { routes } from "./routes/router"
 import { useNevadaSelector } from "./store/rootReducer"
-import { io } from "socket.io-client"
 import { useDispatch } from "react-redux"
 import { updateSocketID } from "./store/ducks/User.ducks"
+import Payer from "./Paiement/Pay"
+import { socket } from "./socket-context"
 
 // Cette page est la racine de toutes les pages, il faudra ajouter le check si un utilisateur est connecté ou pas
 // si il est pas connecté ( on check ca avec un useEffect et dans le redux) alors on le redirige vers la page de connection
@@ -15,14 +16,13 @@ const UserPermission = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  // useEffect(() => {
-  //   const socket = io("http://localhost:5000")
-  //   socket.on("connect", () => {
-  //     console.log(socket.id)
-  //     dispatch(updateSocketID(socket.id))
-  //   })
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [])
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log(socket.id)
+      dispatch(updateSocketID(socket.id))
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // mettre un setter avec les différents champs de connexion
   // si personne est co , alors le useeffect fera une redirection
@@ -44,7 +44,7 @@ function NEVADA() {
       {element}
       <StyledToastContainer data-cy="toast-error" hideProgressBar={true} />
       <UserPermission />
-    </>
+      </>
   )
 }
 
