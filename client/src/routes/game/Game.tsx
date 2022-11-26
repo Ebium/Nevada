@@ -135,7 +135,7 @@ export const Game = () => {
     <Content>
       <HeaderButton
         onClick={() => {
-          navigate("/home")
+          navigate("/main/home")
         }}
       ></HeaderButton>
       <Page>

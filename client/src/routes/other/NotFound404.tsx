@@ -9,14 +9,14 @@ export const NotFound404 = () => {
       error 404
       <StyledButton
         onClick={() => {
-          navigate("/home")
+          navigate("/main/home")
         }}
       >
         Home
       </StyledButton>
       <StyledButton
         onClick={() => {
-          navigate("/game")
+          navigate("/main/game")
         }}
       >
         Game
