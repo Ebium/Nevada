@@ -7,7 +7,6 @@ const Login = () => {
 
     useEffect(()=>{
         getServerReponse()
-        console.log(localStorage.getItem("auth"))
     }, []);
 
     function handleSubmit(event:FormEvent<HTMLFormElement>){
