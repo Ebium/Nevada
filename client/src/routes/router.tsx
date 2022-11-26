@@ -3,7 +3,7 @@ import { Game } from "./game/Game"
 import { Layout } from "../Layout"
 import { Home } from "./Home"
 import { NotFound404 } from "./NotFound404"
-// import SignUp from "./SignUp"
+import SignUp from "./SignUp"
 import Pay from "../Paiement/Pay"
 
 export const routes: RouteObject[] = [

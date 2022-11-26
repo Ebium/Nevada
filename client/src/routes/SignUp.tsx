@@ -32,11 +32,20 @@ const SignUp = () => {
             if(isCreated)
                 // TODO: UPDATE REDIRECTION URL
                 window.location.href = "http://localhost:3000/nevada/home";
-            else{
-                var errors = result.errors.email+"\n"+result.errors.pseudo;
-                alert(errors)
-            }
+            else
+                showErrors(result)
         })
+    }
+
+    function showErrors(result:any) {
+        var errors = ""
+        if(result.errors.email!==undefined)
+            errors = result.errors.email+"\n";   
+
+        if(result.errors.pseudo!==undefined)
+            errors = errors + result.errors.email;
+
+        alert(errors)
     }
 
     return (
