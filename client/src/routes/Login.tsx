@@ -1,10 +1,9 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { socket } from '../socket-context';
 
-const SignUp = () => {
+const Login = () => {
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
-    const [pseudonym, setPseudonym] = useState("");
 
     useEffect(()=>{
         getServerReponse()
@@ -12,7 +11,7 @@ const SignUp = () => {
 
     function handleSubmit(event:FormEvent<HTMLFormElement>){
         event.preventDefault();
-        socket.emit("Register a new user", {email : email ,password : password, pseudo:pseudonym})
+        socket.emit("Login an user", {email : email ,password : password, socketId : socket.id})
     }
 
     function handleChangeEmail(event:ChangeEvent<HTMLInputElement>) {
@@ -23,13 +22,9 @@ const SignUp = () => {
         setPassword(event.target.value)
     }
 
-    function handleChangePseudonym(event:ChangeEvent<HTMLInputElement>) {
-        setPseudonym(event.target.value)
-    }
-
     function getServerReponse(){
-        socket.on("Register a new user", (result,isCreated)=> {
-            if(isCreated)
+        socket.on("Login an user", (result,isConnected)=> {
+            if(isConnected)
                 // TODO: UPDATE REDIRECTION URL
                 window.location.href = "http://localhost:3000/nevada/home";
             else
@@ -38,14 +33,7 @@ const SignUp = () => {
     }
 
     function showErrors(result:any) {
-        var errors = ""
-        if(result.errors.email!==undefined)
-            errors = result.errors.email+"\n";   
-
-        if(result.errors.pseudo!==undefined)
-            errors = errors + result.errors.email;
-
-        alert(errors)
+        alert(result)
     }
 
     return (
@@ -61,13 +49,9 @@ const SignUp = () => {
                 {/* TODO : verify/validate password */}
                 <input type="password" value={password} onChange={handleChangePassword} required/>
             </label>
-            <label>
-                Pseudo :
-                <input type="text" value={pseudonym} onChange={handleChangePseudonym} required/>
-            </label>
-            <input type="submit" value="Sign up"/>
+            <input type="submit" value="Login"/>
         </form>
     );
 };
 
-export default SignUp;
+export default Login;
