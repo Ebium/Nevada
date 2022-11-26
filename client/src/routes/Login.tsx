@@ -7,11 +7,12 @@ const Login = () => {
 
     useEffect(()=>{
         getServerReponse()
+        console.log(localStorage.getItem("auth"))
     }, []);
 
     function handleSubmit(event:FormEvent<HTMLFormElement>){
         event.preventDefault();
-        socket.emit("Login an user", {email : email ,password : password, socketId : socket.id})
+        socket.emit("Login an user", {email : email ,password : password, auth : socket.id})
     }
 
     function handleChangeEmail(event:ChangeEvent<HTMLInputElement>) {
@@ -24,9 +25,11 @@ const Login = () => {
 
     function getServerReponse(){
         socket.on("Login an user", (result,isConnected)=> {
-            if(isConnected)
+            if(isConnected) {
                 // TODO: UPDATE REDIRECTION URL
-                window.location.href = "http://localhost:3000/nevada/home";
+                localStorage.setItem("auth", socket.id )
+                window.location.href = "http://localhost:3000/nevada/home" ;
+            }
             else
                 showErrors(result)
         })

@@ -4,7 +4,7 @@ const app = express()
 const cors = require("cors")
 const products_routes = require("./routes/products.js")
 const { getStripeCheckoutSessionUrl } = require("./controllers/payment")
-const { createValidUser, updateUserSocketId } = require("./controllers/users") 
+const { createValidUser, updateUserAuth } = require("./controllers/users") 
 
 const PORT = 5050
 
@@ -26,7 +26,6 @@ const io = socketIo(server,{
     }
 })
 
-
 /*
  *  client/server : user request
  */
@@ -44,7 +43,8 @@ io.on("connection",(socket)=>{
   })
 
   socket.on("Login an user", async(user)=> {
-    const result = await updateUserSocketId(user);
+    const result = await updateUserAuth(user);
+
     if(!result.modifiedCount) 
       socket.emit("Login an user", result, false)
     else{
@@ -52,7 +52,11 @@ io.on("connection",(socket)=>{
       console.log("user connected : "+ user.email)
     } 
   })
-  
+
+  socket.on("reconnect", () => {
+    console.log("test")
+  });
+
   socket.on("disconnect",(reason)=>{
     console.log(reason)
   })

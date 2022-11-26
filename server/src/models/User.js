@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
     played:{ type: Number, default: 0 },
     won: { type: Number, default: 0 },
     watched: { type: Number, default: 0 },
-    socketId: { type: String, default: "" },
+    auth: { type: String, default: "" },
 }, {
     versionKey: false
 })

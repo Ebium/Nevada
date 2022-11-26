@@ -104,18 +104,18 @@ const createValidUser = async(user) => {
 }
 
 /*
- *  Update socketId only if  
+ *  Update auth only if  
  *  email and password  
  *  match with the database
  */
-const updateUserSocketId = async(user)=> {
+const updateUserAuth = async(user)=> {
     if(!(await userEmailExist(user.email))){
         return "Your email is not registered."
     }
     if(!(await userAccountPasswordMatch(user.email, user.password)))
         return "Your password is incorrect."
     
-    return User.updateOne({email : user.email}, {socketId:user.socketId})
+    return User.updateOne({email : user.email}, {auth:user.auth})
         .then((result) => {return result})
 }
 
@@ -133,6 +133,6 @@ const createNewUserObject = (user) => {
 
 
 module.exports = {
-    updateUserSocketId,
+    updateUserAuth,
     createValidUser,
 }
