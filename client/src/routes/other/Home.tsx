@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import { useNevadaSelector } from "../store/rootReducer"
+import { useNevadaSelector } from "../../store/rootReducer"
 
 export const Home = () => {
   const navigate = useNavigate()
@@ -11,21 +11,21 @@ export const Home = () => {
       Home page
       <StyledButton
         onClick={() => {
-          navigate("/game")
+          navigate("/main/game")
         }}
       >
         Game
       </StyledButton>
       <StyledButton
         onClick={() => {
-          navigate("/pay")
+          navigate("/main/pay")
         }}
       >
         Pay
       </StyledButton>
       <StyledButton
         onClick={() => {
-          navigate("/signup")
+          navigate("/main/signup")
         }}
       >
         Sign up
