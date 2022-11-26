@@ -1,6 +1,6 @@
 const Product = require('../models/Product.js')
 const Stripe = require("stripe")
-const stripe = Stripe("sk_test_51LrLO9JE1Vl9aUiyElWtRFhpLB7oDE5YwmL8h1YFgniEhyugNAiUhlFBzg8qLusFLIzchw9SdDF0QFRlKVudQcDB00T9BwLpiT");
+const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY);
 
 /* 
  *  Obtiens l'url de paiement des produits
