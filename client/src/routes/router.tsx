@@ -9,6 +9,7 @@ import { Payment } from "./payment/Payment"
 import SignUp from "./SignUp"
 import Pay from "../Paiement/Pay"
 import { Showroom } from "./other/Showroom"
+import Login from "./Login"
 
 export const routes: RouteObject[] = [
   {
@@ -78,10 +79,38 @@ export const routes: RouteObject[] = [
         ],
       },
       {
+        path: "login",
+        element: <Login />,
+      },
+      {
         path: "*",
         element: <NotFound404 />,
       },
-      
+      {
+        path: "payment/*",
+        children: [
+          {
+            index: true,
+            element: <Navigate to={"payment"} />,
+          },
+          {
+            path: "payment",
+            element: <Payment />,
+          },
+          {
+            path: "paymentRefused",
+            element: <PaymentRefused />,
+          },
+          {
+            path: "paymentAccepted",
+            element: <PaymentAccepted />,
+          },
+          {
+            path: "*",
+            element: <NotFound404 />,
+          },
+        ],
+      },
     ],
   },
 ]
