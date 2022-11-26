@@ -8,7 +8,6 @@ import {
 import { CellType, playMove } from "../utils/Moves"
 import { updateDroppedCounter, updatePadStore } from "../store/ducks/Pad.ducks"
 import { useNevadaSelector } from "../store/rootReducer"
-import { StyledBoard } from "../styles/StyledBoard"
 import { updateMovesHistory } from "../store/ducks/Game.ducks"
 
 export const Board = () => {
@@ -400,3 +399,14 @@ interface HoleForCelluleProps {
   color?: string
 }
 
+const StyledBoard = styled.div`
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  justify-content: center;
+  height: fit-content;
+  border: black 2px solid;
+  box-shadow: 0px 0px 20px black;
+  padding: 1rem;
+  width: fit-content;
+`
