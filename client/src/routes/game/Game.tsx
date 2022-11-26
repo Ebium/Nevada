@@ -18,9 +18,6 @@ import {
 import { updateGameCanStart, updateMovesHistory } from "../../store/ducks/Game.ducks"
 import { useNavigate } from "react-router-dom"
 
-const backgroundGif = require("../../assets/mygif.gif") as string
-const arizonaLogo = require("../../assets/logo1.png") as string
-
 export const Game = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -276,9 +273,8 @@ const HeaderButton = styled.button`
   position: fixed;
   right: 2px;
   top: 2px;
-  background-image: url(${arizonaLogo});
   background-size: cover;
-  background-color: unset;
+  background-color: cyan;
   border: none;
   height: 3rem;
   width: 3rem;
@@ -289,7 +285,6 @@ const HeaderButton = styled.button`
 `
 
 const Content = styled.div`
-  //background-image: url(${backgroundGif});
 `
 const Page = styled.div`
   color: black;
