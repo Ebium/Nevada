@@ -1,15 +1,14 @@
 
-import * as R from "ramda"
-import React, {useState, useContext, useCallback, useEffect} from 'react';
-import { SocketContext } from "../socket-context";
+import React, { useEffect } from 'react';
+import { socket } from "../socket-context";
 
 const Payer = () => {
     
         const products = 
         [
-            { params : { productID:2, quantity:2 }}
+            { id :0, quantity:1 },
+            { id :1, quantity:3 }
         ]
-        const socket = useContext(SocketContext);
 
         useEffect( () => {
             receivedPaymentLink();
@@ -26,13 +25,12 @@ const Payer = () => {
                     console.log(error);
                 else
                     window.location = url;
-                console.log(url + " " + error);
             });
         }
 
     return (
         <button onClick={sendRequestPayment}>
-            CLICK MOI PAIE MOI
+            CLICK MOI PAIE MOI STP
         </button>
     )
 };
