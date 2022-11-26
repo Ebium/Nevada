@@ -42,7 +42,6 @@ function NEVADA() {
   return (
     <>
       {element}
-      <Payer></Payer>
       <StyledToastContainer data-cy="toast-error" hideProgressBar={true} />
       <UserPermission />
       </>

@@ -1,3 +1,4 @@
+require("dotenv").config()
 const Product = require('../models/Product.js')
 const Stripe = require("stripe")
 const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY);
@@ -14,7 +15,6 @@ async function getStripeCheckoutSessionUrl(products) {
         console.log(e);
         error = "Un problème interne est survenu.";
     }
-    console.log(url);
   return {url, error};
 }
 
@@ -34,7 +34,6 @@ async function requestSessionCheckoutStripeUrl(products) {
  */
 async function createStripeCheckoutSessionUrl(object) {
     return stripe.checkout.sessions.create(object).then((stripeData) => {
-      console.log(stripeData.url)
       return stripeData.url;
     })
 }
@@ -61,7 +60,7 @@ function requestStripeCheckoutObject(buy_products, products_data) {
       };
     }),
     success_url: `http://localhost:3000/nevada/payment/success.html`, // A mettre à jour...
-    cancel_url: `http://localhost:3000/nevada/game`, // A mettre à jour...
+    cancel_url: `http://localhost:3000/nevada/home`, // A mettre à jour... peut etre se faire envoyer côté client ?
   };
 }
 

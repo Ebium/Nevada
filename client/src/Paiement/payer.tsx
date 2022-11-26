@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { socket } from "../socket-context";
 
 const Payer = () => {
@@ -30,7 +30,7 @@ const Payer = () => {
 
     return (
         <button onClick={sendRequestPayment}>
-            CLICK MOI PAIE MOI STP
+            Payer
         </button>
     )
 };
