@@ -26,21 +26,26 @@ export const playMove = (cell: CellType, movesCount: number, movesHistory : Move
     return 
 } 
 
+// Renvoie le plateau avec des cases oranges sur lesquelles un pion peut être posé
 export const showPossibleMoves = (cell: Coord, boardArray: boardType) => {
+    let possibleMoves = 0
     const copy = R.clone(boardArray)
     for(let i = 0; i < 10; i++){
         const tmp = copy[cell.x][i]
-        if(tmp.isFilled){
+        if(tmp.isFilled && !tmp.holeFilled){
             copy[cell.x][i].color = "orange"
+            possibleMoves++
         }
     }
     for(let j = 0; j < 10; j++){
         const tmp = copy[j][cell.y]
-        if(tmp.isFilled){
+        if(tmp.isFilled && !tmp.holeFilled){
             copy[j][cell.y].color = "orange"
+            possibleMoves++
+
         }
     }
-    return copy
+    return {board: copy, possibleMoves: possibleMoves}
 }
 
 export const getPalette = (cell: CellType) => {

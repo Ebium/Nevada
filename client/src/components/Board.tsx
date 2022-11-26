@@ -14,7 +14,7 @@ import { useState } from "react"
 export const Board = () => {
   const dispatch = useDispatch()
   const boardArray = useNevadaSelector((state) => state.board.array)
-  const gameCanStart = useNevadaSelector((state) => state.game.started)
+  const gameStarted = useNevadaSelector((state) => state.game.started)
   const currentPad = useNevadaSelector((state) => state.pad.current)
   const padStore = useNevadaSelector((state) => state.pad.padStore)
   const historyBoard = useNevadaSelector((state) => state.board.history)
@@ -25,19 +25,26 @@ export const Board = () => {
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
   const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
 
-  const [pieces,setPieces] = useState([])
+  const [pieces, setPieces] = useState([])
 
   const handleBoardClick = (cell: CellType) => {
     // Si la partie a commencé, joue un coup
-    if(gameCanStart){
+    if (gameStarted) {
       const payload = playMove(cell, movesCount, movesHistory, boardArray)
-      
-      if (payload!=null){
-        console.log(movesHistory.length)
-        const boardWithoutPreviousMoves = movesHistory.length > 1 ? removeOldPossibleMoves(movesHistory[movesHistory.length-2], payload.boardArray,initialBoard) : boardArray
-        const boardWithMoves = showPossibleMoves(cell,boardWithoutPreviousMoves)
+
+      // Si le coup est possible on met à jour les cases possibles du plateau
+      if (payload != null) {
+        // Si un coup a déjà été joué, on enlève les anciens coup possible, sinon on ne fait rien
+        const boardWithoutPreviousMoves = movesHistory.length > 1 ? removeOldPossibleMoves(movesHistory[movesHistory.length - 2], payload.boardArray, initialBoard) : boardArray
+
+        // Puis on met à jour les coups possibles pour le coup joué
+        const boardWithMoves = showPossibleMoves(cell, boardWithoutPreviousMoves)
+        if (boardWithMoves.possibleMoves === 0) {
+          console.log("game end")
+        }
+
         dispatch(updateMovesHistory(payload.newMovesHistory, payload.movesCount))
-        dispatch(updateBoardArray(boardWithMoves))
+        dispatch(updateBoardArray(boardWithMoves.board))
       }
       return
     }
@@ -354,30 +361,29 @@ export const Board = () => {
                 <Cellule
                   key={keyVar}
                   onClick={() => {
-                    console.log(key)
-                    handleBoardClick(key) 
+                    handleBoardClick(key)
                   }}
                   style={{
                     backgroundColor: key.isFilled
                       ? key.color
-                      : gameCanStart
+                      : gameStarted
                         ? "transparent"
                         : "#D3D3D3",
                     border:
-                      gameCanStart && !key.isFilled ? "none" : "1px red solid",
+                      gameStarted && !key.isFilled ? "none" : "1px red solid",
                   }}
                 >
                   {key.isFilled ? (
                     <HoleForCellule color={key.holeColor}></HoleForCellule>
                   ) : (
-                    // gameCanStart ? (
+                    // gameStarted ? (
                     //   <>
                     //     {/* Couleur? */}
                     //   </>
                     // ) : (
-                      <>
-                        {key.x},{key.y}
-                      </>
+                    <>
+                      {key.x},{key.y}
+                    </>
                     // )
                   )}
                 </Cellule>

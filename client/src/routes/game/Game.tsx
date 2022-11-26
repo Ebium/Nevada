@@ -16,7 +16,7 @@ import {
   updateBoardArray,
   updateHistoryBoard,
 } from "../../store/ducks/Board.ducks"
-import { updateGameCanStart, updateMovesHistory } from "../../store/ducks/Game.ducks"
+import { updateGameStarted, updateMovesHistory } from "../../store/ducks/Game.ducks"
 import { useNavigate } from "react-router-dom"
 import { removeOldPossibleMoves, showPossibleMoves } from "../../utils/Moves"
 
@@ -29,17 +29,17 @@ export const Game = () => {
   const hist = useNevadaSelector((state) => state.board.history)
   const board = useNevadaSelector((state) => state.board.array)
   const padStore = useNevadaSelector((state) => state.pad.padStore)
-  const canStart = useNevadaSelector((state) => state.game.started)
+  const gameStarted = useNevadaSelector((state) => state.game.started)
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
   const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
 
   useEffect(() => {
     if (droppedCounter === 17) {
-      dispatch(updateGameCanStart(true))
+      dispatch(updateGameStarted(true))
     } else {
-      if (canStart) {
-        dispatch(updateGameCanStart(false))
+      if (gameStarted) {
+        dispatch(updateGameStarted(false))
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,14 +105,14 @@ export const Game = () => {
 
   const resetGame = () => {
     resetBoard()
-    dispatch(updateGameCanStart(false))
+    dispatch(updateGameStarted(false))
   }
 
 
   // Enlève la dernière pièece mise
   const undoBoard = () => {
-    if (hist.length === 0 && movesHistory.length === 0) return
-    if(!canStart){
+    if (hist.length === 0) return
+    if(!gameStarted){
       const updatedBoard = R.clone(board)
       let updatedHistory = R.clone(hist)
       hist[hist.length - 1].map(
@@ -129,12 +129,23 @@ export const Game = () => {
 
   // Annule un coup le dernier coup jouer en mettant à jour la dernière case jouée
   const undoMove = () => {
-    if (hist.length === 0 && movesHistory.length === 0) return
-    if(canStart){
+    if (movesHistory.length === 0) return
+    if(gameStarted){
+      // Contient l'ancienne valeur de la case jouée
       const move = movesHistory.pop()
+      console.log(move,movesHistory)
       if(!move) return
-      const updatedBoard = showPossibleMoves(movesHistory[movesHistory.length-1],removeOldPossibleMoves(move,board,initialBoard))
-      
+
+      // Enlève les coups possibles du dernier coup joué
+      let updatedBoard = removeOldPossibleMoves(move,board,initialBoard)
+
+      // S'il y avait des coups joués, on ajoute les coups possibles de l'avant dernier coup joué
+      // sinon on ajoute rien
+      if(movesHistory.length>0){
+        updatedBoard = showPossibleMoves(movesHistory[movesHistory.length-1],updatedBoard).board
+      }
+
+      // On remet à jour la valeur de la case avant le coup joué
       updatedBoard[move.x][move.y].holeColor = move.holeColor
       updatedBoard[move.x][move.y].holeFilled = move.holeFilled 
 
@@ -145,8 +156,8 @@ export const Game = () => {
 
   const startGame = () => {
     console.log("game started")
-    if(!canStart){
-      dispatch(updateGameCanStart(true))
+    if(!gameStarted){
+      dispatch(updateGameStarted(true))
       dispatch(initializeInitialBoard(board))
     }
   }
@@ -197,7 +208,7 @@ export const Game = () => {
           </StyledButton>
           <HeightSpacer></HeightSpacer>
           <StyledButton 
-            // disabled={!canStart} 
+            // disabled={!gameStarted} 
             onClick={() => startGame()}
           >
             StartGame
@@ -236,7 +247,7 @@ export const Game = () => {
 
           <Plaquette
             onClick={() => {
-              changeCurrentPad(4, 1, "blue")
+              changeCurrentPad(4, 1, "azure")
             }}
           >
             <ColumnStyle>

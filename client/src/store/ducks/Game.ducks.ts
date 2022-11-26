@@ -1,11 +1,11 @@
 import { Move } from "../../utils/Moves"
 export const enum GameActionsEnum {
-  UPDATE_GAME_CAN_START = "GAME/updateGameCanStart",
+  UPDATE_GAME_CAN_START = "GAME/updateGameStarted",
 
   UPDATE_MOVES_HISTORY = "GAME/updateMovesHistory",
 }
 
-export const updateGameCanStart = (bool: boolean) =>
+export const updateGameStarted = (bool: boolean) =>
 ({
   type: GameActionsEnum.UPDATE_GAME_CAN_START,
   bool
@@ -18,7 +18,7 @@ export const updateMovesHistory = (moves: Move[], count: number) =>
 } as const)
 
 type GameActionsType = ReturnType<
-  | typeof updateGameCanStart
+  | typeof updateGameStarted
   | typeof updateMovesHistory
 >
 
@@ -32,7 +32,7 @@ export interface GameState {
 export const gameInitialState: GameState = {
   started: false,
   status: "idle",
-  movesHistory: [],
+  movesHistory: [], // Contient l'ancienne valeur des cases avant le coup joué
   movesCount: 0,
 }
 
