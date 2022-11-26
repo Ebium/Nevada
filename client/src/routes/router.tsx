@@ -86,7 +86,31 @@ export const routes: RouteObject[] = [
         path: "*",
         element: <NotFound404 />,
       },
-      
+      {
+        path: "payment/*",
+        children: [
+          {
+            index: true,
+            element: <Navigate to={"payment"} />,
+          },
+          {
+            path: "payment",
+            element: <Payment />,
+          },
+          {
+            path: "paymentRefused",
+            element: <PaymentRefused />,
+          },
+          {
+            path: "paymentAccepted",
+            element: <PaymentAccepted />,
+          },
+          {
+            path: "*",
+            element: <NotFound404 />,
+          },
+        ],
+      },
     ],
   },
 ]
