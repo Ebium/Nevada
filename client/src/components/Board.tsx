@@ -5,10 +5,11 @@ import {
   updateBoardArray,
   updateHistoryBoard,
 } from "../store/ducks/Board.ducks"
-import { CellType, playMove } from "../utils/Moves"
+import { CellType, playMove, removeOldPossibleMoves, showPossibleMoves } from "../utils/Moves"
 import { updateDroppedCounter, updatePadStore } from "../store/ducks/Pad.ducks"
 import { useNevadaSelector } from "../store/rootReducer"
 import { updateMovesHistory } from "../store/ducks/Game.ducks"
+import { useState } from "react"
 
 export const Board = () => {
   const dispatch = useDispatch()
@@ -22,14 +23,21 @@ export const Board = () => {
   )
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
+  const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
+
+  const [pieces,setPieces] = useState([])
 
   const handleBoardClick = (cell: CellType) => {
     // Si la partie a commencé, joue un coup
     if(gameCanStart){
       const payload = playMove(cell, movesCount, movesHistory, boardArray)
+      
       if (payload!=null){
+        console.log(movesHistory.length)
+        const boardWithoutPreviousMoves = movesHistory.length > 1 ? removeOldPossibleMoves(movesHistory[movesHistory.length-2], payload.boardArray,initialBoard) : boardArray
+        const boardWithMoves = showPossibleMoves(cell,boardWithoutPreviousMoves)
         dispatch(updateMovesHistory(payload.newMovesHistory, payload.movesCount))
-        dispatch(updateBoardArray(payload.boardArray))
+        dispatch(updateBoardArray(boardWithMoves))
       }
       return
     }
@@ -345,7 +353,10 @@ export const Board = () => {
               return (
                 <Cellule
                   key={keyVar}
-                  onClick={() => handleBoardClick(key)}
+                  onClick={() => {
+                    console.log(key)
+                    handleBoardClick(key) 
+                  }}
                   style={{
                     backgroundColor: key.isFilled
                       ? key.color
@@ -359,15 +370,15 @@ export const Board = () => {
                   {key.isFilled ? (
                     <HoleForCellule color={key.holeColor}></HoleForCellule>
                   ) : (
-                    gameCanStart ? (
-                      <>
-                        {/* Couleur? */}
-                      </>
-                    ) : (
+                    // gameCanStart ? (
+                    //   <>
+                    //     {/* Couleur? */}
+                    //   </>
+                    // ) : (
                       <>
                         {key.x},{key.y}
                       </>
-                    )
+                    // )
                   )}
                 </Cellule>
               )

@@ -3,6 +3,8 @@ export const enum BoardActionsEnum {
   RESET_BOARD_ARRAY = "BOARD/resetBoardArray",
 
   UPDATE_HISTORY_BOARD = "BOARD/updateHistoryBoard",
+
+  INITIALIZE_INITIALBOARD = "BOARD/initializeInitialBoard",
 }
 
 export const updateBoardArray = (array: boardType) =>
@@ -19,11 +21,17 @@ export const updateHistoryBoard = (histo: Array<Array<any>>) =>
     type: BoardActionsEnum.UPDATE_HISTORY_BOARD,
     histo,
   } as const)
+export const initializeInitialBoard = (initialBoard: boardType) =>
+  ({
+    type: BoardActionsEnum.INITIALIZE_INITIALBOARD,
+    initialBoard,
+  } as const)
 
 type BoardActionsType = ReturnType<
   | typeof updateBoardArray 
   | typeof resetBoardArray 
   | typeof updateHistoryBoard
+  | typeof initializeInitialBoard
 >
 
 let x = -1
@@ -49,6 +57,7 @@ export interface BoardState {
   status: "idle" | "loading" | "failed"
   array: boardType
   history: Array<Array<any>>
+  initialBoard: boardType
 }
 
 export const boardInitialState: BoardState = {
@@ -56,6 +65,7 @@ export const boardInitialState: BoardState = {
   status: "idle",
   array: initialeBoardArray,
   history: [],
+  initialBoard: initialeBoardArray
 }
 
 export function BoardReducer(
@@ -69,6 +79,8 @@ export function BoardReducer(
       return { ...state, array: initialeBoardArray }
     case BoardActionsEnum.UPDATE_HISTORY_BOARD:
       return { ...state, history: action.histo }
+    case BoardActionsEnum.INITIALIZE_INITIALBOARD:
+      return { ...state, initialBoard: action.initialBoard }
     default:
       return { ...state }
   }

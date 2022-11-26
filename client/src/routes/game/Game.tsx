@@ -11,12 +11,14 @@ import {
 import { useDispatch } from "react-redux"
 import { useNevadaSelector } from "../../store/rootReducer"
 import {
+  initializeInitialBoard,
   resetBoardArray,
   updateBoardArray,
   updateHistoryBoard,
 } from "../../store/ducks/Board.ducks"
 import { updateGameCanStart, updateMovesHistory } from "../../store/ducks/Game.ducks"
 import { useNavigate } from "react-router-dom"
+import { removeOldPossibleMoves, showPossibleMoves } from "../../utils/Moves"
 
 export const Game = () => {
   const dispatch = useDispatch()
@@ -30,6 +32,7 @@ export const Game = () => {
   const canStart = useNevadaSelector((state) => state.game.started)
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
+  const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
 
   useEffect(() => {
     if (droppedCounter === 17) {
@@ -98,13 +101,19 @@ export const Game = () => {
     dispatch(resetPadStore())
     dispatch(updateDroppedCounter(0))
     dispatch(updateHistoryBoard([]))
+  }
+
+  const resetGame = () => {
+    resetBoard()
     dispatch(updateGameCanStart(false))
   }
 
+
+  // Enlève la dernière pièece mise
   const undoBoard = () => {
     if (hist.length === 0 && movesHistory.length === 0) return
-    const updatedBoard = R.clone(board)
     if(!canStart){
+      const updatedBoard = R.clone(board)
       let updatedHistory = R.clone(hist)
       hist[hist.length - 1].map(
         (cell) =>
@@ -114,21 +123,32 @@ export const Game = () => {
       updatedHistory.pop()
       dispatch(updateHistoryBoard(updatedHistory))
       dispatch(updateDroppedCounter(droppedCounter - 1))
+      dispatch(updateBoardArray(updatedBoard))
     }
-    // Annule un coup le dernier coup jouer en mettant à jour la dernière case jouée
-    else{
+  }
+
+  // Annule un coup le dernier coup jouer en mettant à jour la dernière case jouée
+  const undoMove = () => {
+    if (hist.length === 0 && movesHistory.length === 0) return
+    if(canStart){
       const move = movesHistory.pop()
       if(!move) return
+      const updatedBoard = showPossibleMoves(movesHistory[movesHistory.length-1],removeOldPossibleMoves(move,board,initialBoard))
+      
       updatedBoard[move.x][move.y].holeColor = move.holeColor
       updatedBoard[move.x][move.y].holeFilled = move.holeFilled 
+
       dispatch(updateMovesHistory(movesHistory,movesCount-1))
+      dispatch(updateBoardArray(updatedBoard))
     }
-    dispatch(updateBoardArray(updatedBoard))
   }
 
   const startGame = () => {
     console.log("game started")
-    dispatch(updateGameCanStart(true))
+    if(!canStart){
+      dispatch(updateGameCanStart(true))
+      dispatch(initializeInitialBoard(board))
+    }
   }
 
   return (
@@ -149,7 +169,7 @@ export const Game = () => {
           </StyledButton>
           <HeightSpacer></HeightSpacer>
           <StyledButton
-            // disabled={droppedCounter === 0}
+            disabled={droppedCounter === 0}
             onClick={() => resetBoard()}
           >
             reset Board
@@ -160,6 +180,20 @@ export const Game = () => {
             onClick={() => undoBoard()}
           >
             Undo
+          </StyledButton>
+          <HeightSpacer></HeightSpacer>
+          <StyledButton
+            disabled={movesCount === 0}
+            onClick={() => undoMove()}
+          >
+            Undo Move
+          </StyledButton>
+          <HeightSpacer></HeightSpacer>
+          <StyledButton
+            // disabled={droppedCounter === 0}
+            onClick={() => resetGame()}
+          >
+            Reset Game
           </StyledButton>
           <HeightSpacer></HeightSpacer>
           <StyledButton 
