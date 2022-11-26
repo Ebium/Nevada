@@ -3,28 +3,40 @@ const mongoose = require("mongoose")
 const app = express()
 const cors = require("cors")
 const products_routes = require("./routes/products.js")
-const PORT = 5000
+const { getStripeCheckoutSessionUrl } = require("./controllers/payment")
+
+
+const PORT = 5050
 
 const corsOptions = {
   origin: "http://localhost:3000",
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 
+
 require("dotenv").config()
 
 const socketIo = require("socket.io")
 const http = require("http")
 const server = http.createServer(app)
-const io = socketIo(server, {
-  cors: {
-    origin: "http://localhost:3000",
-  },
+
+const io = socketIo(server,{ 
+    cors: {
+      origin: ["http://localhost:3000"]
+    }
 })
 
-io.on("connection", (socket) => {
-  console.log("client connected: ", socket.id)
 
-  socket.on("disconnect", (reason) => {
+
+io.on("connection",(socket)=>{
+  console.log("client connected: ",socket.id)
+
+  socket.on("pay_products", async(products) => {
+    socket.emit("pay_products", await getStripeCheckoutSessionUrl(products) );
+  })
+  
+  socket.on("disconnect",(reason)=>{
+
     console.log(reason)
   })
 })
