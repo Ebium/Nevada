@@ -43,6 +43,16 @@ io.on("connection",(socket)=>{
   })
 
   socket.on("Login an user", async(user)=> {
+    const result = await updateUserSocketId(user);
+    if(!result.modifiedCount) 
+      socket.emit("Login an user", result, false)
+    else{
+      socket.emit("Login an user", result, true)
+      console.log("user connected : "+ user.email)
+    } 
+  })
+
+  socket.on("Login an user", async(user)=> {
     const result = await updateUserAuth(user);
 
     if(!result.modifiedCount) 
