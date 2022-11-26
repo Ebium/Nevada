@@ -15,14 +15,14 @@ const UserPermission = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    const socket = io("http://localhost:5000")
-    socket.on("connect", () => {
-      console.log(socket.id)
-      dispatch(updateSocketID(socket.id))
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // useEffect(() => {
+  //   const socket = io("http://localhost:5000")
+  //   socket.on("connect", () => {
+  //     console.log(socket.id)
+  //     dispatch(updateSocketID(socket.id))
+  //   })
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
   // mettre un setter avec les différents champs de connexion
   // si personne est co , alors le useeffect fera une redirection
