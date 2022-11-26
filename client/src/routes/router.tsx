@@ -28,6 +28,10 @@ export const routes: RouteObject[] = [
         element: <Payer />,
       },
       {
+        path: "signup",
+        element: <SignUp />,
+      },
+      {
         path: "*",
         element: <NotFound404 />,
       },

@@ -25,6 +25,13 @@ export const Home = () => {
       </StyledButton>
       <StyledButton
         onClick={() => {
+          navigate("/signup")
+        }}
+      >
+        Sign up
+      </StyledButton>
+      <StyledButton
+        onClick={() => {
           navigate("/NotFound404")
         }}
       >
