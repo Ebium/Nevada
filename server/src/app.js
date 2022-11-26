@@ -4,7 +4,7 @@ const app = express()
 const cors = require("cors")
 const products_routes = require("./routes/products.js")
 const { getStripeCheckoutSessionUrl } = require("./controllers/payment")
-
+const { createValidUser } = require("./controllers/users") 
 
 const PORT = 5050
 
@@ -27,17 +27,33 @@ const io = socketIo(server,{
 })
 
 
-
+/*
+ *  client/server : user request
+ */
 io.on("connection",(socket)=>{
   console.log("client connected: ",socket.id)
 
-  socket.on("pay_products", async(products) => {
-    socket.emit("pay_products", await getStripeCheckoutSessionUrl(products) );
+  socket.on("Register a new user", async(user)=> {
+    const result = await createValidUser(user);
+    if(result.user==null) 
+      socket.emit("Register a new user", result, false)
+    else{
+      socket.emit("Register a new user", result, true)
+      console.log("new user registered : "+ user.pseudo)
+    } 
   })
   
   socket.on("disconnect",(reason)=>{
-
     console.log(reason)
+  })
+})
+
+/*
+ *  client/user : payment request
+ */
+io.on("connection", (socket) => {
+  socket.on("pay_products", async(products) => {
+    socket.emit("pay_products", await getStripeCheckoutSessionUrl(products) );
   })
 })
 
