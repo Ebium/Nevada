@@ -5,7 +5,7 @@ import { routes } from "./routes/router"
 import { useNevadaSelector } from "./store/rootReducer"
 import { useDispatch } from "react-redux"
 import { updateSocketID } from "./store/ducks/User.ducks"
-import Payer from "./Paiement/payer"
+import Payer from "./Paiement/Pay"
 import { socket } from "./socket-context"
 
 // Cette page est la racine de toutes les pages, il faudra ajouter le check si un utilisateur est connecté ou pas

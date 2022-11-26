@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { socket } from "../socket-context";
 
-const Payer = () => {
+const Pay = () => {
     
         const products = 
         [
@@ -30,10 +30,10 @@ const Payer = () => {
 
     return (
         <button onClick={sendRequestPayment}>
-            Payer
+            Pay
         </button>
     )
 };
 
 
-export default Payer;
+export default Pay;
