@@ -10,6 +10,8 @@ import SignUp from "./SignUp"
 import Pay from "../Paiement/Pay"
 import { Showroom } from "./other/Showroom"
 import Login from "./Login"
+import RoomButton from "./game/RoomButton"
+import Room from "./game/Room"
 
 export const routes: RouteObject[] = [
   {
@@ -46,6 +48,14 @@ export const routes: RouteObject[] = [
           {
             path: "signup",
             element: <SignUp />,
+          },
+          {
+            path: "createroom",
+            element: <RoomButton />,
+          },
+          {
+            path: ":room",
+            element: <Room />,
           },
           {
             path: "*",
