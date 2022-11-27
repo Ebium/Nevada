@@ -59,8 +59,8 @@ function requestStripeCheckoutObject(buy_products, products_data) {
         quantity: product.quantity,
       };
     }),
-    success_url: `http://localhost:3000/nevada/payment/success.html`, // TODO : update URL
-    cancel_url: `http://localhost:3000/nevada/home`, // TODO : update URL (idea : sended by client side ?)
+    success_url: `http://localhost:3000/nevada/main/payment/paymentAccepted`, // TODO : update URL
+    cancel_url: `http://localhost:3000/nevada/main/payment/paymentRefused`, // TODO : update URL (idea : sended by client side ?)
   };
 }
 

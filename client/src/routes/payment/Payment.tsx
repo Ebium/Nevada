@@ -6,14 +6,31 @@ export const Payment = () => {
   return (
     <Content>
       <NevadaHeader />
-      <NVButton disabled={false} content={"S'abonner"} colorSchem={"black"} />
+      <NVButton
+        disabled={false}
+        content={"S'abonner"}
+        colorSchem={"black"}
+        onClick={() => {
+          console.log("random")
+        }}
+      />
       a
-      <NVButton disabled={false} content={"S'abonner"} colorSchem={"blue"} />
+      <NVButton
+        disabled={false}
+        content={"S'abonner"}
+        colorSchem={"blue"}
+        onClick={() => {
+          console.log("random")
+        }}
+      />
       a
       <NVButton
         disabled={false}
         content={"Page d'accueil"}
         colorSchem={"gold"}
+        onClick={() => {
+          console.log("random")
+        }}
       />
     </Content>
   )

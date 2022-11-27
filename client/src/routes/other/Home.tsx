@@ -44,6 +44,13 @@ export const Home = () => {
       >
         Error 404
       </StyledButton>
+      <StyledButton
+        onClick={() => {
+          navigate("/showroom")
+        }}
+      >
+        showroom (main page en gros)
+      </StyledButton>
       Socket id for current connection = {sockID}
     </Content>
   )

@@ -4,4 +4,5 @@ export const colors = {
   nevadaBlue: "#2B3062",
   topGrey: "#494949",
   midGrey: "#D9D9D9",
+  nevadaBackground: "#262626",
 }

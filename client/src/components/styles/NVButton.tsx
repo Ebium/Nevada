@@ -6,17 +6,21 @@ interface ButtonProps {
   disabled: boolean
   content: string
   colorSchem: "black" | "blue" | "gold"
+  onClick: () => void
 }
 
-export const NVButton = ({ disabled, content, colorSchem }: ButtonProps) => {
+export const NVButton = ({
+  disabled,
+  content,
+  colorSchem,
+  onClick,
+}: ButtonProps) => {
   return (
     <>
       <StyledButton
         colorSchem={colorSchem}
         disabled={disabled}
-        onClick={() => {
-          console.log("button")
-        }}
+        onClick={onClick}
       >
         <StyledFont colorSchem={colorSchem} disabled={disabled}>
           {content}
@@ -43,7 +47,6 @@ const StyledButton = styled.button<StyledButtonProps>`
   height: 3.1rem;
   border: none;
   border-radius: 10px;
-  margin-left: 50rem;
   padding: 1rem 3rem;
   display: flex;
   align-items: center;
