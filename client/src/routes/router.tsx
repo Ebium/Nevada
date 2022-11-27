@@ -11,6 +11,7 @@ import Pay from "../Paiement/Pay"
 import { Showroom } from "./other/Showroom"
 import Login from "./Login"
 import { Main } from "../components/Main"
+import { Profil } from "./other/Profil"
 
 export const routes: RouteObject[] = [
   {
@@ -36,6 +37,10 @@ export const routes: RouteObject[] = [
           {
             path: "home",
             element: <Home />,
+          },
+          {
+            path: "profil",
+            element: <Profil />,
           },
           {
             path: "game",
