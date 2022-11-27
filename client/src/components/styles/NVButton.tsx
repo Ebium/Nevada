@@ -51,7 +51,7 @@ const StyledButton = styled.button<StyledButtonProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  letter-spacing: 0.15rem;
+  letter-spacing: 0.1rem;
   :hover {
     box-shadow: 0px 0px 0.3rem
       ${({ colorSchem }) =>

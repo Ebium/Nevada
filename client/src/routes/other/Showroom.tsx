@@ -35,7 +35,7 @@ export const Showroom = () => {
           <NVButton
             disabled={false}
             content={intl.formatMessage({
-              id: "button.home-page",
+              id: "button.home",
             })}
             colorSchem={"black"}
             onClick={() => {
