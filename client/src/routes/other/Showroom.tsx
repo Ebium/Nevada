@@ -1,12 +1,15 @@
+import { useIntl } from "react-intl"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components/macro"
 import { ReactComponent as NevadaLogo } from "../../assets/nevada_logo_2.svg"
 import { colors } from "../../components/styles/design.config"
 import { NVButton } from "../../components/styles/NVButton"
 import { NVSpacer } from "../../components/styles/NVSpacer"
+import { NVText } from "../../components/styles/NVText"
 
 export const Showroom = () => {
   const navigate = useNavigate()
+  const intl = useIntl()
 
   return (
     <Content>
@@ -14,15 +17,26 @@ export const Showroom = () => {
         <NevadaLogo />
       </LeftDiv>
       <RightDiv>
-        <RowDiv>
-          <TextDiv> text la</TextDiv>
+        <RowDiv style={{ width: "40rem" }}>
+          <NVText
+            text={intl.formatMessage({
+              id: "showroom.content",
+            })}
+            textStyle={{
+              color: "nevadaGold",
+              textAlign: "center",
+              fontSize: 1.5,
+            }}
+          />
           <NVSpacer width={8} />
         </RowDiv>
         <NVSpacer height={8} />
         <RowDiv>
           <NVButton
             disabled={false}
-            content={"Page d'accueil"}
+            content={intl.formatMessage({
+              id: "button.home-page",
+            })}
             colorSchem={"black"}
             onClick={() => {
               navigate("/main/home")
@@ -34,7 +48,9 @@ export const Showroom = () => {
         <RowDiv>
           <NVButton
             disabled={false}
-            content={"Règles du jeu"}
+            content={intl.formatMessage({
+              id: "button.rules",
+            })}
             colorSchem={"black"}
             onClick={() => {
               navigate("/main/home")
@@ -43,7 +59,9 @@ export const Showroom = () => {
           <NVSpacer width={8} />
           <NVButton
             disabled={false}
-            content={"Nous soutenir"}
+            content={intl.formatMessage({
+              id: "button.help-us",
+            })}
             colorSchem={"black"}
             onClick={() => {
               navigate("/main/home")
@@ -82,8 +100,4 @@ const RightDiv = styled.div`
 const RowDiv = styled.div`
   display: flex;
   flex-direction: row;
-`
-
-const TextDiv = styled.div`
-  color: ${colors.nevadaGold};
 `

@@ -1,5 +1,5 @@
 import styled from "styled-components/macro"
-import { ReactComponent as NevadaLogo } from "../../assets/nevada_logo_1.svg"
+import { ReactComponent as NevadaLogo } from "../assets/nevada_logo_1.svg"
 import { colors } from "./styles/design.config"
 
 export const NevadaHeader = () => {
