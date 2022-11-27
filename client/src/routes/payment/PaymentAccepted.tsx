@@ -14,30 +14,34 @@ export const PaymentAccepted = () => {
     <Content>
       <NVText
         text={intl.formatMessage({
-          id: "payment.refused.header",
+          id: "payment.accepted.text",
         })}
-        textStyle={{ color: "nevadaGold", fontSize: 4, letterSpacing: 1 }}
-      />
-      <NVSpacer height={3} />
-
-      <NVText
-        text={intl.formatMessage({
-          id: "payment.refused.text",
-        })}
-        textStyle={{ color: "nevadaGold", fontSize: 1.75, letterSpacing: 0.5 }}
+        textStyle={{ color: "nevadaGold", fontSize: 1.75, letterSpacing: 0.3 }}
       />
       <NVSpacer height={10} />
-      <NVButton
-        disabled={false}
-        content={intl.formatMessage({
-          id: "payment.refused.back-home",
-        })}
-        colorSchem={"black"}
-        onClick={() => {
-          navigate("/main/payment")
-        }}
-      />
-      <NVSpacer height={5} />
+      <RowDiv>
+        <NVButton
+          disabled={false}
+          content={intl.formatMessage({
+            id: "button.profil",
+          })}
+          colorSchem={"black"}
+          onClick={() => {
+            navigate("/main/profil")
+          }}
+        />
+        <NVSpacer width={10} />
+        <NVButton
+          disabled={false}
+          content={intl.formatMessage({
+            id: "button.home",
+          })}
+          colorSchem={"black"}
+          onClick={() => {
+            navigate("/main/payment")
+          }}
+        />
+      </RowDiv>
     </Content>
   )
 }
@@ -50,4 +54,9 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+`
+
+const RowDiv = styled.div`
+  display: flex;
+  flex-direction: row;
 `

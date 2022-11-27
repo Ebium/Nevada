@@ -13,7 +13,7 @@ import { Main } from "../components/Main"
 import Login from "./Login"
 import RoomButton from "./game/RoomButton"
 import Room from "./game/Room"
-
+import { Profil } from "./other/Profil"
 
 export const routes: RouteObject[] = [
   {
@@ -39,6 +39,10 @@ export const routes: RouteObject[] = [
           {
             path: "home",
             element: <Home />,
+          },
+          {
+            path: "profil",
+            element: <Profil />,
           },
           {
             path: "game",
