@@ -39,6 +39,13 @@ export const Home = () => {
       </StyledButton>
       <StyledButton
         onClick={() => {
+          navigate("/main/createroom")
+        }}
+      >
+        Create Room
+      </StyledButton>
+      <StyledButton
+        onClick={() => {
           navigate("/NotFound404")
         }}
       >

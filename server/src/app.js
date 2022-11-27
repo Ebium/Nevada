@@ -5,6 +5,7 @@ const cors = require("cors")
 const products_routes = require("./routes/products.js")
 const { getStripeCheckoutSessionUrl } = require("./controllers/payment")
 const { createValidUser, updateUserAuth } = require("./controllers/users") 
+const { createRoom, updateANewPlayerRoom, updateAQuitPlayerRoom, clearRooms } = require("./controllers/room.js")
 
 const PORT = 5050
 
@@ -26,8 +27,14 @@ const io = socketIo(server,{
     }
 })
 
+/* 
+ * When we launch the server or reset the server
+ * Rooms should not exist
+ */
+clearRooms()
+
 /*
- *  client/server : user request
+ *  client/server : user account request
  */
 io.on("connection",(socket)=>{
   console.log("client connected: ",socket.id)
@@ -63,12 +70,45 @@ io.on("connection",(socket)=>{
     } 
   })
 
-  socket.on("reconnect", () => {
-    console.log("test")
-  });
-
   socket.on("disconnect",(reason)=>{
     console.log(reason)
+  })
+})
+
+/*
+ *  client/server : room request
+ */
+io.on("connection", (socket) => {
+  var currentRoomId = undefined;
+  var usersRoom = undefined;
+
+  socket.on("Create a new room", async(player) => {
+    const room = await createRoom({})
+    if(room._id)
+      socket.emit("Create a new room", room._id, true)
+    else
+      socket.emit("Create a new room", undefined, false)
+  })
+
+  socket.on("Join a room", async(roomId) => {
+    const room = await updateANewPlayerRoom({ _id : mongoose.Types.ObjectId(roomId)}, socket.id)
+    if(room.modifiedCount){
+      
+      socket.join(roomId)
+      currentRoomId=roomId;
+      usersRoom = await io.sockets.adapter.rooms.get(currentRoomId)
+
+      socket.emit("Join a room", true)
+      io.to(currentRoomId).emit("An user joined the room",  Array.from(usersRoom))
+    } else
+      socket.emit("Join a room", false)
+  })
+
+  socket.on("disconnect", async()=> {
+    if(currentRoomId!=undefined) {
+      await updateAQuitPlayerRoom({ _id : mongoose.Types.ObjectId(currentRoomId)},socket.id)
+      io.to(currentRoomId).emit("An user has left the room",  Array.from(usersRoom))
+    }
   })
 })
 
