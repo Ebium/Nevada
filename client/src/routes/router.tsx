@@ -14,6 +14,8 @@ import Login from "./Login"
 import RoomButton from "./game/RoomButton"
 import Room from "./game/Room"
 import { Profil } from "./other/Profil"
+import RoomButton from "./game/RoomButton"
+import Room from "./game/Room"
 
 export const routes: RouteObject[] = [
   {
