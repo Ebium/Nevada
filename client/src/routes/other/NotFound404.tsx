@@ -1,6 +1,6 @@
 import { useIntl } from "react-intl"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components"
+import styled from "styled-components/macro"
 import { colors } from "../../components/styles/design.config"
 import { NVText } from "../../components/styles/NVText"
 import { ReactComponent as NevadaLogo } from "../../assets/nevada_logo_1.svg"
@@ -53,8 +53,4 @@ const Content = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-`
-
-const StyledButton = styled.button`
-  margin-top: 2rem;
 `

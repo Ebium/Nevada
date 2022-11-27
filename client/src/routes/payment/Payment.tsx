@@ -1,11 +1,12 @@
+import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import { NevadaHeader } from "../../components/NevadaHeader"
 import { NVButton } from "../../components/styles/NVButton"
 
 export const Payment = () => {
+  const navigate = useNavigate()
+
   return (
     <Content>
-      <NevadaHeader />
       <NVButton
         disabled={false}
         content={"S'abonner"}
@@ -29,7 +30,7 @@ export const Payment = () => {
         content={"Page d'accueil"}
         colorSchem={"gold"}
         onClick={() => {
-          console.log("random")
+          navigate("/main/home")
         }}
       />
     </Content>
@@ -39,5 +40,4 @@ export const Payment = () => {
 const Content = styled.div`
   height: 100vh;
   width: 100vw;
-  // background-color: gray;
 `
