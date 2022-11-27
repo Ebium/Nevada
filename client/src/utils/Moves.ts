@@ -45,6 +45,8 @@ export const showPossibleMoves = (cell: Coord, boardArray: boardType) => {
 
         }
     }
+    copy[cell.x][cell.y].color = "lime"
+    console.log("poss",possibleMoves)
     return {board: copy, possibleMoves: possibleMoves}
 }
 

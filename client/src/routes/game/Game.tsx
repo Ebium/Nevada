@@ -135,19 +135,19 @@ export const Game = () => {
       const move = movesHistory.pop()
       console.log(move,movesHistory)
       if(!move) return
-
+      
       // Enlève les coups possibles du dernier coup joué
       let updatedBoard = removeOldPossibleMoves(move,board,initialBoard)
 
+      // On remet à jour la valeur de la case avant le coup joué 
+      updatedBoard[move.x][move.y].holeColor = move.holeColor
+      updatedBoard[move.x][move.y].holeFilled = move.holeFilled 
+  
       // S'il y avait des coups joués, on ajoute les coups possibles de l'avant dernier coup joué
       // sinon on ajoute rien
       if(movesHistory.length>0){
         updatedBoard = showPossibleMoves(movesHistory[movesHistory.length-1],updatedBoard).board
       }
-
-      // On remet à jour la valeur de la case avant le coup joué
-      updatedBoard[move.x][move.y].holeColor = move.holeColor
-      updatedBoard[move.x][move.y].holeFilled = move.holeFilled 
 
       dispatch(updateMovesHistory(movesHistory,movesCount-1))
       dispatch(updateBoardArray(updatedBoard))
