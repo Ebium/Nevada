@@ -7,7 +7,15 @@ export const translations = {
   "button.rules": "Règles du jeu",
   "button.help-us": "Nous soutenir",
 
+  "header.title": "Nevada",
+  "header.log-in": "Connexion",
+  "header.sign-in": "Inscription",
+
   "error404.header": "Error 404",
   "error404.text": "Page introuvable",
   "error404.back-home": "Revenir à l'accueil",
+
+  "payment.refused.header": "Paiement annulé",
+  "payment.refused.text": "quel dommage ...",
+  "payment.refused.back-home": "Revenir en arrière",
 }

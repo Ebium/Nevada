@@ -9,9 +9,11 @@ import { Payment } from "./payment/Payment"
 import SignUp from "./SignUp"
 import Pay from "../Paiement/Pay"
 import { Showroom } from "./other/Showroom"
+import { Main } from "../components/Main"
 import Login from "./Login"
 import RoomButton from "./game/RoomButton"
 import Room from "./game/Room"
+
 
 export const routes: RouteObject[] = [
   {
@@ -28,10 +30,11 @@ export const routes: RouteObject[] = [
       },
       {
         path: "main/*",
+        element: <Main />,
         children: [
           {
-            element: <Navigate to={"home"} />,
             index: true,
+            element: <Navigate to={"home"} />,
           },
           {
             path: "home",
@@ -66,10 +69,6 @@ export const routes: RouteObject[] = [
             children: [
               {
                 index: true,
-                element: <Navigate to={"payment"} />,
-              },
-              {
-                path: "payment",
                 element: <Payment />,
               },
               {
@@ -95,31 +94,6 @@ export const routes: RouteObject[] = [
       {
         path: "*",
         element: <NotFound404 />,
-      },
-      {
-        path: "payment/*",
-        children: [
-          {
-            index: true,
-            element: <Navigate to={"payment"} />,
-          },
-          {
-            path: "payment",
-            element: <Payment />,
-          },
-          {
-            path: "paymentRefused",
-            element: <PaymentRefused />,
-          },
-          {
-            path: "paymentAccepted",
-            element: <PaymentAccepted />,
-          },
-          {
-            path: "*",
-            element: <NotFound404 />,
-          },
-        ],
       },
     ],
   },
