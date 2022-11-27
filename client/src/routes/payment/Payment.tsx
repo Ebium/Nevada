@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { NevadaHeader } from "../../components/styles/NevadaHeader"
+import { NevadaHeader } from "../../components/NevadaHeader"
 import { NVButton } from "../../components/styles/NVButton"
 
 export const Payment = () => {
