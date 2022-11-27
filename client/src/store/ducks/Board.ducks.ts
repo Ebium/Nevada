@@ -1,3 +1,5 @@
+import { PadHistory } from "../../utils/Moves"
+
 export const enum BoardActionsEnum {
   UPDATE_BOARD_ARRAY = "BOARD/updateBoardArray",
   RESET_BOARD_ARRAY = "BOARD/resetBoardArray",
@@ -16,7 +18,7 @@ export const resetBoardArray = () =>
   ({
     type: BoardActionsEnum.RESET_BOARD_ARRAY,
   } as const)
-export const updateHistoryBoard = (histo: Array<Array<any>>) =>
+export const updateHistoryBoard = (histo: PadHistory[]) =>
   ({
     type: BoardActionsEnum.UPDATE_HISTORY_BOARD,
     histo,
@@ -56,8 +58,9 @@ export interface BoardState {
   value: number
   status: "idle" | "loading" | "failed"
   array: boardType
-  history: Array<Array<any>>
-  initialBoard: boardType
+  history: PadHistory[]
+  initialBoard: boardType // Contient la grille au début de la partie, elle va permettre de pouvoir remettre les bonnes couleurs de palette 
+                          // pour enlever les couleurs prévisionnels des coups possibles du joueurs
 }
 
 export const boardInitialState: BoardState = {
@@ -65,7 +68,7 @@ export const boardInitialState: BoardState = {
   status: "idle",
   array: initialeBoardArray,
   history: [],
-  initialBoard: initialeBoardArray
+  initialBoard: initialeBoardArray,
 }
 
 export function BoardReducer(

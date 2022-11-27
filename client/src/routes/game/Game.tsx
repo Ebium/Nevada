@@ -26,7 +26,7 @@ export const Game = () => {
 
   const droppedCounter = useNevadaSelector((state) => state.pad.droppedCounter)
   const currentPad = useNevadaSelector((state) => state.pad.current)
-  const hist = useNevadaSelector((state) => state.board.history)
+  const padHistory = useNevadaSelector((state) => state.board.history)
   const board = useNevadaSelector((state) => state.board.array)
   const padStore = useNevadaSelector((state) => state.pad.padStore)
   const gameStarted = useNevadaSelector((state) => state.game.started)
@@ -109,17 +109,17 @@ export const Game = () => {
   }
 
 
-  // Enlève la dernière pièece mise
+  // Enlève la dernière pièce/Pad/Palette mise
   const undoBoard = () => {
-    if (hist.length === 0) return
+    if (padHistory.length === 0) return
     if(!gameStarted){
       const updatedBoard = R.clone(board)
-      let updatedHistory = R.clone(hist)
-      hist[hist.length - 1].map(
+      let updatedHistory = R.clone(padHistory)
+      padHistory[padHistory.length - 1].coord.map(
         (cell) =>
           (updatedBoard[cell[0]][cell[1]] = initialeBoardArray[cell[0]][cell[1]])
       )
-      updatePadStoreFunction(hist[hist.length - 1].length, +1)
+      updatePadStoreFunction(padHistory[padHistory.length - 1].coord.length, +1)
       updatedHistory.pop()
       dispatch(updateHistoryBoard(updatedHistory))
       dispatch(updateDroppedCounter(droppedCounter - 1))
@@ -128,6 +128,7 @@ export const Game = () => {
   }
 
   // Annule un coup le dernier coup jouer en mettant à jour la dernière case jouée
+  // Enlève la dernière boule jouée
   const undoMove = () => {
     if (movesHistory.length === 0) return
     if(gameStarted){
@@ -160,6 +161,26 @@ export const Game = () => {
       dispatch(updateGameStarted(true))
       dispatch(initializeInitialBoard(board))
     }
+  }
+
+  const oui = () => {
+    const test = {
+      x: [1,2,3],
+      y: [1,2],
+      coord: [],
+    }
+
+    // for(let i = 0; i < 10; i++){
+    //   for(let j = 0; j < 10; j++){
+    //     if(test.x.includes(i) && test.y.includes(j)){
+    //       console.log("x: ",i," j: ",j)
+    //     }
+    //   }
+    // }
+
+    console.log([...[test,{      x: [3],
+      y: [2],
+      coord: [],}],test])
   }
 
   return (
@@ -212,6 +233,13 @@ export const Game = () => {
             onClick={() => startGame()}
           >
             StartGame
+          </StyledButton>
+          <HeightSpacer></HeightSpacer>
+          <StyledButton 
+            // disabled={!gameStarted} 
+            onClick={() => oui()}
+          >
+            oui
           </StyledButton>
         </ColumnStyle>
         <ColumnStyle>
@@ -299,9 +327,9 @@ export const Game = () => {
         <HistoryBoard style={{ color: "white" }}>
           <HeightSpacer></HeightSpacer>
           board history
-          {hist.map((key, index) => {
-            if (hist.length === 0) return <></>
-            else return <Cellule key={index}>{key.length}</Cellule>
+          {padHistory.map((key, index) => {
+            if (padHistory.length === 0) return <></>
+            else return <Cellule key={index}>{key.coord.length}</Cellule>
           })}
         </HistoryBoard>
         <div>

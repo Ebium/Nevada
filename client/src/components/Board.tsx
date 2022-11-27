@@ -5,11 +5,10 @@ import {
   updateBoardArray,
   updateHistoryBoard,
 } from "../store/ducks/Board.ducks"
-import { CellType, playMove, removeOldPossibleMoves, showPossibleMoves } from "../utils/Moves"
+import { CellType, disablePads, getPadIndex, Pad, PadHistory, playMove, removeOldPossibleMoves, showPossibleMoves } from "../utils/Moves"
 import { updateDroppedCounter, updatePadStore } from "../store/ducks/Pad.ducks"
 import { useNevadaSelector } from "../store/rootReducer"
-import { updateMovesHistory } from "../store/ducks/Game.ducks"
-import { useState } from "react"
+import { updateDisabledIndexPads, updateMovesHistory, updatePads } from "../store/ducks/Game.ducks"
 
 export const Board = () => {
   const dispatch = useDispatch()
@@ -24,8 +23,8 @@ export const Board = () => {
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
   const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
-
-  const [pieces, setPieces] = useState([])
+  const pads = useNevadaSelector((state) => state.game.pads)
+  const disabledPadsIndex = useNevadaSelector((state) => state.game.disabledIndexPads)
 
   const handleBoardClick = (cell: CellType) => {
     // Si la partie a commencé, joue un coup
@@ -42,9 +41,11 @@ export const Board = () => {
         if (boardWithMoves.possibleMoves === 0) {
           console.log("game end")
         }
+        dispatch(updateDisabledIndexPads([...disabledPadsIndex,getPadIndex(cell,pads)]))
+
 
         dispatch(updateMovesHistory(payload.newMovesHistory, payload.movesCount))
-        dispatch(updateBoardArray(boardWithMoves.board))
+        dispatch(updateBoardArray(disablePads(boardWithMoves.board,disabledPadsIndex,pads)))
       }
       return
     }
@@ -53,6 +54,18 @@ export const Board = () => {
     if (currentPad.nbHole === 0 || cell.isFilled) return
     const padNum = currentPad.nbHole
     const updatedBoard = R.clone(boardArray)
+
+    const padHistory: PadHistory = {
+      coord: [],
+    }
+
+    const pad: Pad = {
+      xCoords: [],
+      yCoords: [],
+      firstPlayerCounter: 0,
+      secondPlayerCounter: 0,
+    }
+
 
     if (padStore[padNum - 1].remaining === 0) return
     if (padNum === 2) {
@@ -89,11 +102,12 @@ export const Board = () => {
         holeColor: "black",
       }
 
-      historyBoard.push([
+      padHistory.coord = [
         [cell.x, cell.y],
         [ax, ay],
-      ])
-      dispatch(updateHistoryBoard(historyBoard))
+      ]
+      pad.xCoords = Array.from(new Set([cell.x, ax]))
+      pad.yCoords = Array.from(new Set([cell.y, ay]))
     }
 
     if (padNum === 3) {
@@ -144,12 +158,14 @@ export const Board = () => {
         holeColor: "black",
       }
 
-      historyBoard.push([
+      padHistory.coord = [
         [cell.x, cell.y],
         [ax1, ay1],
         [ax2, ay2],
-      ])
-      dispatch(updateHistoryBoard(historyBoard))
+      ]
+
+      pad.xCoords = Array.from(new Set([cell.x, ax1, ax2]))
+      pad.yCoords = Array.from(new Set([cell.y, ay1, ay2]))
     }
 
     if (padNum === 4) {
@@ -215,13 +231,15 @@ export const Board = () => {
         holeColor: "black",
       }
 
-      historyBoard.push([
+      padHistory.coord = [
         [cell.x, cell.y],
         [ax1, ay1],
         [ax2, ay2],
         [ax3, ay3],
-      ])
-      dispatch(updateHistoryBoard(historyBoard))
+      ]
+
+      pad.xCoords = Array.from(new Set([cell.x, ax1, ax2, ax3]))
+      pad.yCoords = Array.from(new Set([cell.y, ay1, ay2, ay3]))
     }
 
     if (padNum === 6) {
@@ -317,16 +335,24 @@ export const Board = () => {
         holeColor: "black",
       }
 
-      historyBoard.push([
+      padHistory.coord = [
         [cell.x, cell.y],
         [ax1, ay1],
         [ax2, ay2],
         [ax3, ay3],
         [ax4, ay4],
         [ax5, ay5],
-      ])
-      dispatch(updateHistoryBoard(historyBoard))
+      ]
+
+      pad.xCoords = Array.from(new Set([cell.x, ax1, ax2, ax3, ax4, ax5]))
+      pad.yCoords = Array.from(new Set([cell.y, ay1, ay2, ay3, ay4, ay5]))
     }
+
+    historyBoard.push(padHistory)
+    dispatch(updateHistoryBoard(historyBoard))
+    // pads.push(pad)
+    // console.log()
+    dispatch(updatePads([...pads,pad]))
 
     updatedBoard[cell.x][cell.y] = {
       x: cell.x,
