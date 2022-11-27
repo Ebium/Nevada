@@ -1,10 +1,18 @@
 const Room = require('../models/Room.js')
 
+/*
+ * Clean rooms at the start of the server
+ * or when we reset the server
+ */
+const clearRooms = async() => {
+    return Room.deleteMany({});
+}
+
 
 /* ========================================
     Search functions
  ========================================*/
- 
+
 const findRooms = async() => {
     return Room.find({})
         .then(result => { return result; } )
@@ -143,5 +151,6 @@ module.exports = {
     createRoom,
     updateANewPlayerRoom,
     updateAQuitPlayerRoom,
-    deleteRoom
+    deleteRoom,
+    clearRooms
 }

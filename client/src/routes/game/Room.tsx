@@ -1,20 +1,26 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { socket } from '../../socket-context';
 
 const Room = () => {
     const roomId = window.location.pathname.slice(13);
     const homeURL = "http://localhost:3000/nevada/main/home" //update URL of home
+    const [users, setUsers] = useState([socket.id])
 
     useEffect(()=>{
         askJoinRoom()
         getServerReponse()
-    },[])
+        AnUserJoined()
+        AnUserHasLeft()
+    },[users])
+    
 
     function askJoinRoom() {
-        socket.emit("Join a room",roomId)
+        socket.once("connect", ()=> {
+            socket.emit("Join a room",roomId)
+        })
     }
 
-    async function getServerReponse() {
+    function getServerReponse() {
         socket.on("Join a room", (joined)=> {
             if(joined)
                 alert("joined the room")
@@ -23,10 +29,30 @@ const Room = () => {
         })
     }
 
+    function AnUserJoined() {
+        socket.on("An user joined the room", (userslist)=> {
+            setUsers(userslist)
+        })
+    }
+
+    function AnUserHasLeft() {
+        socket.on("An user has left the room", (userslist)=> {
+            setUsers(userslist)
+        })
+    }
+
+    function showPlayers() {
+        return users.map((user, index) => {
+            return (<li key={index}>{user}</li>)
+        })
+    }
+
+    
 
     return (
         <div>
             Room : {roomId}
+            <div>{showPlayers()}</div>
         </div>
     );
 };

@@ -5,7 +5,7 @@ const cors = require("cors")
 const products_routes = require("./routes/products.js")
 const { getStripeCheckoutSessionUrl } = require("./controllers/payment")
 const { createValidUser, updateUserAuth } = require("./controllers/users") 
-const { createRoom, updateANewPlayerRoom, updateAQuitPlayerRoom } = require("./controllers/room.js")
+const { createRoom, updateANewPlayerRoom, updateAQuitPlayerRoom, clearRooms } = require("./controllers/room.js")
 
 const PORT = 5050
 
@@ -26,6 +26,12 @@ const io = socketIo(server,{
       origin: ["http://localhost:3000"]
     }
 })
+
+/* 
+ * When we launch the server or reset the server
+ * Rooms should not exist
+ */
+clearRooms()
 
 /*
  *  client/server : user account request
@@ -74,6 +80,7 @@ io.on("connection",(socket)=>{
  */
 io.on("connection", (socket) => {
   var currentRoomId = undefined;
+  var usersRoom = undefined;
 
   socket.on("Create a new room", async(player) => {
     const room = await createRoom({})
@@ -86,9 +93,13 @@ io.on("connection", (socket) => {
   socket.on("Join a room", async(roomId) => {
     const room = await updateANewPlayerRoom({ _id : mongoose.Types.ObjectId(roomId)}, socket.id)
     if(room.modifiedCount){
+      
       socket.join(roomId)
       currentRoomId=roomId;
+      usersRoom = await io.sockets.adapter.rooms.get(currentRoomId)
+
       socket.emit("Join a room", true)
+      io.to(currentRoomId).emit("An user joined the room",  Array.from(usersRoom))
     } else
       socket.emit("Join a room", false)
   })
@@ -96,6 +107,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", async()=> {
     if(currentRoomId!=undefined) {
       await updateAQuitPlayerRoom({ _id : mongoose.Types.ObjectId(currentRoomId)},socket.id)
+      io.to(currentRoomId).emit("An user has left the room",  Array.from(usersRoom))
     }
   })
 })
