@@ -14,6 +14,7 @@ import Login from "./Login"
 import RoomButton from "./game/RoomButton"
 import Room from "./game/Room"
 import { Profil } from "./other/Profil"
+import { LoginSignup } from "./other/LoginSignup"
 
 export const routes: RouteObject[] = [
   {
@@ -57,6 +58,10 @@ export const routes: RouteObject[] = [
             element: <SignUp />,
           },
           {
+            path: "login",
+            element: <LoginSignup />,
+          },
+          {
             path: "createroom",
             element: <RoomButton />,
           },
@@ -66,7 +71,7 @@ export const routes: RouteObject[] = [
           },
           {
             path: "*",
-            element: <NotFound404 />,
+            element: <Navigate to={"/not_found"} />,
           },
           {
             path: "payment/*",
@@ -85,7 +90,7 @@ export const routes: RouteObject[] = [
               },
               {
                 path: "*",
-                element: <NotFound404 />,
+                element: <Navigate to={"/not_found"} />,
               },
             ],
           },
