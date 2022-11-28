@@ -6,6 +6,7 @@ import { colors } from "../../components/styles/design.config"
 import { NVButton } from "../../components/styles/NVButton"
 import { NVSpacer } from "../../components/styles/NVSpacer"
 import { NVText } from "../../components/styles/NVText"
+import { getDonateAmountUrl } from "../../utils/Donation"
 
 export const Showroom = () => {
   const navigate = useNavigate()
@@ -64,7 +65,7 @@ export const Showroom = () => {
             })}
             colorSchem={"black"}
             onClick={() => {
-              navigate("/main/home")
+              getDonateAmountUrl()
             }}
           />
           <NVSpacer width={8} />

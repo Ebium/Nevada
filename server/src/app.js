@@ -3,7 +3,7 @@ const mongoose = require("mongoose")
 const app = express()
 const cors = require("cors")
 const products_routes = require("./routes/products.js")
-const { getStripeCheckoutSessionUrl } = require("./controllers/payment")
+const { getStripeCheckoutSessionUrl, getStripeCheckoutSessionUrlFromStripeObject } = require("./controllers/payment")
 const { createValidUser, updateUserAuth } = require("./controllers/users") 
 const { createRoom, updateANewPlayerRoom, updateAQuitPlayerRoom, clearRooms } = require("./controllers/room.js")
 
@@ -118,6 +118,10 @@ io.on("connection", (socket) => {
 io.on("connection", (socket) => {
   socket.on("pay_products", async(products) => {
     socket.emit("pay_products", await getStripeCheckoutSessionUrl(products) );
+  })
+  socket.on("Donate", async(donateStripeObject)=> {
+    const donationUrl = await getStripeCheckoutSessionUrlFromStripeObject(donateStripeObject)
+    socket.emit("Donate", donationUrl);
   })
 })
 

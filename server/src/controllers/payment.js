@@ -4,6 +4,16 @@ const Stripe = require("stripe")
 const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY);
 
 /* 
+ *  Get Payment Link of donation 
+ */
+async function getStripeCheckoutSessionUrlFromStripeObject(stripeObject){
+  return stripe.checkout.sessions.create(stripeObject).then((stripeData) => {
+    return stripeData.url;
+  })
+}
+
+
+/* 
  *  Get Payment Link of products
  */
 async function getStripeCheckoutSessionUrl(products) {
@@ -65,4 +75,7 @@ function requestStripeCheckoutObject(buy_products, products_data) {
 }
 
 
-module.exports = { getStripeCheckoutSessionUrl }
+module.exports = { 
+  getStripeCheckoutSessionUrl,
+  getStripeCheckoutSessionUrlFromStripeObject
+}
