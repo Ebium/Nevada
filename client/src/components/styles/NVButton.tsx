@@ -1,6 +1,7 @@
 import styled from "styled-components"
 import { colors } from "./design.config"
 import "@fontsource/inter"
+import { NVText } from "./NVText"
 
 interface ButtonProps {
   disabled: boolean
@@ -22,9 +23,15 @@ export const NVButton = ({
         disabled={disabled}
         onClick={onClick}
       >
-        <StyledFont colorSchem={colorSchem} disabled={disabled}>
-          {content}
-        </StyledFont>
+        <NVText
+          text={content}
+          textStyle={{
+            color: colorSchem === "gold" ? "nevadaBlack" : "nevadaGold",
+            fontSize: 1,
+            fontWeight: 700,
+            letterSpacing: 0.1,
+          }}
+        />
       </StyledButton>
     </>
   )
@@ -57,23 +64,4 @@ const StyledButton = styled.button<StyledButtonProps>`
       ${({ colorSchem }) =>
         colorSchem === "gold" ? colors.nevadaBlack : colors.nevadaGold};
   }
-`
-
-interface StyledFontProps {
-  disabled: boolean
-  colorSchem: "black" | "blue" | "gold"
-}
-
-const StyledFont = styled.div<StyledFontProps>`
-  color: ${({ colorSchem, disabled }) =>
-    disabled
-      ? "grey"
-      : colorSchem === "gold"
-      ? colors.nevadaBlack
-      : colors.nevadaGold};
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 700;
-  font-size: 1rem;
-  line-height: 32px;
 `

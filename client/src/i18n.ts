@@ -7,7 +7,8 @@ export const translations = {
   "button.rules": "Règles du jeu",
   "button.help-us": "Nous soutenir",
   "button.profil": "Profil",
-
+  "button.cgu": "CGU",
+  
   "header.title": "Nevada",
   "header.log-in": "Connexion",
   "header.sign-in": "Inscription",
@@ -20,4 +21,8 @@ export const translations = {
   "payment.refused.text": "quel dommage ...",
   "payment.refused.back-home": "Revenir en arrière",
   "payment.accepted.text": "Vous êtes désormais premium, merci de votre confiance !",
+
+  "loginsignup.login": "Connexion",
+  "loginsignup.signup": "Inscription",
+
 }

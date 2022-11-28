@@ -5,6 +5,7 @@ import { colors } from "../../components/styles/design.config"
 import { NVText } from "../../components/styles/NVText"
 import { NVSpacer } from "../../components/styles/NVSpacer"
 import { NVButton } from "../../components/styles/NVButton"
+import { CGUButton } from "../../components/CGUButton"
 
 export const PaymentAccepted = () => {
   const navigate = useNavigate()
@@ -38,18 +39,19 @@ export const PaymentAccepted = () => {
           })}
           colorSchem={"black"}
           onClick={() => {
-            navigate("/main/payment")
+            navigate("/main/home")
           }}
         />
       </RowDiv>
+      <CGUButton />
     </Content>
   )
 }
 
 const Content = styled.div`
   background-color: ${colors.nevadaBackground};
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;

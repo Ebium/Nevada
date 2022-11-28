@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
+import { CGUButton } from "../../components/CGUButton"
 import { NVButton } from "../../components/styles/NVButton"
 
 export const Payment = () => {
