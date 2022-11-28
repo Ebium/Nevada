@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import { CGUButton } from "../../components/CGUButton"
 import { NVButton } from "../../components/styles/NVButton"
+import { getPremiumSubscriptionUrl } from "../../utils/Subscription"
 
 export const Payment = () => {
   const navigate = useNavigate()
@@ -13,7 +14,7 @@ export const Payment = () => {
         content={"S'abonner"}
         colorSchem={"black"}
         onClick={() => {
-          console.log("random")
+          getPremiumSubscriptionUrl()
         }}
       />
       a

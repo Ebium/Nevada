@@ -123,6 +123,10 @@ io.on("connection", (socket) => {
     const donationUrl = await getStripeCheckoutSessionUrlFromStripeObject(donateStripeObject)
     socket.emit("Donate", donationUrl);
   })
+  socket.on("Premium subscription", async(subscriptionStripeObject)=> {
+    const subscriptionUrl = await getStripeCheckoutSessionUrlFromStripeObject(subscriptionStripeObject)
+    socket.emit("Premium subscription", subscriptionUrl);
+  })
 })
 
 mongoose
