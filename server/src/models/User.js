@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     createdAt:{ type: Date, default: Date.now },
     played:{ type: Number, default: 0 },
     won: { type: Number, default: 0 },
-    watched: { type: Number, default: 0 },
+    winStreak: { type: Number, default: 0 },
     auth: { type: String, default: "" },
 }, {
     versionKey: false
