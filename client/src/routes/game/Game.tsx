@@ -16,9 +16,9 @@ import {
   updateBoardArray,
   updateHistoryBoard,
 } from "../../store/ducks/Board.ducks"
-import { updateGameStarted, updateMovesHistory } from "../../store/ducks/Game.ducks"
+import { restartGame, updateDisabledIndexPads, updateGameStarted, updateMovesHistory } from "../../store/ducks/Game.ducks"
 import { useNavigate } from "react-router-dom"
-import { removeOldPossibleMoves, showPossibleMoves } from "../../utils/Moves"
+import { disablePads, enablePads, getPadIndex, removeOldPossibleMoves, showPossibleMoves } from "../../utils/Moves"
 
 export const Game = () => {
   const dispatch = useDispatch()
@@ -33,6 +33,8 @@ export const Game = () => {
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
   const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
+  const pads = useNevadaSelector((state) => state.game.pads)
+  const disabledIndexPads = useNevadaSelector((state) => state.game.disabledIndexPads)
 
   useEffect(() => {
     if (droppedCounter === 17) {
@@ -106,10 +108,11 @@ export const Game = () => {
   const resetGame = () => {
     resetBoard()
     dispatch(updateGameStarted(false))
+    dispatch(restartGame())
   }
 
 
-  // Enlève la dernière pièce/Pad/Palette mise
+  // Enlève la dernière pièce/Pad/Palette/Plaquette mise
   const undoBoard = () => {
     if (padHistory.length === 0) return
     if(!gameStarted){
@@ -149,6 +152,28 @@ export const Game = () => {
       if(movesHistory.length>0){
         updatedBoard = showPossibleMoves(movesHistory[movesHistory.length-1],updatedBoard).board
       }
+
+
+      let boardWithDisabledPad = updatedBoard
+      let index = getPadIndex({x: move.x, y: move.y }, pads)
+
+
+      if (index != -1) {
+        console.log(disabledIndexPads)
+        if (disabledIndexPads.length > 1) {
+          let enablePadIndex = disabledIndexPads.shift()
+          boardWithDisabledPad = enablePads(boardWithDisabledPad, enablePadIndex, pads, initialBoard)
+        }
+        console.log(disabledIndexPads)
+
+        boardWithDisabledPad = (disablePads(boardWithDisabledPad, index, pads))
+        disabledIndexPads.push(index)
+        dispatch(updateDisabledIndexPads(disabledIndexPads))
+      } else {
+        console.log("LE JEU EST CASSéE OMG OMMGMG OOGMOGMOMMGO MOMGOOMGMOG MOGU MOGU NORDVPN")
+        return
+      }
+
 
       dispatch(updateMovesHistory(movesHistory,movesCount-1))
       dispatch(updateBoardArray(updatedBoard))

@@ -3,8 +3,8 @@ import * as R from "ramda"
 
 
 // Joue un coup remplissant le trou, et mettant une couleur, et ajoute dans movesHistory le coup joué
-export const playMove = (cell: CellType, movesCount: number, movesHistory : Move[], boardArray: boardType) => {
-    if(movesCount === 0 || cell.color === "orange"){
+export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[], boardArray: boardType) => {
+    if (movesCount === 0 || cell.color === "orange") {
         if (!cell?.holeFilled) {
             const oldMove: Move = {
                 x: cell.x,
@@ -13,18 +13,18 @@ export const playMove = (cell: CellType, movesCount: number, movesHistory : Move
                 holeFilled: cell.holeFilled
             }
             const color = movesCount % 2 === 0 ? "red" : "blue"
-    
+
             boardArray[cell.x][cell.y].holeFilled = true;
             boardArray[cell.x][cell.y].holeColor = color;
-    
+
             const newMovesHistory = movesHistory
             newMovesHistory.push(oldMove)
-    
-            return {newMovesHistory : newMovesHistory, movesCount: movesCount + 1, boardArray: boardArray}
+
+            return { newMovesHistory: newMovesHistory, movesCount: movesCount + 1, boardArray: boardArray }
         }
     }
-    return 
-} 
+    return
+}
 
 // Renvoie le plateau avec des cases oranges sur lesquelles un pion peut être posé
 // colorie en oranges les cases sur lesquelles peut jouer l'adversaire 
@@ -34,39 +34,39 @@ export const playMove = (cell: CellType, movesCount: number, movesHistory : Move
 export const showPossibleMoves = (cell: Coord, boardArray: boardType) => {
     let possibleMoves = 0
     const copy = R.clone(boardArray)
-    for(let i = 0; i < 10; i++){
+    for (let i = 0; i < 10; i++) {
         const tmp = copy[cell.x][i]
-        if(tmp.isFilled && !tmp.holeFilled){
+        if (tmp.isFilled && !tmp.holeFilled && tmp.color != "black") {
             copy[cell.x][i].color = "orange"
             possibleMoves++
         }
     }
-    for(let j = 0; j < 10; j++){
+    for (let j = 0; j < 10; j++) {
         const tmp = copy[j][cell.y]
-        if(tmp.isFilled && !tmp.holeFilled){
+        if (tmp.isFilled && !tmp.holeFilled && tmp.color != "black") {
             copy[j][cell.y].color = "orange"
             possibleMoves++
 
         }
     }
-    copy[cell.x][cell.y].color = "lime"
-    console.log("poss",possibleMoves)
-    return {board: copy, possibleMoves: possibleMoves}
+    // copy[cell.x][cell.y].color = "lime"
+    console.log("poss", possibleMoves)
+    return { board: copy, possibleMoves: possibleMoves }
 }
 
 // Retourne la grille sans les coups possibles de l'ancien coup,
 // Remet seulement les couleurs du plateau initiale par rapport au coup possible de l'ancien coup 
 export const removeOldPossibleMoves = (previousMove: Coord, boardArray: boardType, initalBoard: boardType) => {
     const copy = R.clone(boardArray)
-    for(let i = 0; i < 10; i++){
+    for (let i = 0; i < 10; i++) {
         const tmp = copy[previousMove.x][i]
-        if(tmp.isFilled){
+        if (tmp.isFilled && tmp.color != "black") {
             copy[previousMove.x][i].color = initalBoard[previousMove.x][i].color
         }
     }
-    for(let j = 0; j < 10; j++){
+    for (let j = 0; j < 10; j++) {
         const tmp = copy[j][previousMove.y]
-        if(tmp.isFilled){
+        if (tmp.isFilled && tmp.color != "black") {
             copy[j][previousMove.y].color = initalBoard[j][previousMove.y].color
         }
     }
@@ -74,39 +74,41 @@ export const removeOldPossibleMoves = (previousMove: Coord, boardArray: boardTyp
 }
 
 // Retourne l'indice de la palette sur laquelle est 'cell' sinon retourne -1
-export const getPadIndex = (cell: CellType, pads: Pad[]) => {
-    pads.forEach((pad, index) => {
-        // si cell.x et cell.y sont contenues dans les coordonnées x ET y de la palette, cela veut dire que cell contient la palette
-        if(pad.xCoords.includes(cell.x) && pad.yCoords.includes(cell.y)){
-            console.log(index)
+export const getPadIndex = (cell: Coord, pads: Pad[]) => {
+    for (let index = 0; index < pads.length; index++) {
+        let pad = pads[index]
+        if (pad.xCoords.includes(cell.x) && pad.yCoords.includes(cell.y)) {
             return index
         }
-    })
+    }
     return -1
 }
 
-export const disablePads = (boardArray: boardType, disabledIndexPads: number[], pads: Pad[]) => {
+// Désactive une plaquette/palette/pad
+// Rend les cases de la palettes noirs
+export const disablePads = (boardArray: boardType, index: number | undefined, pads: Pad[]) => {
     const copy = R.clone(boardArray)
-    for(let index = 0; index < disabledIndexPads.length; index++){
-        console.log(pads)
+    if (index != undefined) {
         let pad = pads[index]
-        pad.xCoords.forEach((x) => {
-            pad.yCoords.forEach((y) => {
-                copy[x][y].color = "black"
+        if (pad) {
+            pad.xCoords.forEach((x) => {
+                pad.yCoords.forEach((y) => {
+                    copy[x][y].color = "black"
+                })
             })
-        })
+        }
     }
     return copy
 }
 
 
-export const enablePads = (boardArray: boardType, disabledIndexPads: number[], pads: Pad[]) => {
+export const enablePads = (boardArray: boardType, index: number | undefined, pads: Pad[], initalBoard: boardType) => {
     const copy = R.clone(boardArray)
-    for(let index = 0; index < disabledIndexPads.length; index++){
+    if (index != undefined) {
         let pad = pads[index]
         pad.xCoords.forEach((x) => {
             pad.yCoords.forEach((y) => {
-                copy[x][y].color = "black"
+                copy[x][y].color = initalBoard[x][y].color
             })
         })
     }

@@ -59,7 +59,8 @@ export interface BoardState {
   status: "idle" | "loading" | "failed"
   array: boardType
   history: PadHistory[]
-  initialBoard: boardType // Contient la grille au début de la partie, elle va permettre de pouvoir remettre les bonnes couleurs de palette 
+  initialBoard: boardType // Contient la grille au début de la partie, elle va permettre de pouvoir 
+                          // remettre les bonnes couleurs de la palette/plaquette/pad 
                           // pour enlever les couleurs prévisionnels des coups possibles du joueurs
 }
 

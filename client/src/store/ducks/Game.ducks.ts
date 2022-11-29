@@ -7,6 +7,8 @@ export const enum GameActionsEnum {
   UPDATE_PADS = "GAME/updatePads",
 
   UPDATE_DISABLED_INDEX_PADS = "GAME/updateDisabledIndexPads",
+
+  RESTART_GAME = "GAME/restartGame"
 }
 
 export const updateGameStarted = (bool: boolean) =>
@@ -30,12 +32,17 @@ export const updateDisabledIndexPads = (disabledIndexPads: number[]) =>
   type: GameActionsEnum.UPDATE_DISABLED_INDEX_PADS,
   disabledIndexPads
 } as const)
+export const restartGame = () => 
+({
+  type: GameActionsEnum.RESTART_GAME
+} as const)
 
 type GameActionsType = ReturnType<
   | typeof updateGameStarted
   | typeof updateMovesHistory
   | typeof updatePads
   | typeof updateDisabledIndexPads
+  | typeof restartGame
 >
 
 export interface GameState {
@@ -72,7 +79,9 @@ export function GameReducer(
 ): GameState {
   switch (action.type) {
     case GameActionsEnum.UPDATE_GAME_STARTED:
-      return { ...state, started: action.bool, movesCount: 0, movesHistory: [], pads: []}
+      return { ...state, started: action.bool, movesCount: 0, movesHistory: []}
+    case GameActionsEnum.RESTART_GAME:
+      return { ...state, started: false, movesCount: 0, movesHistory: [], pads: [], disabledIndexPads: []}
     case GameActionsEnum.UPDATE_MOVES_HISTORY:
       return { ...state, movesHistory: action.moves, movesCount: action.count }
     case GameActionsEnum.UPDATE_PADS:
