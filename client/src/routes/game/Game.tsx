@@ -11,12 +11,14 @@ import {
 import { useDispatch } from "react-redux"
 import { useNevadaSelector } from "../../store/rootReducer"
 import {
+  initializeInitialBoard,
   resetBoardArray,
   updateBoardArray,
   updateHistoryBoard,
 } from "../../store/ducks/Board.ducks"
-import { updateGameCanStart, updateMovesHistory } from "../../store/ducks/Game.ducks"
+import { restartGame, updateDisabledIndexPads, updateGameStarted, updateMovesHistory } from "../../store/ducks/Game.ducks"
 import { useNavigate } from "react-router-dom"
+import { disablePads, enablePads, getPadIndex, removeOldPossibleMoves, showPossibleMoves } from "../../utils/Moves"
 
 export const Game = () => {
   const dispatch = useDispatch()
@@ -24,19 +26,22 @@ export const Game = () => {
 
   const droppedCounter = useNevadaSelector((state) => state.pad.droppedCounter)
   const currentPad = useNevadaSelector((state) => state.pad.current)
-  const hist = useNevadaSelector((state) => state.board.history)
+  const padHistory = useNevadaSelector((state) => state.board.history)
   const board = useNevadaSelector((state) => state.board.array)
   const padStore = useNevadaSelector((state) => state.pad.padStore)
-  const canStart = useNevadaSelector((state) => state.game.started)
+  const gameStarted = useNevadaSelector((state) => state.game.started)
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
+  const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
+  const pads = useNevadaSelector((state) => state.game.pads)
+  const disabledIndexPads = useNevadaSelector((state) => state.game.disabledIndexPads)
 
   useEffect(() => {
     if (droppedCounter === 17) {
-      dispatch(updateGameCanStart(true))
+      dispatch(updateGameStarted(true))
     } else {
-      if (canStart) {
-        dispatch(updateGameCanStart(false))
+      if (gameStarted) {
+        dispatch(updateGameStarted(false))
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -98,37 +103,106 @@ export const Game = () => {
     dispatch(resetPadStore())
     dispatch(updateDroppedCounter(0))
     dispatch(updateHistoryBoard([]))
-    dispatch(updateGameCanStart(false))
   }
 
+  const resetGame = () => {
+    resetBoard()
+    dispatch(updateGameStarted(false))
+    dispatch(restartGame())
+  }
+
+
+  // Enlève la dernière pièce/Pad/Palette/Plaquette mise
   const undoBoard = () => {
-    if (hist.length === 0 && movesHistory.length === 0) return
-    const updatedBoard = R.clone(board)
-    if(!canStart){
-      let updatedHistory = R.clone(hist)
-      hist[hist.length - 1].map(
+    if (padHistory.length === 0) return
+    if(!gameStarted){
+      const updatedBoard = R.clone(board)
+      let updatedHistory = R.clone(padHistory)
+      padHistory[padHistory.length - 1].coord.map(
         (cell) =>
           (updatedBoard[cell[0]][cell[1]] = initialeBoardArray[cell[0]][cell[1]])
       )
-      updatePadStoreFunction(hist[hist.length - 1].length, +1)
+      updatePadStoreFunction(padHistory[padHistory.length - 1].coord.length, +1)
       updatedHistory.pop()
       dispatch(updateHistoryBoard(updatedHistory))
       dispatch(updateDroppedCounter(droppedCounter - 1))
+      dispatch(updateBoardArray(updatedBoard))
     }
-    // Annule un coup le dernier coup jouer en mettant à jour la dernière case jouée
-    else{
+  }
+
+  // Annule un coup le dernier coup jouer en mettant à jour la dernière case jouée
+  // Enlève la dernière boule jouée
+  const undoMove = () => {
+    if (movesHistory.length === 0) return
+    if(gameStarted){
+      // Contient l'ancienne valeur de la case jouée
       const move = movesHistory.pop()
       if(!move) return
+
+      let boardWithDisabledPad = board
+      
+      // On active la palette du dernier coup joué
+      let enableIndexPad = getPadIndex({x: move.x, y: move.y }, pads)
+      if (enableIndexPad !== -1) {
+        boardWithDisabledPad = enablePads(boardWithDisabledPad, enableIndexPad, pads,initialBoard)
+        disabledIndexPads.pop()
+      } else 
+
+      // Ensuite l'avant dernier coup devient le dernier coup
+      // on doit donc désactiver l'avant dernier coup du nouveau dernier coup 
+      if(movesHistory.length>1){
+        const disableBeforeLastMove = movesHistory[movesHistory.length-2]
+        const disableBeforeLastMovePadIndex =  getPadIndex({x: disableBeforeLastMove.x, y: disableBeforeLastMove.y},pads)
+        if(disableBeforeLastMovePadIndex !== -1){
+          boardWithDisabledPad = disablePads(boardWithDisabledPad,disableBeforeLastMovePadIndex, pads)
+        } 
+      }
+
+      // Puis on enlève les coups possibles de l'ancien dernier coup joué
+      let updatedBoard = removeOldPossibleMoves(move,boardWithDisabledPad,initialBoard)
+
+      // On remet à jour la valeur de la case avant l'ancien dernier coup joué 
       updatedBoard[move.x][move.y].holeColor = move.holeColor
       updatedBoard[move.x][move.y].holeFilled = move.holeFilled 
+  
+      // S'il y avait des coups joués, on ajoute les coups possibles de l'avant dernier coup joué
+      // sinon on ajoute rien
+      if(movesHistory.length>0){
+        updatedBoard = showPossibleMoves(movesHistory[movesHistory.length-1],updatedBoard).board
+      }
+
+      dispatch(updateDisabledIndexPads(disabledIndexPads))
       dispatch(updateMovesHistory(movesHistory,movesCount-1))
+      dispatch(updateBoardArray(updatedBoard))
     }
-    dispatch(updateBoardArray(updatedBoard))
   }
 
   const startGame = () => {
     console.log("game started")
-    dispatch(updateGameCanStart(true))
+    if(!gameStarted){
+      dispatch(updateGameStarted(true))
+      dispatch(initializeInitialBoard(board))
+    }
+  }
+
+  const oui = () => {
+    const test = {
+      x: [1,2,3],
+      y: [1,2],
+      coord: [],
+    }
+
+    // for(let i = 0; i < 10; i++){
+    //   for(let j = 0; j < 10; j++){
+    //     if(test.x.includes(i) && test.y.includes(j)){
+    //       console.log("x: ",i," j: ",j)
+    //     }
+    //   }
+    // }
+
+    console.log([...[test,{      x: [3],
+      y: [2],
+      coord: [],}],test])
   }
 
   return (
@@ -149,7 +223,7 @@ export const Game = () => {
           </StyledButton>
           <HeightSpacer></HeightSpacer>
           <StyledButton
-            // disabled={droppedCounter === 0}
+            disabled={droppedCounter === 0}
             onClick={() => resetBoard()}
           >
             reset Board
@@ -162,11 +236,32 @@ export const Game = () => {
             Undo
           </StyledButton>
           <HeightSpacer></HeightSpacer>
+          <StyledButton
+            disabled={movesCount === 0}
+            onClick={() => undoMove()}
+          >
+            Undo Move
+          </StyledButton>
+          <HeightSpacer></HeightSpacer>
+          <StyledButton
+            // disabled={droppedCounter === 0}
+            onClick={() => resetGame()}
+          >
+            Reset Game
+          </StyledButton>
+          <HeightSpacer></HeightSpacer>
           <StyledButton 
-            // disabled={!canStart} 
+            // disabled={!gameStarted} 
             onClick={() => startGame()}
           >
             StartGame
+          </StyledButton>
+          <HeightSpacer></HeightSpacer>
+          <StyledButton 
+            // disabled={!gameStarted} 
+            onClick={() => oui()}
+          >
+            oui
           </StyledButton>
         </ColumnStyle>
         <ColumnStyle>
@@ -202,7 +297,7 @@ export const Game = () => {
 
           <Plaquette
             onClick={() => {
-              changeCurrentPad(4, 1, "blue")
+              changeCurrentPad(4, 1, "azure")
             }}
           >
             <ColumnStyle>
@@ -254,9 +349,9 @@ export const Game = () => {
         <HistoryBoard style={{ color: "white" }}>
           <HeightSpacer></HeightSpacer>
           board history
-          {hist.map((key, index) => {
-            if (hist.length === 0) return <></>
-            else return <Cellule key={index}>{key.length}</Cellule>
+          {padHistory.map((key, index) => {
+            if (padHistory.length === 0) return <></>
+            else return <Cellule key={index}>{key.coord.length}</Cellule>
           })}
         </HistoryBoard>
         <div>

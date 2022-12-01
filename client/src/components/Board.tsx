@@ -5,15 +5,15 @@ import {
   updateBoardArray,
   updateHistoryBoard,
 } from "../store/ducks/Board.ducks"
-import { CellType, playMove } from "../utils/Moves"
+import { CellType, disablePads, enablePads, getPadIndex, Pad, PadHistory, playMove, removeOldPossibleMoves, showPossibleMoves } from "../utils/Moves"
 import { updateDroppedCounter, updatePadStore } from "../store/ducks/Pad.ducks"
 import { useNevadaSelector } from "../store/rootReducer"
-import { updateMovesHistory } from "../store/ducks/Game.ducks"
+import { updateDisabledIndexPads, updateMovesHistory, updatePads } from "../store/ducks/Game.ducks"
 
 export const Board = () => {
   const dispatch = useDispatch()
   const boardArray = useNevadaSelector((state) => state.board.array)
-  const gameCanStart = useNevadaSelector((state) => state.game.started)
+  const gameStarted = useNevadaSelector((state) => state.game.started)
   const currentPad = useNevadaSelector((state) => state.pad.current)
   const padStore = useNevadaSelector((state) => state.pad.padStore)
   const historyBoard = useNevadaSelector((state) => state.board.history)
@@ -22,14 +22,48 @@ export const Board = () => {
   )
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
+  const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
+  const pads = useNevadaSelector((state) => state.game.pads)
+  const disabledIndexPads = useNevadaSelector((state) => state.game.disabledIndexPads)
 
   const handleBoardClick = (cell: CellType) => {
     // Si la partie a commencé, joue un coup
-    if(gameCanStart){
+    if (gameStarted) {
       const payload = playMove(cell, movesCount, movesHistory, boardArray)
-      if (payload!=null){
+
+      // Si le coup est possible on met à jour les cases possibles du plateau
+      if (payload !== undefined) {
+        let boardWithDisabledPad = payload.boardArray
+        let index = getPadIndex({x: cell.x, y: cell.y}, pads)
+
+        if (index !== -1) {
+          console.log(disabledIndexPads)
+          if (disabledIndexPads.length > 1) {
+            let enablePadIndex = disabledIndexPads.shift()
+            boardWithDisabledPad = enablePads(boardWithDisabledPad, enablePadIndex, pads, initialBoard)
+          }
+          console.log(disabledIndexPads)
+
+          boardWithDisabledPad = (disablePads(boardWithDisabledPad, index, pads))
+          disabledIndexPads.push(index)
+          dispatch(updateDisabledIndexPads(disabledIndexPads))
+        } else {
+          console.log("LE JEU EST CASSéE OMG OMMGMG OOGMOGMOMMGO MOMGOOMGMOG MOGU MOGU NORDVPN")
+          return
+        }
+
+        // Si un coup a déjà été joué, on enlève les anciens coup possible, sinon on ne fait rien
+        const boardWithoutPreviousMoves = movesHistory.length > 1 ? removeOldPossibleMoves(movesHistory[movesHistory.length - 2], boardWithDisabledPad, initialBoard) : boardWithDisabledPad
+
+
+        // Puis on met à jour les coups possibles pour le coup joué
+        let boardWithMoves = showPossibleMoves(cell, boardWithoutPreviousMoves)
+        if (boardWithMoves.possibleMoves === 0) {
+          console.log("game end")
+        }
+
         dispatch(updateMovesHistory(payload.newMovesHistory, payload.movesCount))
-        dispatch(updateBoardArray(payload.boardArray))
+        dispatch(updateBoardArray(boardWithMoves.board))
       }
       return
     }
@@ -38,6 +72,18 @@ export const Board = () => {
     if (currentPad.nbHole === 0 || cell.isFilled) return
     const padNum = currentPad.nbHole
     const updatedBoard = R.clone(boardArray)
+
+    const padHistory: PadHistory = {
+      coord: [],
+    }
+
+    const pad: Pad = {
+      xCoords: [],
+      yCoords: [],
+      firstPlayerCounter: 0,
+      secondPlayerCounter: 0,
+    }
+
 
     if (padStore[padNum - 1].remaining === 0) return
     if (padNum === 2) {
@@ -74,11 +120,12 @@ export const Board = () => {
         holeColor: "black",
       }
 
-      historyBoard.push([
+      padHistory.coord = [
         [cell.x, cell.y],
         [ax, ay],
-      ])
-      dispatch(updateHistoryBoard(historyBoard))
+      ]
+      pad.xCoords = Array.from(new Set([cell.x, ax]))
+      pad.yCoords = Array.from(new Set([cell.y, ay]))
     }
 
     if (padNum === 3) {
@@ -129,12 +176,14 @@ export const Board = () => {
         holeColor: "black",
       }
 
-      historyBoard.push([
+      padHistory.coord = [
         [cell.x, cell.y],
         [ax1, ay1],
         [ax2, ay2],
-      ])
-      dispatch(updateHistoryBoard(historyBoard))
+      ]
+
+      pad.xCoords = Array.from(new Set([cell.x, ax1, ax2]))
+      pad.yCoords = Array.from(new Set([cell.y, ay1, ay2]))
     }
 
     if (padNum === 4) {
@@ -200,13 +249,15 @@ export const Board = () => {
         holeColor: "black",
       }
 
-      historyBoard.push([
+      padHistory.coord = [
         [cell.x, cell.y],
         [ax1, ay1],
         [ax2, ay2],
         [ax3, ay3],
-      ])
-      dispatch(updateHistoryBoard(historyBoard))
+      ]
+
+      pad.xCoords = Array.from(new Set([cell.x, ax1, ax2, ax3]))
+      pad.yCoords = Array.from(new Set([cell.y, ay1, ay2, ay3]))
     }
 
     if (padNum === 6) {
@@ -302,16 +353,24 @@ export const Board = () => {
         holeColor: "black",
       }
 
-      historyBoard.push([
+      padHistory.coord = [
         [cell.x, cell.y],
         [ax1, ay1],
         [ax2, ay2],
         [ax3, ay3],
         [ax4, ay4],
         [ax5, ay5],
-      ])
-      dispatch(updateHistoryBoard(historyBoard))
+      ]
+
+      pad.xCoords = Array.from(new Set([cell.x, ax1, ax2, ax3, ax4, ax5]))
+      pad.yCoords = Array.from(new Set([cell.y, ay1, ay2, ay3, ay4, ay5]))
     }
+
+    historyBoard.push(padHistory)
+    dispatch(updateHistoryBoard(historyBoard))
+    // pads.push(pad)
+    // console.log()
+    dispatch(updatePads([...pads, pad]))
 
     updatedBoard[cell.x][cell.y] = {
       x: cell.x,
@@ -345,29 +404,31 @@ export const Board = () => {
               return (
                 <Cellule
                   key={keyVar}
-                  onClick={() => handleBoardClick(key)}
+                  onClick={() => {
+                    handleBoardClick(key)
+                  }}
                   style={{
                     backgroundColor: key.isFilled
                       ? key.color
-                      : gameCanStart
+                      : gameStarted
                         ? "transparent"
                         : "#D3D3D3",
                     border:
-                      gameCanStart && !key.isFilled ? "none" : "1px red solid",
+                      gameStarted && !key.isFilled ? "none" : "1px red solid",
                   }}
                 >
                   {key.isFilled ? (
                     <HoleForCellule color={key.holeColor}></HoleForCellule>
                   ) : (
-                    gameCanStart ? (
-                      <>
-                        {/* Couleur? */}
-                      </>
-                    ) : (
-                      <>
-                        {key.x},{key.y}
-                      </>
-                    )
+                    // gameStarted ? (
+                    //   <>
+                    //     {/* Couleur? */}
+                    //   </>
+                    // ) : (
+                    <>
+                      {key.x},{key.y}
+                    </>
+                    // )
                   )}
                 </Cellule>
               )

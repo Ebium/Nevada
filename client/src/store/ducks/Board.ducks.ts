@@ -1,8 +1,12 @@
+import { PadHistory } from "../../utils/Moves"
+
 export const enum BoardActionsEnum {
   UPDATE_BOARD_ARRAY = "BOARD/updateBoardArray",
   RESET_BOARD_ARRAY = "BOARD/resetBoardArray",
 
   UPDATE_HISTORY_BOARD = "BOARD/updateHistoryBoard",
+
+  INITIALIZE_INITIALBOARD = "BOARD/initializeInitialBoard",
 }
 
 export const updateBoardArray = (array: boardType) =>
@@ -14,16 +18,22 @@ export const resetBoardArray = () =>
   ({
     type: BoardActionsEnum.RESET_BOARD_ARRAY,
   } as const)
-export const updateHistoryBoard = (histo: Array<Array<any>>) =>
+export const updateHistoryBoard = (histo: PadHistory[]) =>
   ({
     type: BoardActionsEnum.UPDATE_HISTORY_BOARD,
     histo,
+  } as const)
+export const initializeInitialBoard = (initialBoard: boardType) =>
+  ({
+    type: BoardActionsEnum.INITIALIZE_INITIALBOARD,
+    initialBoard,
   } as const)
 
 type BoardActionsType = ReturnType<
   | typeof updateBoardArray 
   | typeof resetBoardArray 
   | typeof updateHistoryBoard
+  | typeof initializeInitialBoard
 >
 
 let x = -1
@@ -48,7 +58,10 @@ export interface BoardState {
   value: number
   status: "idle" | "loading" | "failed"
   array: boardType
-  history: Array<Array<any>>
+  history: PadHistory[]
+  initialBoard: boardType // Contient la grille au début de la partie, elle va permettre de pouvoir 
+                          // remettre les bonnes couleurs de la palette/plaquette/pad 
+                          // pour enlever les couleurs prévisionnels des coups possibles du joueurs
 }
 
 export const boardInitialState: BoardState = {
@@ -56,6 +69,7 @@ export const boardInitialState: BoardState = {
   status: "idle",
   array: initialeBoardArray,
   history: [],
+  initialBoard: initialeBoardArray,
 }
 
 export function BoardReducer(
@@ -69,6 +83,8 @@ export function BoardReducer(
       return { ...state, array: initialeBoardArray }
     case BoardActionsEnum.UPDATE_HISTORY_BOARD:
       return { ...state, history: action.histo }
+    case BoardActionsEnum.INITIALIZE_INITIALBOARD:
+      return { ...state, initialBoard: action.initialBoard }
     default:
       return { ...state }
   }
