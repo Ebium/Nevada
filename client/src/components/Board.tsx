@@ -58,8 +58,9 @@ export const Board = () => {
 
         // Puis on met à jour les coups possibles pour le coup joué
         let boardWithMoves = showPossibleMoves(cell, boardWithoutPreviousMoves)
-        if (boardWithMoves.possibleMoves === 0) {
+        if (boardWithMoves.possibleMoves === 0 || movesCount > 60) {
           console.log("game end")
+          // faire fin de jeu ici où un truc du genre dispatch ....
         }
 
         dispatch(updateMovesHistory(payload.newMovesHistory, payload.movesCount))
