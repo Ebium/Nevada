@@ -15,6 +15,7 @@ import RoomButton from "./game/RoomButton"
 import Room from "./game/Room"
 import { Profil } from "./other/Profil"
 import { LoginSignup } from "./other/LoginSignup"
+import { TempGame } from "./game/TempGame"
 
 export const routes: RouteObject[] = [
   {
@@ -28,6 +29,10 @@ export const routes: RouteObject[] = [
       {
         path: "showroom",
         element: <Showroom />,
+      },
+      {
+        path: "game",
+        element: <TempGame />,
       },
       {
         path: "main/*",
