@@ -137,13 +137,31 @@ export const Game = () => {
     if(gameStarted){
       // Contient l'ancienne valeur de la case jouée
       const move = movesHistory.pop()
-      console.log(move,movesHistory)
       if(!move) return
-      
-      // Enlève les coups possibles du dernier coup joué
-      let updatedBoard = removeOldPossibleMoves(move,board,initialBoard)
 
-      // On remet à jour la valeur de la case avant le coup joué 
+      let boardWithDisabledPad = board
+      
+      // On active la palette du dernier coup joué
+      let enableIndexPad = getPadIndex({x: move.x, y: move.y }, pads)
+      if (enableIndexPad !== -1) {
+        boardWithDisabledPad = enablePads(boardWithDisabledPad, enableIndexPad, pads,initialBoard)
+        disabledIndexPads.pop()
+      } else 
+
+      // Ensuite l'avant dernier coup devient le dernier coup
+      // on doit donc désactiver l'avant dernier coup du nouveau dernier coup 
+      if(movesHistory.length>1){
+        const disableBeforeLastMove = movesHistory[movesHistory.length-2]
+        const disableBeforeLastMovePadIndex =  getPadIndex({x: disableBeforeLastMove.x, y: disableBeforeLastMove.y},pads)
+        if(disableBeforeLastMovePadIndex !== -1){
+          boardWithDisabledPad = disablePads(boardWithDisabledPad,disableBeforeLastMovePadIndex, pads)
+        } 
+      }
+
+      // Puis on enlève les coups possibles de l'ancien dernier coup joué
+      let updatedBoard = removeOldPossibleMoves(move,boardWithDisabledPad,initialBoard)
+
+      // On remet à jour la valeur de la case avant l'ancien dernier coup joué 
       updatedBoard[move.x][move.y].holeColor = move.holeColor
       updatedBoard[move.x][move.y].holeFilled = move.holeFilled 
   
@@ -153,28 +171,7 @@ export const Game = () => {
         updatedBoard = showPossibleMoves(movesHistory[movesHistory.length-1],updatedBoard).board
       }
 
-
-      let boardWithDisabledPad = updatedBoard
-      let index = getPadIndex({x: move.x, y: move.y }, pads)
-
-
-      if (index != -1) {
-        console.log(disabledIndexPads)
-        if (disabledIndexPads.length > 1) {
-          let enablePadIndex = disabledIndexPads.shift()
-          boardWithDisabledPad = enablePads(boardWithDisabledPad, enablePadIndex, pads, initialBoard)
-        }
-        console.log(disabledIndexPads)
-
-        boardWithDisabledPad = (disablePads(boardWithDisabledPad, index, pads))
-        disabledIndexPads.push(index)
-        dispatch(updateDisabledIndexPads(disabledIndexPads))
-      } else {
-        console.log("LE JEU EST CASSéE OMG OMMGMG OOGMOGMOMMGO MOMGOOMGMOG MOGU MOGU NORDVPN")
-        return
-      }
-
-
+      dispatch(updateDisabledIndexPads(disabledIndexPads))
       dispatch(updateMovesHistory(movesHistory,movesCount-1))
       dispatch(updateBoardArray(updatedBoard))
     }

@@ -32,12 +32,11 @@ export const Board = () => {
       const payload = playMove(cell, movesCount, movesHistory, boardArray)
 
       // Si le coup est possible on met à jour les cases possibles du plateau
-      if (payload != null) {
-
+      if (payload !== undefined) {
         let boardWithDisabledPad = payload.boardArray
         let index = getPadIndex({x: cell.x, y: cell.y}, pads)
 
-        if (index != -1) {
+        if (index !== -1) {
           console.log(disabledIndexPads)
           if (disabledIndexPads.length > 1) {
             let enablePadIndex = disabledIndexPads.shift()

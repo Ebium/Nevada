@@ -36,14 +36,14 @@ export const showPossibleMoves = (cell: Coord, boardArray: boardType) => {
     const copy = R.clone(boardArray)
     for (let i = 0; i < 10; i++) {
         const tmp = copy[cell.x][i]
-        if (tmp.isFilled && !tmp.holeFilled && tmp.color != "black") {
+        if (tmp.isFilled && !tmp.holeFilled && tmp.color !== "black") {
             copy[cell.x][i].color = "orange"
             possibleMoves++
         }
     }
     for (let j = 0; j < 10; j++) {
         const tmp = copy[j][cell.y]
-        if (tmp.isFilled && !tmp.holeFilled && tmp.color != "black") {
+        if (tmp.isFilled && !tmp.holeFilled && tmp.color !== "black") {
             copy[j][cell.y].color = "orange"
             possibleMoves++
 
@@ -60,13 +60,13 @@ export const removeOldPossibleMoves = (previousMove: Coord, boardArray: boardTyp
     const copy = R.clone(boardArray)
     for (let i = 0; i < 10; i++) {
         const tmp = copy[previousMove.x][i]
-        if (tmp.isFilled && tmp.color != "black") {
+        if (tmp.isFilled && tmp.color !== "black") {
             copy[previousMove.x][i].color = initalBoard[previousMove.x][i].color
         }
     }
     for (let j = 0; j < 10; j++) {
         const tmp = copy[j][previousMove.y]
-        if (tmp.isFilled && tmp.color != "black") {
+        if (tmp.isFilled && tmp.color !== "black") {
             copy[j][previousMove.y].color = initalBoard[j][previousMove.y].color
         }
     }
@@ -88,7 +88,7 @@ export const getPadIndex = (cell: Coord, pads: Pad[]) => {
 // Rend les cases de la palettes noirs
 export const disablePads = (boardArray: boardType, index: number | undefined, pads: Pad[]) => {
     const copy = R.clone(boardArray)
-    if (index != undefined) {
+    if (index !== undefined) {
         let pad = pads[index]
         if (pad) {
             pad.xCoords.forEach((x) => {
@@ -104,7 +104,7 @@ export const disablePads = (boardArray: boardType, index: number | undefined, pa
 
 export const enablePads = (boardArray: boardType, index: number | undefined, pads: Pad[], initalBoard: boardType) => {
     const copy = R.clone(boardArray)
-    if (index != undefined) {
+    if (index !== undefined) {
         let pad = pads[index]
         pad.xCoords.forEach((x) => {
             pad.yCoords.forEach((y) => {
