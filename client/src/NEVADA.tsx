@@ -25,6 +25,9 @@ export const CustomIntlProvider = ({ children }: ChildrenProp) => (
       i: (chunks) => <i>{chunks}</i>,
       dot: (chunks) => <b>&#8226;</b>,
       nbsp: (chunks) => <span>&nbsp;</span>,
+      strike: (chunks) => (
+        <span style={{ textDecoration: "line-through" }}>{chunks}</span>
+      ),
     }}
   >
     {children}

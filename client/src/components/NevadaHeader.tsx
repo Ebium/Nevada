@@ -1,13 +1,18 @@
 import { useIntl } from "react-intl"
+import { useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components/macro"
 import { ReactComponent as NevadaLogo } from "../assets/nevada_logo_1.svg"
+import { useNevadaSelector } from "../store/rootReducer"
 import { colors } from "./styles/design.config"
 import { NVButton } from "./styles/NVButton"
-import { NVSpacer } from "./styles/NVSpacer"
 import { NVText } from "./styles/NVText"
 
 export const NevadaHeader = () => {
   const intl = useIntl()
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const userPseudo = useNevadaSelector((state) => state.user.pseudo)
 
   return (
     <Content>
@@ -23,24 +28,41 @@ export const NevadaHeader = () => {
           }}
         />
       </CenteredTitle>
-      <ButtonsPannel>
-        <NVButton
-          disabled={false}
-          content={intl.formatMessage({ id: "header.log-in" })}
-          colorSchem={"gold"}
-          onClick={() => {
-            console.log("random")
-          }}
-        />
-        <NVButton
-          disabled={false}
-          content={intl.formatMessage({ id: "header.sign-in" })}
-          colorSchem={"gold"}
-          onClick={() => {
-            console.log("random")
-          }}
-        />
-      </ButtonsPannel>
+
+      {!location.pathname.includes("login") && (
+        <ButtonsPannel>
+          {userPseudo ? (
+            <>
+              <NVButton
+                disabled={true}
+                content={userPseudo}
+                cursor={"unset"}
+                colorSchem={"blue"}
+                onClick={() => {
+                  navigate("/main/login")
+                }}
+              />
+              <NVButton
+              disabled={false}
+              content={intl.formatMessage({ id: "header.logout" })}
+              colorSchem={"gold"}
+              onClick={() => {
+                navigate("/main/login")
+              }}
+            />
+            </>
+          ) : (
+            <NVButton
+              disabled={false}
+              content={intl.formatMessage({ id: "header.loginSignup" })}
+              colorSchem={"gold"}
+              onClick={() => {
+                navigate("/main/login")
+              }}
+            />
+          )}
+        </ButtonsPannel>
+      )}
     </Content>
   )
 }
@@ -55,12 +77,12 @@ const Content = styled.div`
 `
 
 const ButtonsPannel = styled.div`
-margin-right: 10rem;
-display:flex;
-flex-direction: column;
-height: 100%;
-justify-content: space-evenly;
-z-index:2;
+  margin-right: 10rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-evenly;
+  z-index: 2;
 `
 
 const CenteredTitle = styled.div`

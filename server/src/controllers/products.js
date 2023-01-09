@@ -8,7 +8,7 @@ const getProducts = ((req, res) => {
 
 const getProduct = ((req, res) => {
     Product.findOne({ _id: req.params.productID })
-        .then(result => res.status(200).json({ result }))
+        .then(result => res.status(200).json({ result:result }))
         .catch(() => res.status(404).json({msg: 'Product not found'}))
 })
 
