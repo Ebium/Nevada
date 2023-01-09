@@ -1,13 +1,28 @@
+import { useIntl } from "react-intl"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
+import { CGUButton } from "../../components/CGUButton"
+import { NVButton } from "../../components/styles/NVButton"
+import { NVText } from "../../components/styles/NVText"
 import { useNevadaSelector } from "../../store/rootReducer"
 
 export const Home = () => {
   const navigate = useNavigate()
   const sockID = useNevadaSelector((state) => state.user.socketId)
+  const intl = useIntl() 
 
   return (
     <Content>
+      <StyledLink href={require("../../assets/Kulami_FR.pdf")} target="blank">
+        <NVButton
+          disabled={false}
+          content={intl.formatMessage({id:"button.rules"})}
+          colorSchem={"black"}
+          onClick={function (): void {
+            throw new Error("Function not implemented.")
+          }}
+        />
+      </StyledLink>
       Home page
       <StyledButton
         onClick={() => {
@@ -25,14 +40,14 @@ export const Home = () => {
       </StyledButton>
       <StyledButton
         onClick={() => {
-          navigate("/main/signup")
+          navigate("/main/payment")
         }}
       >
-        Sign up
+        Payment page
       </StyledButton>
       <StyledButton
         onClick={() => {
-          navigate("/login")
+          navigate("/main/login")
         }}
       >
         Login
@@ -59,6 +74,7 @@ export const Home = () => {
         showroom (main page en gros)
       </StyledButton>
       Socket id for current connection = {sockID}
+      <CGUButton />
     </Content>
   )
 }
@@ -74,4 +90,8 @@ const Content = styled.div`
 
 const StyledButton = styled.button`
   margin-top: 2rem;
+`
+
+const StyledLink = styled.a`
+  text-decoration: none;
 `

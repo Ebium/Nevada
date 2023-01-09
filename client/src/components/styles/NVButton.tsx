@@ -2,12 +2,15 @@ import styled from "styled-components"
 import { colors } from "./design.config"
 import "@fontsource/inter"
 import { NVText } from "./NVText"
+import { ReactNode } from "react"
 
 interface ButtonProps {
   disabled: boolean
   content: string
   colorSchem: "black" | "blue" | "gold"
   onClick: () => void
+  cursor?: string
+  svg?: ReactNode
 }
 
 export const NVButton = ({
@@ -15,16 +18,26 @@ export const NVButton = ({
   content,
   colorSchem,
   onClick,
+  cursor,
+  svg,
 }: ButtonProps) => {
+  const hasSvg = svg ? true : false
+
   return (
     <>
       <StyledButton
+        hasSvg={hasSvg}
         colorSchem={colorSchem}
         disabled={disabled}
         onClick={onClick}
+        cursor={cursor}
       >
-        <NVText
+        {svg ? <StyledSvg colorSchem={colorSchem}>{svg}</StyledSvg> : <></>}
+
+        <StyledNVText
+          disabled={disabled}
           text={content}
+          cursor={cursor}
           textStyle={{
             color: colorSchem === "gold" ? "nevadaBlack" : "nevadaGold",
             fontSize: 1,
@@ -40,10 +53,13 @@ export const NVButton = ({
 interface StyledButtonProps {
   disabled: boolean
   colorSchem: "black" | "blue" | "gold"
+  cursor?: string
+  hasSvg: boolean
 }
 
 const StyledButton = styled.button<StyledButtonProps>`
-  cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
+  cursor: ${({ disabled, cursor }) =>
+    cursor ? cursor : disabled ? "not-allowed" : "pointer"};
   background-color: ${({ colorSchem }) =>
     colorSchem === "gold"
       ? colors.nevadaGold
@@ -63,5 +79,31 @@ const StyledButton = styled.button<StyledButtonProps>`
     box-shadow: 0px 0px 0.3rem
       ${({ colorSchem }) =>
         colorSchem === "gold" ? colors.nevadaBlack : colors.nevadaGold};
+  }
+`
+
+interface StyledFontProps {
+  disabled: boolean
+  cursor?: string
+}
+
+const StyledNVText = styled(NVText)<StyledFontProps>`
+  cursor: ${({ disabled, cursor }) =>
+    cursor ? cursor : disabled ? "not-allowed" : "pointer"};
+`
+
+interface StyledSvgProps {
+  colorSchem: "black" | "blue" | "gold"
+}
+
+const StyledSvg = styled.div<StyledSvgProps>`
+  position: absolute;
+  left: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  & path {
+    stroke: ${({ colorSchem }) =>
+      colorSchem === "gold" ? colors.nevadaBlack : colors.nevadaGold};
   }
 `

@@ -6,15 +6,14 @@ import { NotFound404 } from "./other/NotFound404"
 import { PaymentRefused } from "./payment/PaymentRefused"
 import { PaymentAccepted } from "./payment/PaymentAccepted"
 import { Payment } from "./payment/Payment"
-import SignUp from "./SignUp"
 import Pay from "../Paiement/Pay"
 import { Showroom } from "./other/Showroom"
 import { Main } from "../components/Main"
-import Login from "./Login"
 import RoomButton from "./game/RoomButton"
 import Room from "./game/Room"
 import { Profil } from "./other/Profil"
 import { LoginSignup } from "./other/LoginSignup"
+import { CGU } from "./other/CGU"
 
 export const routes: RouteObject[] = [
   {
@@ -28,6 +27,10 @@ export const routes: RouteObject[] = [
       {
         path: "showroom",
         element: <Showroom />,
+      },
+      {
+        path: "cgu",
+        element: <CGU />,
       },
       {
         path: "main/*",
@@ -52,10 +55,6 @@ export const routes: RouteObject[] = [
           {
             path: "pay",
             element: <Pay />,
-          },
-          {
-            path: "signup",
-            element: <SignUp />,
           },
           {
             path: "login",
@@ -95,10 +94,6 @@ export const routes: RouteObject[] = [
             ],
           },
         ],
-      },
-      {
-        path: "login",
-        element: <Login />,
       },
       {
         path: "*",

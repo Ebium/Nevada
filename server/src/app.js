@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 const app = express()
 const cors = require("cors")
 const products_routes = require("./routes/products.js")
+const users_routes = require("./routes/users.js")
 const { getStripeCheckoutSessionUrl, getStripeCheckoutSessionUrlFromStripeObject } = require("./controllers/payment")
 const { createValidUser, updateUserAuth } = require("./controllers/users") 
 const { createRoom, updateANewPlayerRoom, updateAQuitPlayerRoom, clearRooms } = require("./controllers/room.js")
@@ -142,4 +143,5 @@ mongoose
   })
 
 app.use(express.json())
+app.use("/users", cors(corsOptions), users_routes)
 app.use("/api/products", cors(corsOptions), products_routes)

@@ -2,6 +2,7 @@ import { useIntl } from "react-intl"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components/macro"
 import { ReactComponent as NevadaLogo } from "../../assets/nevada_logo_2.svg"
+import { RulesButton } from "../../components/RulesButton"
 import { colors } from "../../components/styles/design.config"
 import { NVButton } from "../../components/styles/NVButton"
 import { NVSpacer } from "../../components/styles/NVSpacer"
@@ -47,16 +48,7 @@ export const Showroom = () => {
         </RowDiv>
         <NVSpacer height={4} />
         <RowDiv>
-          <NVButton
-            disabled={false}
-            content={intl.formatMessage({
-              id: "button.rules",
-            })}
-            colorSchem={"black"}
-            onClick={() => {
-              navigate("/main/home")
-            }}
-          />
+          <RulesButton />
           <NVSpacer width={8} />
           <NVButton
             disabled={false}
@@ -101,4 +93,7 @@ const RightDiv = styled.div`
 const RowDiv = styled.div`
   display: flex;
   flex-direction: row;
+`
+const StyledLink = styled.a`
+  text-decoration: none;
 `

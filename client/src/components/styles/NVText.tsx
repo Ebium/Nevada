@@ -20,7 +20,7 @@ export interface TextProps {
     fontWeight?: number
     textTransform?: "uppercase" | "lowercase" | "capitalize" | "initial"
     cursor?: "pointer" | "auto" | "default"
-    textAlign?: "center"
+    textAlign?: "center" | "justify"
     letterSpacing?: number
   }
   dataCy?: string
@@ -50,9 +50,11 @@ const StyledText = styled.span<TextProps>`
   text-transform: ${({ textStyle }) =>
     textStyle && textStyle.textTransform ? textStyle.textTransform : "initial"};
   text-align: ${({ textStyle }) =>
-    textStyle && textStyle.textAlign ? textStyle.textAlign : "start "};
+    textStyle && textStyle.textAlign ? textStyle.textAlign : "start"};
   font-style: ${({ textStyle }) =>
     textStyle && textStyle.fontStyle ? textStyle.fontStyle : "normal"};
   letter-spacing: ${({ textStyle }) =>
-    textStyle && textStyle.letterSpacing ? `${textStyle.letterSpacing}rem` : "0.1rem"};
+    textStyle && textStyle.letterSpacing
+      ? `${textStyle.letterSpacing}rem`
+      : "0.1rem"};
 `

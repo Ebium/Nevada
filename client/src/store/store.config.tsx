@@ -3,8 +3,8 @@ import thunkMiddleware, { ThunkAction } from "redux-thunk"
 import { composeWithDevTools } from "redux-devtools-extension"
 import rootReducer, { RootState } from "./rootReducer"
 
-export type NevadaThunkAction = ThunkAction<
-  Promise<unknown>,
+export type NevadaThunkAction<ReturnType = void> = ThunkAction<
+  ReturnType,
   RootState,
   unknown,
   AnyAction

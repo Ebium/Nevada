@@ -2,8 +2,9 @@ import { useIntl } from "react-intl"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components/macro"
 import { NVButton } from "./styles/NVButton"
+import { ReactComponent as ArrowLeft } from "../assets/arrow_left.svg"
 
-export const CGUButton = () => {
+export const ReturnHomeButton = () => {
   const navigate = useNavigate()
   const intl = useIntl()
 
@@ -11,11 +12,12 @@ export const CGUButton = () => {
     <AbsoluteContent>
       <NVButton
         disabled={false}
-        content={intl.formatMessage({ id: "button.cgu" })}
-        colorSchem={"blue"}
+        content={intl.formatMessage({ id:"button.back-home" })}
+        colorSchem={"black"}
         onClick={() => {
-          navigate("/CGU")
+          navigate("/main/home")
         }}
+        svg={<ArrowLeft />}
       />
     </AbsoluteContent>
   )
@@ -24,5 +26,5 @@ export const CGUButton = () => {
 const AbsoluteContent = styled.div`
   position: absolute;
   left: 1rem;
-  bottom: 1rem;
+  top: 10rem;
 `
