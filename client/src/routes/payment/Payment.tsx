@@ -8,6 +8,7 @@ import { NVButton } from "../../components/styles/NVButton"
 import { NVSpacer } from "../../components/styles/NVSpacer"
 import { NVText } from "../../components/styles/NVText"
 import { useNevadaSelector } from "../../store/rootReducer"
+import { getDonateAmountUrl } from "../../utils/Donation"
 import { getPremiumSubscriptionUrl } from "../../utils/Subscription"
 
 export const Payment = () => {
@@ -197,7 +198,7 @@ export const Payment = () => {
               content={intl.formatMessage({ id: "payment.choice.3" })}
               colorSchem={"black"}
               onClick={() => {
-                console.log("random")
+                getDonateAmountUrl()
               }}
             />
           </RowDiv>

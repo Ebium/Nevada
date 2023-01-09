@@ -49,7 +49,6 @@ export const LoginSignup = () => {
     setLoginPassword(event.target.value)
   }
 
-
   const getLoginServerReponse = () => {
     socket.once("Login an user", (result, isConnected) => {
       if (isConnected) {
@@ -203,7 +202,7 @@ export const LoginSignup = () => {
           }}
         />
       </MidDiv>
-      <form onSubmit={handleSignupSubmit}>
+      <form onSubmit={handleSignupSubmit} autoComplete="off">
         <RightDiv>
           <NVText
             text={intl.formatMessage({ id: "loginsignup.signup" })}

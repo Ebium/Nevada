@@ -57,7 +57,7 @@ export const Showroom = () => {
             })}
             colorSchem={"black"}
             onClick={() => {
-              getDonateAmountUrl()
+              navigate("/main/payment")
             }}
           />
           <NVSpacer width={8} />

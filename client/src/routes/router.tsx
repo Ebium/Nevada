@@ -14,6 +14,7 @@ import Room from "./game/Room"
 import { Profil } from "./other/Profil"
 import { LoginSignup } from "./other/LoginSignup"
 import { CGU } from "./other/CGU"
+import { Temp } from "./other/Temp"
 
 export const routes: RouteObject[] = [
   {
@@ -43,6 +44,10 @@ export const routes: RouteObject[] = [
           {
             path: "home",
             element: <Home />,
+          },
+          {
+            path: "temp",
+            element: <Temp />,
           },
           {
             path: "profil",

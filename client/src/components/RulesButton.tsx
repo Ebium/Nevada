@@ -12,9 +12,7 @@ export const RulesButton = () => {
           disabled={false}
           content={intl.formatMessage({ id: "button.rules" })}
           colorSchem={"black"}
-          onClick={function (): void {
-            throw new Error("Function not implemented.")
-          }}
+          onClick={() => {}}
         />
       </StyledLink>
     </>

@@ -23,6 +23,19 @@ export const CGU = () => {
         <RowStyle>
           <SizedDiv>
             <NVText
+              text={intl.formatMessage({ id: "CGU.text.1.1" })}
+              textStyle={{
+                color: "nevadaGold",
+                lineHeight: 1.5,
+                fontSize: 0.7,
+              }}
+            />
+            <NVText
+              text={intl.formatMessage({ id: "CGU.text.1.2" })}
+              textStyle={{ color: "nevadaGold", lineHeight: 2, fontSize: 0.7 }}
+            />
+            <NVSpacer height={2} />
+            <NVText
               text={intl.formatMessage({ id: "CGU.text.2.1" })}
               textStyle={{
                 color: "nevadaGold",
@@ -34,7 +47,12 @@ export const CGU = () => {
               text={intl.formatMessage({ id: "CGU.text.2.2" })}
               textStyle={{ color: "nevadaGold", lineHeight: 2, fontSize: 0.7 }}
             />
-            <NVSpacer height={2} />
+          </SizedDiv>
+          <NVSpacer width={5} />
+          <NVLine height={45} />
+          <NVSpacer width={5} />
+
+          <SizedDiv>
             <NVText
               text={intl.formatMessage({ id: "CGU.text.3.1" })}
               textStyle={{
@@ -47,12 +65,7 @@ export const CGU = () => {
               text={intl.formatMessage({ id: "CGU.text.3.2" })}
               textStyle={{ color: "nevadaGold", lineHeight: 2, fontSize: 0.7 }}
             />
-          </SizedDiv>
-          <NVSpacer width={5} />
-          <NVLine height={45} />
-          <NVSpacer width={5} />
-
-          <SizedDiv>
+            <NVSpacer height={2} />
             <NVText
               text={intl.formatMessage({ id: "CGU.text.4.1" })}
               textStyle={{
@@ -76,19 +89,6 @@ export const CGU = () => {
             />
             <NVText
               text={intl.formatMessage({ id: "CGU.text.5.2" })}
-              textStyle={{ color: "nevadaGold", lineHeight: 2, fontSize: 0.7 }}
-            />
-            <NVSpacer height={2} />
-            <NVText
-              text={intl.formatMessage({ id: "CGU.text.6.1" })}
-              textStyle={{
-                color: "nevadaGold",
-                lineHeight: 1.5,
-                fontSize: 0.7,
-              }}
-            />
-            <NVText
-              text={intl.formatMessage({ id: "CGU.text.6.2" })}
               textStyle={{ color: "nevadaGold", lineHeight: 2, fontSize: 0.7 }}
             />
             <NVSpacer height={5} />

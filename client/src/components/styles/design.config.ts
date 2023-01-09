@@ -5,5 +5,7 @@ export const colors = {
   nevadaRed: "#540000",
   topGrey: "#494949",
   midGrey: "#D9D9D9",
+  backgroundGrey: "#999999",
   nevadaBackground: "#262626",
+  white: "#FFFFFF",
 }
