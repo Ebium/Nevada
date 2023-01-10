@@ -1,9 +1,10 @@
 import { boardType } from "../store/ducks/Board.ducks";
 import * as R from "ramda"
+import { Pion } from "../store/ducks/Game.ducks";
 
 
 // Joue un coup remplissant le trou, et mettant une couleur, et ajoute dans movesHistory le coup joué
-export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[], boardArray: boardType) => {
+export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[], boardArray: boardType, pads:Pad[], pion : Pion) => {
     if (movesCount === 0 || cell.color === "orange") {
         if (!cell?.holeFilled) {
             const oldMove: Move = {
@@ -12,7 +13,48 @@ export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[
                 holeColor: cell.holeColor,
                 holeFilled: cell.holeFilled
             }
-            const color = movesCount % 2 === 0 ? "red" : "blue"
+            //comptage de point simple
+            let color
+            const coo: Coord = {
+                x : cell.x,
+                y : cell.y
+            }
+            let indi = getPadIndex(coo,pads)
+            
+            //tableau de coordonnées, vides ou pleines (rouge ou bleu)
+
+            if (indi===-1){
+                console.log("Erreur dans l'incrémentation du nombre de pions sur la tuile")
+            }else{
+                if (movesCount % 2 === 0){
+                    color = "red"
+                    pads[indi].firstPlayerCounter +=1
+                    pion.pionrge.push(coo)
+                    
+                    //tableau de coordonnées des pions rouge placés
+                    //tri tableau
+                }
+
+                else{
+                    color = "blue"
+                    pads[indi].secondPlayerCounter +=1
+                    pion.pionble.push(coo)
+                    
+                    //tableau de coordonnées des pions bleu placés
+                    //tri tableau
+                }
+            }
+
+            //sol 2
+            //ajouter un stockage des coordonnées des pions placés pour chaque couleur afin de pouvoir parcourir les 2 listes (rouge et bleu)
+            //parcourir la liste pour voir le nombre de pions limitrophes
+
+            //sol 3
+            //diagonale en plus
+
+
+            
+            /*movesCount % 2 === 0 ? "red" : "blue"*/
 
             boardArray[cell.x][cell.y].holeFilled = true;
             boardArray[cell.x][cell.y].holeColor = color;
@@ -20,7 +62,7 @@ export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[
             const newMovesHistory = movesHistory
             newMovesHistory.push(oldMove)
 
-            return { newMovesHistory: newMovesHistory, movesCount: movesCount + 1, boardArray: boardArray }
+            return { newMovesHistory: newMovesHistory, movesCount: movesCount + 1, boardArray: boardArray , pion : pion}
         }
     }
     return
