@@ -13,9 +13,13 @@ import { ReactComponent as ProfileSVG } from "../../assets/profile.svg"
 import { ReactComponent as MailSVG } from "../../assets/mail.svg"
 import { NVAlert } from "../../components/styles/NVAlert"
 import { ChangeEvent, FormEvent, useEffect, useState } from "react"
-import { socket } from "../../socket-context"
+import { reloadSocket, socket } from "../../socket-context"
 import { useDispatch } from "react-redux"
 import { updateUserThunk } from "../../store/ducks/User.ducks"
+import bcrypt from "bcryptjs-react";
+import JWT from 'expo-jwt';
+import env from "react-dotenv"
+import { updateSocketID } from "../../store/ducks/User.ducks"
 
 export const LoginSignup = () => {
   const intl = useIntl()
@@ -26,19 +30,31 @@ export const LoginSignup = () => {
 
   const [loginPassword, setLoginPassword] = useState("")
   const [loginEmail, setLoginEmail] = useState("")
+  const [submitLogin, setSubmitLogin] = useState(false)
 
   useEffect(() => {
-    getLoginServerReponse()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [submitLogin, socket])
+
+
+  const setLoginToken = () => {
+    const token = JWT.encode({
+      email: loginEmail,
+      password : loginPassword,
+      isRegistered : true,
+    },env.JWT_SECRET)  
+    localStorage.setItem("Nevada_Token", token)
+  }
+
+  const loginWithToken = () => {
+    setLoginToken()
+    reloadSocket()
+  }
 
   const handleLoginSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    socket.emit("Login an user", {
-      email: loginEmail,
-      password: loginPassword,
-      auth: socket.id,
-    })
+    setSubmitLogin(true)
+    loginWithToken()
   }
 
   const handleLoginChangeEmail = (event: ChangeEvent<HTMLInputElement>) => {
@@ -49,24 +65,21 @@ export const LoginSignup = () => {
     setLoginPassword(event.target.value)
   }
 
-  const getLoginServerReponse = () => {
-    socket.once("Login an user", (result, isConnected) => {
-      if (isConnected) {
-        localStorage.setItem("auth", socket.id)
-        dispatch(updateUserThunk(result.user.email))
-        console.log("passe la 2")
-        navigate("/main/home")
-      } else {
-        showLoginError(result)
-      }
-    })
-  }
+  socket.on("connect_error", (err:Error)=> {
+    localStorage.removeItem("Nevada_Token")
+    if(submitLogin) {
+      alert(err.message) 
+    }
+    setSubmitLogin(false)
+  })
 
-  const showLoginError = (result: any) => {
-    console.log("on a eu error")
-    console.log(result)
-    alert(result)
-  }
+  socket.on("connect",()=> {
+    if(submitLogin) {
+      dispatch(updateUserThunk(loginEmail))
+      dispatch(updateSocketID(socket.id))
+      navigate("/main/home")
+    }
+  })
 
   //-------------------------------------------------------------------------------
 
@@ -77,22 +90,44 @@ export const LoginSignup = () => {
   const [signupPseudo, setSignupPseudo] = useState("")
   const [cguAlertDisplayed, setCGUAlertDisplayed] = useState(false)
   const [signupCheckboxCGU, setSignupCheckboxCGU] = useState(false)
+  const [submitSignup, setSubmitSignup] = useState(false)
 
   useEffect(() => {
-    getSignupServerReponse()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [submitSignup,socket])
 
-  const handleSignupSubmit = (event: FormEvent<HTMLFormElement>) => {
+  
+  const signupWithToken = async () => {
+    const token = JWT.encode({
+      email: signupEmail,
+      password : bcrypt.hashSync(signupPassword),
+      pseudo : signupPseudo,
+      isRegistered : false,
+    },env.JWT_SECRET) 
+    localStorage.setItem("Nevada_Token", token)
+    reloadSocket()
+  }
+
+  const setSignupToken = () => {
+    const token = JWT.encode({
+      email: signupEmail,
+      password : signupPassword,
+      isRegistered : true,
+    },env.JWT_SECRET) 
+    localStorage.setItem("Nevada_Token", token)
+  }
+
+  const handleSignupSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!signupCheckboxCGU) setCGUAlertDisplayed(true)
     else {
-      setCGUAlertDisplayed(false)
-      socket.emit("Register a new user", {
-        email: signupEmail,
-        password: signupPassword,
-        pseudo: signupPseudo,
-      })
+      if(!emailIsValid(signupEmail)) {
+        alert("Email format is invalid")
+      } else {
+        setCGUAlertDisplayed(false)
+        setSubmitSignup(true)
+        signupWithToken()
+      }
     }
   }
 
@@ -108,27 +143,35 @@ export const LoginSignup = () => {
     event: ChangeEvent<HTMLInputElement>
   ) => {
     setSignupPseudo(event.target.value)
-  }
+  }    
 
-  const getSignupServerReponse = () => {
-    socket.on("Register a new user", (result, isCreated) => {
-      if (isCreated) {
-        updateUserThunk(result.email)
+    socket.on("connect_error", (err:Error)=> {
+      localStorage.removeItem("Nevada_Token")
+      if(submitSignup) {
+        alert(err.message) 
+      }
+      setSubmitSignup(false)
+    })
+
+    socket.on("connect",()=> {
+      if(submitSignup) {
+        setSignupToken()
+        dispatch(updateSocketID(socket.id))
         navigate("/main/home")
-      } else {
-        showSignupErrors(result)
       }
     })
-  }
 
-  const showSignupErrors = (result: any) => {
-    var errors = ""
-    if (result.errors.email !== undefined) errors = result.errors.email + "\n"
 
-    if (result.errors.pseudo !== undefined)
-      errors = errors + result.errors.email
+    //-------------------------------------------------------------------------------
 
-    alert(errors)
+  //Verify --------------------------------------------------------------------
+
+  const emailIsValid = (email:String) => {
+    const emailSplited = email.split("@")
+    if(emailSplited.length!==2)
+      return false
+
+    return emailSplited[1].includes(".")
   }
 
   //-------------------------------------------------------------------------------

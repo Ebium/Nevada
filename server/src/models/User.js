@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema(
     winStreak: { type: Number, default: 0 },
     auth: { type: String, default: "" },
     pseudoColor: { type: String, default: "gold" },
+    cusId: { type:String, default: "" }
   },
   {
     versionKey: false,
