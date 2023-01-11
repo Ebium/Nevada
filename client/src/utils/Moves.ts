@@ -4,7 +4,7 @@ import * as R from "ramda"
 
 // Joue un coup remplissant le trou, et mettant une couleur, et ajoute dans movesHistory le coup joué
 export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[], boardArray: boardType) => {
-    if (movesCount === 0 || cell.color === "orange") {
+    if (movesCount === 0 || !cell.disabled && cell.color === "orange") {
         if (!cell?.holeFilled) {
             const oldMove: Move = {
                 x: cell.x,
@@ -33,23 +33,27 @@ export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[
 // pb rajout de ligne mais c'est mieux ?
 export const showPossibleMoves = (cell: Coord, boardArray: boardType) => {
     let possibleMoves = 0
+    console.log("possible ", boardArray)
+    
     const copy = R.clone(boardArray)
-    for (let i = 0; i < 10; i++) {
-        const tmp = copy[cell.x][i]
-        if (tmp.isFilled && !tmp.holeFilled && tmp.color !== "black") {
-            copy[cell.x][i].color = "orange"
+    console.log("copy ", copy)
+    for (let y = 0; y < 10; y++) {
+        const tmpCell = copy[cell.x][y]
+        console.log("orange",tmpCell)
+        if (tmpCell.isFilled && !tmpCell.holeFilled && !tmpCell.disabled) {
+            // copy[cell.x][y].color = "orange"
             possibleMoves++
         }
     }
-    for (let j = 0; j < 10; j++) {
-        const tmp = copy[j][cell.y]
-        if (tmp.isFilled && !tmp.holeFilled && tmp.color !== "black") {
-            copy[j][cell.y].color = "orange"
+    for (let x = 0; x < 10; x++) {
+        const tmpCell = copy[x][cell.y]
+        if (tmpCell.isFilled && !tmpCell.holeFilled && !tmpCell.disabled) {
+            // copy[x][cell.y].color = "orange"
             possibleMoves++
 
         }
     }
-    // copy[cell.x][cell.y].color = "lime"
+
     console.log("poss", possibleMoves)
     return { board: copy, possibleMoves: possibleMoves }
 }
@@ -58,16 +62,18 @@ export const showPossibleMoves = (cell: Coord, boardArray: boardType) => {
 // Remet seulement les couleurs du plateau initiale par rapport au coup possible de l'ancien coup 
 export const removeOldPossibleMoves = (previousMove: Coord, boardArray: boardType, initalBoard: boardType) => {
     const copy = R.clone(boardArray)
-    for (let i = 0; i < 10; i++) {
-        const tmp = copy[previousMove.x][i]
-        if (tmp.isFilled && tmp.color !== "black") {
-            copy[previousMove.x][i].color = initalBoard[previousMove.x][i].color
+    for (let y = 0; y < 10; y++) {
+        const tmpCell = copy[previousMove.x][y]
+        if (tmpCell.isFilled && !tmpCell.disabled) {
+            copy[previousMove.x][y].color = initalBoard[previousMove.x][y].color
+            // copy[previousMove.x][y].disabled = false
         }
     }
-    for (let j = 0; j < 10; j++) {
-        const tmp = copy[j][previousMove.y]
-        if (tmp.isFilled && tmp.color !== "black") {
-            copy[j][previousMove.y].color = initalBoard[j][previousMove.y].color
+    for (let x = 0; x < 10; x++) {
+        const tmpCell = copy[x][previousMove.y]
+        if (tmpCell.isFilled && !tmpCell.disabled) {
+            copy[x][previousMove.y].color = initalBoard[x][previousMove.y].color
+            // copy[x][previousMove.y].disabled = false
         }
     }
     return copy
@@ -93,7 +99,8 @@ export const disablePads = (boardArray: boardType, index: number | undefined, pa
         if (pad) {
             pad.xCoords.forEach((x) => {
                 pad.yCoords.forEach((y) => {
-                    copy[x][y].color = "black"
+                    copy[x][y].disabled = true
+                    // copy[x][y].color = "black"
                 })
             })
         }
@@ -109,6 +116,7 @@ export const enablePads = (boardArray: boardType, index: number | undefined, pad
         pad.xCoords.forEach((x) => {
             pad.yCoords.forEach((y) => {
                 copy[x][y].color = initalBoard[x][y].color
+                copy[x][y].disabled = false
             })
         })
     }
@@ -130,6 +138,7 @@ export interface CellType {
     y: number,
     holeColor: string,
     holeFilled: boolean,
+    disabled: boolean
 }
 
 /* Interface d'un coup joué : utilisé pour le dernier coup joué
