@@ -6,11 +6,15 @@ export const translations = {
   "button.home": "Page d'accueil",
   "button.rules": "Règles du jeu",
   "button.help-us": "Nous soutenir",
+  "button.get-premium": "Devenir premium",
   "button.profil": "Profil",
   "button.cgu": "CGU",
   "button.back-home": "Retour à l'accueil",
   "button.back": "Retour",
   "button.connect": "Se connecter",
+  "button.game.join": "Rejoindre",
+  "button.game.create": "Créer une partie",
+  "button.game.forfait": "Déclarer forfait",
 
   "header.title": "Nevada",
   "header.log-in": "Connexion",
@@ -77,13 +81,64 @@ export const translations = {
   "home.leftbar.stats.players": "Joueur en ligne : {data}",
   "home.leftbar.stats.games": "Parties en cours : {data}",
   "home.leftbar.stats.spectators": "Spectateurs : {data}",
+  "home.leftbar.spectate.title": "Observer une partie",
+  "home.leftbar.training.title": "Mode entraînement",
+  "home.leftbar.soon.1": "Bientôt disponible",
+  "home.leftbar.soon.2": "pour les premiums !",
+
   "home.center.card.news.title": "Nouveautés",
-  "home.center.card.news.content": "Incroyable ! Le site est en plein développement, il n'y a donc, <b>pour l'instant</b>, aucune nouvelle ! C'est une bonne nouvelle hein ? deux ! BAHHAHHAHHAHHAHHAHAH",
+  "home.center.card.news.content":
+    "Incroyable ! Le site est en plein développement, il n'y a donc, <b>pour l'instant</b>, aucune nouvelle ! C'est une bonne nouvelle hein ? deux ! BAHHAHHAHHAHHAHHAHAH",
+
   "home.center.card.player-stats.title": "Statistiques du profil",
-  "home.center.card.player-stats.content.1": "Vous n'êtes pas connecté !",
-  "home.center.card.player-stats.content.2": "Connectez-vous pour accéder à vos statistiques !",
+  "home.center.card.offline.player-stats.content.1":
+    "Vous n'êtes pas connecté !",
+  "home.center.card.offline.player-stats.content.2":
+    "Connectez-vous pour accéder à vos statistiques !",
+  "home.center.card.online.player-stats.content.pseudo": "Pseudo : {data}",
+  "home.center.card.online.player-stats.content.premium": "Premium : {data}",
+  "home.center.card.online.player-stats.content.games.title":
+    "<b>Parties :</b>",
+  "home.center.card.online.player-stats.content.games.played":
+    "Jouées : {data}",
+  "home.center.card.online.player-stats.content.games.won": "Gagnées : {data}",
+  "home.center.card.online.player-stats.content.games.serie":
+    "Série de victoire : {data}",
+  "home.center.card.online.player-stats.content.created-at":
+    "Compte crée le : {data}",
+
   "home.center.card.play.title": "Jouer",
-  "home.center.card.play.content": "Vous devez vous connecter pour commencer à jouer !",
+  "home.center.card.play.join.no-code-game-alert":
+    "Vous devez entrer un code avant de rejoindre une partie !",
+  "home.center.card.offline.play.content":
+    "Vous devez vous connecter pour commencer à jouer !",
+  "home.center.card.online.play.content":
+    "Rejoignez une partie à l'aide du code généré ou alors créez-en une !",
+
   "home.center.card.ranking.title": "Classement top joueurs",
-  
+
+  "game.code": "Code de la partie : {data}",
+  "game.boarding.title": "Vous avez été tiré au sort pour proposer un plateau pour cette partie, que souhaitez-vous faire ?",
+  "game.boarding.build": "Construire mon propre plateau",
+  "game.boarding.preset": "Choisir un plateau dans la liste ci-dessous",
+
+  "game.building.reset": "Tout remettre à zéro",
+  "game.building.undo": "Revenir en arrière",
+  "game.building.rotate-pad": "Tourner la plaquette",
+  "game.building.start-game": "Lancer la partie",
+  "game.building.pad.preview": "Aperçu de la plaquette actuelle",
+  "game.building.pad.select": "Sélectionnez une des plaquettes restantes",
+  "game.building.pad.remaining": "Restant : {data}",
+
+  "game.playing.player-start.yes": "Vous avez été tiré au sort pour commencer en premier !",
+  "game.playing.player-start.no": "Votre adversaire commence en premier !",
+  "game.playing.actual-turn": "Tour actuel : {data}",
+  "game.playing.player.1": "Joueur 1",
+  "game.playing.player.2": "Joueur 2",
+  "game.playing.games.played": "Parties jouées : {data}",
+  "game.playing.games.won": "Gagnées : {data}",
+  "game.playing.games.lost": "Perdues : {data}",
+  "game.playing.games.serie": "Série de victoire : {data}",
+  "game.playing.remaining": "Pions restants : {data}",
+
 }

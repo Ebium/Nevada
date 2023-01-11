@@ -5,10 +5,26 @@ import {
   updateBoardArray,
   updateHistoryBoard,
 } from "../store/ducks/Board.ducks"
-import { CellType, disablePads, enablePads, getPadIndex, Pad, PadHistory, playMove, removeOldPossibleMoves, showPossibleMoves } from "../utils/Moves"
+import {
+  CellType,
+  disablePads,
+  enablePads,
+  getPadIndex,
+  Pad,
+  PadHistory,
+  playMove,
+  removeOldPossibleMoves,
+  showPossibleMoves,
+} from "../utils/Moves"
 import { updateDroppedCounter, updatePadStore } from "../store/ducks/Pad.ducks"
 import { useNevadaSelector } from "../store/rootReducer"
-import { updateDisabledIndexPads, updateMovesHistory, updatePads } from "../store/ducks/Game.ducks"
+import {
+  updateDisabledIndexPads,
+  updateMovesHistory,
+  updatePads,
+} from "../store/ducks/Game.ducks"
+import { colors } from "./styles/design.config"
+import { ReactNode, useState } from "react"
 
 export const Board = () => {
   const dispatch = useDispatch()
@@ -24,7 +40,84 @@ export const Board = () => {
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
   const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
   const pads = useNevadaSelector((state) => state.game.pads)
-  const disabledIndexPads = useNevadaSelector((state) => state.game.disabledIndexPads)
+  const disabledIndexPads = useNevadaSelector(
+    (state) => state.game.disabledIndexPads
+  )
+
+  const Pad2 = (props: { orientation: number }) => {
+    return (
+      <Plaquette>
+        {props.orientation ? (
+          <RowS>
+            <Cell />
+            <Cell />
+          </RowS>
+        ) : (
+          <ColumnS>
+            <Cell />
+            <Cell />
+          </ColumnS>
+        )}
+      </Plaquette>
+    )
+  }
+
+  const Pad3 = () => {
+    return (
+      <Plaquette>
+        <RowS>
+          <Cell />
+          <Cell />
+          <Cell />
+        </RowS>
+      </Plaquette>
+    )
+  }
+
+  const Pad4 = () => {
+    return (
+      <Plaquette>
+        <ColumnS>
+          <RowS>
+            <Cell />
+            <Cell />
+          </RowS>
+          <RowS>
+            <Cell />
+            <Cell />
+          </RowS>
+        </ColumnS>
+      </Plaquette>
+    )
+  }
+
+  const Pad6 = () => {
+    return (
+      <Plaquette>
+        <ColumnS>
+          <RowS>
+            <Cell />
+            <Cell />
+            <Cell />
+          </RowS>
+          <RowS>
+            <Cell />
+            <Cell />
+            <Cell />
+          </RowS>
+        </ColumnS>
+      </Plaquette>
+    )
+  }
+
+  interface PadPosArray {
+    x: number
+    y: number
+    compo: ReactNode
+  }
+
+  const [padsList, setPadsList] = useState<Array<PadPosArray>>([])
+  console.log(padsList)
 
   const handleBoardClick = (cell: CellType) => {
     // Si la partie a commencé, joue un coup
@@ -34,27 +127,40 @@ export const Board = () => {
       // Si le coup est possible on met à jour les cases possibles du plateau
       if (payload !== undefined) {
         let boardWithDisabledPad = payload.boardArray
-        let index = getPadIndex({x: cell.x, y: cell.y}, pads)
+        let index = getPadIndex({ x: cell.x, y: cell.y }, pads)
 
         if (index !== -1) {
           console.log(disabledIndexPads)
           if (disabledIndexPads.length > 1) {
             let enablePadIndex = disabledIndexPads.shift()
-            boardWithDisabledPad = enablePads(boardWithDisabledPad, enablePadIndex, pads, initialBoard)
+            boardWithDisabledPad = enablePads(
+              boardWithDisabledPad,
+              enablePadIndex,
+              pads,
+              initialBoard
+            )
           }
           console.log(disabledIndexPads)
 
-          boardWithDisabledPad = (disablePads(boardWithDisabledPad, index, pads))
+          boardWithDisabledPad = disablePads(boardWithDisabledPad, index, pads)
           disabledIndexPads.push(index)
           dispatch(updateDisabledIndexPads(disabledIndexPads))
         } else {
-          console.log("LE JEU EST CASSéE OMG OMMGMG OOGMOGMOMMGO MOMGOOMGMOG MOGU MOGU NORDVPN")
+          console.log(
+            "LE JEU EST CASSéE OMG OMMGMG OOGMOGMOMMGO MOMGOOMGMOG MOGU MOGU NORDVPN"
+          )
           return
         }
 
         // Si un coup a déjà été joué, on enlève les anciens coup possible, sinon on ne fait rien
-        const boardWithoutPreviousMoves = movesHistory.length > 1 ? removeOldPossibleMoves(movesHistory[movesHistory.length - 2], boardWithDisabledPad, initialBoard) : boardWithDisabledPad
-
+        const boardWithoutPreviousMoves =
+          movesHistory.length > 1
+            ? removeOldPossibleMoves(
+                movesHistory[movesHistory.length - 2],
+                boardWithDisabledPad,
+                initialBoard
+              )
+            : boardWithDisabledPad
 
         // Puis on met à jour les coups possibles pour le coup joué
         let boardWithMoves = showPossibleMoves(cell, boardWithoutPreviousMoves)
@@ -63,7 +169,9 @@ export const Board = () => {
           // faire fin de jeu ici où un truc du genre dispatch ....
         }
 
-        dispatch(updateMovesHistory(payload.newMovesHistory, payload.movesCount))
+        dispatch(
+          updateMovesHistory(payload.newMovesHistory, payload.movesCount)
+        )
         dispatch(updateBoardArray(boardWithMoves.board))
       }
       return
@@ -73,7 +181,6 @@ export const Board = () => {
     if (currentPad.nbHole === 0 || cell.isFilled) return
     const padNum = currentPad.nbHole
     const updatedBoard = R.clone(boardArray)
-
     const padHistory: PadHistory = {
       coord: [],
     }
@@ -84,7 +191,6 @@ export const Board = () => {
       firstPlayerCounter: 0,
       secondPlayerCounter: 0,
     }
-
 
     if (padStore[padNum - 1].remaining === 0) return
     if (padNum === 2) {
@@ -120,6 +226,8 @@ export const Board = () => {
         holeFilled: false,
         holeColor: "black",
       }
+
+      padsList.push({ x: cell.x, y: cell.y, compo: <Pad2 orientation={1} /> })
 
       padHistory.coord = [
         [cell.x, cell.y],
@@ -399,42 +507,44 @@ export const Board = () => {
     <>
       <StyledBoard>
         {boardArray.map((key) => {
-          return key.map(
-            (key: CellType) => {
-              keyVar++
-              return (
-                <Cellule
-                  key={keyVar}
-                  onClick={() => {
-                    handleBoardClick(key)
-                  }}
-                  style={{
-                    backgroundColor: key.isFilled
-                      ? key.color
-                      : gameStarted
-                        ? "transparent"
-                        : "#D3D3D3",
-                    border:
-                      gameStarted && !key.isFilled ? "none" : "1px red solid",
-                  }}
-                >
-                  {key.isFilled ? (
-                    <HoleForCellule color={key.holeColor}></HoleForCellule>
-                  ) : (
-                    // gameStarted ? (
-                    //   <>
-                    //     {/* Couleur? */}
-                    //   </>
-                    // ) : (
-                    <>
-                      {key.x},{key.y}
-                    </>
-                    // )
-                  )}
-                </Cellule>
-              )
-            }
-          )
+          return key.map((key: CellType) => {
+            keyVar++
+            return (
+              <Cellule
+                key={keyVar}
+                onClick={() => {
+                  handleBoardClick(key)
+                }}
+                style={{
+                  backgroundColor: key.isFilled
+                    ? key.color
+                    : gameStarted
+                    ? "transparent"
+                    : "#D3D3D3",
+                  border:
+                    gameStarted && !key.isFilled ? "none" : "1px red solid",
+                }}
+              >
+                {padsList.map((ah) =>
+                  key.x === ah.x && key.y === ah.y ? <>{ah.compo}</> : <></>
+                )}
+
+                {key.isFilled ? (
+                  <HoleForCellule color={key.holeColor}></HoleForCellule>
+                ) : (
+                  // gameStarted ? (
+                  //   <>
+                  //     {/* Couleur? */}
+                  //   </>
+                  // ) : (
+                  <>
+                    {key.x},{key.y}
+                  </>
+                  // )
+                )}
+              </Cellule>
+            )
+          })
         })}
       </StyledBoard>
     </>
@@ -471,4 +581,35 @@ const StyledBoard = styled.div`
   box-shadow: 0px 0px 20px black;
   padding: 1rem;
   width: fit-content;
+`
+
+const Plaquette = styled.div`
+  position: relative;
+  z-index: 10;
+
+  top: -2rem;
+  left: -2rem;
+  border: 1px solid white;
+  height: fit-content;
+  width: fit-content;
+  border-radius: 15px;
+  background-color: ${colors.nevadaBlue};
+  margin: 1rem;
+`
+const RowS = styled.div`
+  display: flex;
+  flex-direction: row;
+`
+const ColumnS = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+const Cell = styled.div`
+  height: 50px;
+  width: 50px;
+  border-radius: 50px;
+  margin: 10px;
+  background-color: white;
+  box-shadow: 0px 0px 10px 2px black;
 `

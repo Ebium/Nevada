@@ -1,7 +1,6 @@
 import { useIntl } from "react-intl"
 import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import { CGUButton } from "../../components/CGUButton"
 import { RulesButton } from "../../components/RulesButton"
 import { colors } from "../../components/styles/design.config"
 import { NVButton } from "../../components/styles/NVButton"
@@ -9,11 +8,29 @@ import { NVLine } from "../../components/styles/NVLine"
 import { NVSpacer } from "../../components/styles/NVSpacer"
 import { NVText } from "../../components/styles/NVText"
 import { useNevadaSelector } from "../../store/rootReducer"
+import { ReactComponent as UserOctagonSVG } from "../../assets/user_octagon.svg"
+import {
+  StyledPlaySVG,
+  StyledNewsSVG,
+  StyledRankSVG,
+  StyledGamesWinSVG,
+  StyledStatsSVG,
+  StyledWinSerieSVG,
+} from "../../components/styles/CommonSvg"
+import { NVInput } from "../../components/styles/NVInput"
+import { ChangeEvent, FormEvent, ReactNode, useState } from "react"
+import { NVAlert } from "../../components/styles/NVAlert"
 
 export const Home = () => {
   const navigate = useNavigate()
   const intl = useIntl()
-  const userPseudo = useNevadaSelector((state) => state.user.pseudo)
+  // const userPseudo = useNevadaSelector((state) => state.user.pseudo)
+  const userPseudo = "a"
+  const userPremium = useNevadaSelector((state) => state.user.isPremium)
+  const userGamesPlayed = useNevadaSelector((state) => state.user.nbGames)
+  const userGamesWon = useNevadaSelector((state) => state.user.nbGamesWin)
+  const userGamesSerie = useNevadaSelector((state) => state.user.winStreak)
+  const userCreatedAt = useNevadaSelector((state) => state.user.creationDate)
 
   const CenterCard = (props: {
     children: any
@@ -23,6 +40,27 @@ export const Home = () => {
     return (
       <TheCard>
         <TopCard>
+          {props.title === "player-stats" ? (
+            <>
+              <UserOctagonSVG />
+              <NVSpacer width={0.5} />
+            </>
+          ) : props.title === "play" ? (
+            <>
+              <StyledPlaySVG />
+              <NVSpacer width={0.5} />
+            </>
+          ) : props.title === "news" ? (
+            <>
+              <StyledNewsSVG />
+              <NVSpacer width={0.5} />
+            </>
+          ) : (
+            <>
+              <StyledRankSVG />
+              <NVSpacer width={0.5} />
+            </>
+          )}
           <NVText
             text={intl.formatMessage({
               id: `home.center.card.${props.title}.title`,
@@ -30,13 +68,13 @@ export const Home = () => {
             textStyle={{
               color: "white",
               textAlign: "center",
-              fontSize: 1.2,
-              fontWeight: 900,
+              fontSize: 1,
+              fontWeight: 600,
             }}
           />
         </TopCard>
         <NVLine fullWidth={true} height={0.2} color={"nevadaBlack"} />
-        <BottomCard color={props.color ? props.color : "midGrey"}>
+        <BottomCard color={props.color ? props.color : "backgroundGrey"}>
           <BottomCardContent>
             <NVSpacer height={1} />
             {props.children}
@@ -56,12 +94,15 @@ export const Home = () => {
           <NVText
             text={intl.formatMessage(
               {
-                id: `home.leftbar.stats.${data.text}`,
+                id:
+                  data.schema === 2
+                    ? data.text
+                    : `home.leftbar.stats.${data.text}`,
               },
               { data: data.data }
             )}
             textStyle={{
-              color: data.schema ? "topGrey" : "midGrey",
+              color: data.schema === 1 ? "topGrey" : "midGrey",
               textAlign: "center",
               fontSize: 1,
               fontWeight: 900,
@@ -72,8 +113,58 @@ export const Home = () => {
     )
   }
 
+  const SimpleText = (props: {
+    textId: string
+    data?: any
+    weight?: number
+  }) => {
+    return (
+      <NVText
+        text={intl.formatMessage(
+          {
+            id: props.textId,
+          },
+          { data: props.data }
+        )}
+        textStyle={{
+          color: "nevadaBlack",
+          textAlign: "center",
+          fontSize: 0.9,
+          fontWeight: 600,
+          lineHeight: 2,
+        }}
+      />
+    )
+  }
+
+  const [gameCode, setGameCode] = useState("")
+  const [gameCodeAlertDisplayed, setGameCodeAlertDisplayed] = useState(false)
+
+  const handleGameCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setGameCode(event.target.value)
+  }
+
+  const handleJoinGameWithCodeSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!gameCode) setGameCodeAlertDisplayed(true)
+    else {
+      setGameCodeAlertDisplayed(false)
+      console.log("SIUUUUUUUUU")
+    }
+  }
+
   return (
     <Content>
+      <NVAlert
+        isDisplayed={gameCodeAlertDisplayed}
+        text={intl.formatMessage({
+          id: "home.center.card.play.join.no-code-game-alert",
+        })}
+        onClose={() => {
+          setGameCodeAlertDisplayed(!gameCodeAlertDisplayed)
+        }}
+      />
+
       <LeftBar>
         <NVSpacer height={1} />
         <LeftBarStats>
@@ -90,13 +181,63 @@ export const Home = () => {
           />
           <NVSpacer height={1} />
           <NVLine width={17} height={0.2} color={"nevadaBlack"} />
-
-          <LeftBarLine schema={1} data={0} text={"players"} />
-          <LeftBarLine schema={0} data={0} text={"games"} />
-          <LeftBarLine schema={1} data={0} text={"spectators"} />
+          <LeftBarLine schema={1} data={-1} text={"players"} />
+          <LeftBarLine schema={0} data={-1} text={"games"} />
+          <LeftBarLine schema={1} data={-1} text={"spectators"} />
 
           <NVLine width={17} height={0.2} color={"nevadaBlack"} />
         </LeftBarStats>
+        {userPseudo ? (
+          <>
+            <NVSpacer height={2} />
+
+            <LeftBarSpectateGame>
+              <NVText
+                text={intl.formatMessage({
+                  id: "home.leftbar.spectate.title",
+                })}
+                textStyle={{
+                  color: "nevadaBlack",
+                  textAlign: "center",
+                  fontSize: 1.2,
+                  fontWeight: 900,
+                }}
+              />
+              <NVSpacer height={1} />
+              <NVLine width={17} height={0.2} color={"nevadaBlack"} />
+
+              <LeftBarLine schema={2} data={-1} text={"home.leftbar.soon.1"} />
+              <LeftBarLine schema={2} data={-1} text={"home.leftbar.soon.2"} />
+
+              <NVLine width={17} height={0.2} color={"nevadaBlack"} />
+            </LeftBarSpectateGame>
+
+            <NVSpacer height={2} />
+
+            <LeftBarTrainingMode>
+              <NVText
+                text={intl.formatMessage({
+                  id: "home.leftbar.training.title",
+                })}
+                textStyle={{
+                  color: "nevadaBlack",
+                  textAlign: "center",
+                  fontSize: 1.2,
+                  fontWeight: 900,
+                }}
+              />
+              <NVSpacer height={1} />
+              <NVLine width={17} height={0.2} color={"nevadaBlack"} />
+
+              <LeftBarLine schema={2} data={-1} text={"home.leftbar.soon.1"} />
+              <LeftBarLine schema={2} data={-1} text={"home.leftbar.soon.2"} />
+
+              <NVLine width={17} height={0.2} color={"nevadaBlack"} />
+            </LeftBarTrainingMode>
+          </>
+        ) : (
+          <></>
+        )}
         <LeftBarButtons>
           <RulesButton />
           <NVSpacer height={1} />
@@ -131,37 +272,89 @@ export const Home = () => {
               color: "nevadaBlack",
               textAlign: "center",
               fontSize: 0.9,
-              fontWeight: 500,
+              fontWeight: 600,
               lineHeight: 2,
             }}
           />
         </CenterCard>
         <CenterCard title="player-stats">
           {userPseudo ? (
-            <></>
+            <>
+              <SimpleText
+                textId={"home.center.card.online.player-stats.content.pseudo"}
+                data={userPseudo}
+              />
+              <SimpleText
+                textId={"home.center.card.online.player-stats.content.premium"}
+                data={userPremium ? "oui" : "non"}
+              />
+              {userPremium ? (
+                <></>
+              ) : (
+                <>
+                  <NVSpacer height={1} />
+                  <NVButton
+                    disabled={false}
+                    content={intl.formatMessage({ id: "button.get-premium" })}
+                    colorSchem={"blue"}
+                    onClick={() => {
+                      navigate("/main/payment")
+                    }}
+                  />
+                </>
+              )}
+              <NVSpacer height={1} />
+              <NVLine width={18} height={0.2} color={"nevadaBlack"} />
+              <SimpleText
+                textId={
+                  "home.center.card.online.player-stats.content.games.title"
+                }
+              />
+              <StatCardRow>
+                <StyledStatsSVG width={30} />
+                <NVSpacer width={1} />
+                <SimpleText
+                  textId={
+                    "home.center.card.online.player-stats.content.games.played"
+                  }
+                  data={userGamesPlayed}
+                />
+              </StatCardRow>
+              <StatCardRow>
+                <StyledGamesWinSVG width={30} />
+                <NVSpacer width={1} />
+                <SimpleText
+                  textId={
+                    "home.center.card.online.player-stats.content.games.won"
+                  }
+                  data={userGamesWon}
+                />
+              </StatCardRow>
+              <StatCardRow>
+                <StyledWinSerieSVG width={30} />
+                <NVSpacer width={1} />
+                <SimpleText
+                  textId={
+                    "home.center.card.online.player-stats.content.games.serie"
+                  }
+                  data={userGamesSerie}
+                />
+              </StatCardRow>
+              <NVLine width={18} height={0.2} color={"nevadaBlack"} />
+              <SimpleText
+                textId={
+                  "home.center.card.online.player-stats.content.created-at"
+                }
+                data={userCreatedAt}
+              />
+            </>
           ) : (
             <>
-              <NVText
-                text={intl.formatMessage({
-                  id: "home.center.card.player-stats.content.1",
-                })}
-                textStyle={{
-                  color: "nevadaBlack",
-                  textAlign: "center",
-                  fontSize: 0.9,
-                  fontWeight: 500,
-                }}
+              <SimpleText
+                textId={"home.center.card.offline.player-stats.content.1"}
               />
-              <NVText
-                text={intl.formatMessage({
-                  id: "home.center.card.player-stats.content.2",
-                })}
-                textStyle={{
-                  color: "nevadaBlack",
-                  textAlign: "center",
-                  fontSize: 0.9,
-                  fontWeight: 500,
-                }}
+              <SimpleText
+                textId={"home.center.card.offline.player-stats.content.2"}
               />
               <NVButton
                 disabled={false}
@@ -176,20 +369,44 @@ export const Home = () => {
         </CenterCard>
         <CenterCard title="play">
           {userPseudo ? (
-            <></>
-          ) : (
             <>
-              <NVText
-                text={intl.formatMessage({
-                  id: "home.center.card.play.content",
-                })}
-                textStyle={{
-                  color: "nevadaBlack",
-                  textAlign: "center",
-                  fontSize: 0.9,
-                  fontWeight: 500,
+              <SimpleText textId={"home.center.card.online.play.content"} />
+              <form onSubmit={handleJoinGameWithCodeSubmit}>
+                <ColumnStyle>
+                  <NVInput
+                    disabled={false}
+                    type={"text"}
+                    placeholder={"CODE"}
+                    width={8.5}
+                    value={gameCode}
+                    onChange={(e) => {
+                      handleGameCodeChange(e)
+                    }}
+                  />
+                  <NVSpacer height={1} />
+                  <NVInput
+                    disabled={false}
+                    value={intl.formatMessage({
+                      id: "button.game.join",
+                    })}
+                    type={"submit"}
+                    colorSchem={"black"}
+                  />
+                </ColumnStyle>
+              </form>
+              <NVLine width={18} height={0.2} color={"nevadaBlack"} />
+              <NVButton
+                disabled={false}
+                content={intl.formatMessage({ id: "button.game.create" })}
+                colorSchem={"black"}
+                onClick={() => {
+                  navigate("/game2")
                 }}
               />
+            </>
+          ) : (
+            <>
+              <SimpleText textId={"home.center.card.offline.play.content"} />
               <NVSpacer height={1} />
               <NVButton
                 disabled={false}
@@ -203,14 +420,7 @@ export const Home = () => {
           )}
         </CenterCard>
         <CenterCard title="ranking" color="nevadaBlue">
-          <NVButton
-            disabled={false}
-            content={intl.formatMessage({ id: "button.help-us" })}
-            colorSchem={"blue"}
-            onClick={() => {
-              navigate("/main/payment")
-            }}
-          />
+          VIDE
         </CenterCard>
         <NVSpacer width={1} />
       </CenterContent>
@@ -226,7 +436,6 @@ const Content = styled.div`
   align-items: center;
   justify-content: center;
 `
-
 const LeftBar = styled.div`
   left: 0;
   height: 100%;
@@ -236,12 +445,10 @@ const LeftBar = styled.div`
   flex-direction: column;
   align-items: center;
 `
-
 const LeftBarButtons = styled.div`
   position: absolute;
   bottom: 0;
 `
-
 const CenterContent = styled.div`
   background-color: ${colors.nevadaBackground};
   width: 100%;
@@ -251,29 +458,41 @@ const CenterContent = styled.div`
   align-items: center;
   justify-content: space-between;
 `
-
 const LeftBarStats = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
   flex-direction: column;
 `
-
+const LeftBarSpectateGame = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+`
+const LeftBarTrainingMode = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+`
 interface LeftBarRowProps {
   text?: string
   schema: number
   data?: number
 }
-
 const LeftBarRow = styled.div<LeftBarRowProps>`
   width: 100%;
   background-color: ${({ schema }) =>
-    schema ? colors.midGrey : colors.topGrey};
+    schema === 2
+      ? colors.nevadaBlue
+      : schema
+      ? colors.midGrey
+      : colors.topGrey};
   display: flex;
   align-items: center;
   height: 2.5rem;
 `
-
 const TheCard = styled.div`
   width: 18rem;
   height: 25rem;
@@ -288,15 +507,16 @@ const TopCard = styled.div`
   align-items: center;
 `
 interface BottomCardProps {
-  color?: keyof typeof colors
+  color: keyof typeof colors
 }
 const BottomCard = styled.div<BottomCardProps>`
-  background-color: ${({ color }) => (color ? colors[color] : colors.midGrey)};
+  background-color: ${({ color }) => colors[color]};
   height: 100%;
   width: 100%;
   border-radius: 0 0 1rem 1rem;
+  box-shadow: 2px 6px 10px ${colors.nevadaBlack},
+    -2px 6px 10px ${colors.nevadaBlack};
 `
-
 const BottomCardContent = styled.div`
   height: 100%;
   padding: 0 1rem;
@@ -304,4 +524,16 @@ const BottomCardContent = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+`
+const StatCardRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 1rem;
+  width: 100%;
+`
+const ColumnStyle = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `

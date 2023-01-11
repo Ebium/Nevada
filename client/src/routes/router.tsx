@@ -15,6 +15,7 @@ import { Profil } from "./other/Profil"
 import { LoginSignup } from "./other/LoginSignup"
 import { CGU } from "./other/CGU"
 import { Temp } from "./other/Temp"
+import { Game2 } from "./game/Game2"
 
 export const routes: RouteObject[] = [
   {
@@ -32,6 +33,10 @@ export const routes: RouteObject[] = [
       {
         path: "cgu",
         element: <CGU />,
+      },
+      {
+        path: "game2",
+        element: <Game2 />,
       },
       {
         path: "main/*",

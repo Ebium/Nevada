@@ -3,11 +3,7 @@ import { colors } from "./design.config"
 import "@fontsource/inter"
 
 export const NVText = (props: TextProps) => {
-  return (
-    <StyledText data-cy={props.dataCy} {...props}>
-      {props.text}
-    </StyledText>
-  )
+  return <StyledText {...props}>{props.text}</StyledText>
 }
 export interface TextProps {
   text: string
@@ -23,8 +19,8 @@ export interface TextProps {
     textAlign?: "center" | "justify"
     letterSpacing?: number
   }
-  dataCy?: string
   onClick?: () => void
+  width?: number
 }
 
 const StyledText = styled.span<TextProps>`
@@ -56,5 +52,6 @@ const StyledText = styled.span<TextProps>`
   letter-spacing: ${({ textStyle }) =>
     textStyle && textStyle.letterSpacing
       ? `${textStyle.letterSpacing}rem`
-      : "0.1rem"};
+      : "1px"};
+  width: ${({ width }) => width + "rem"};
 `

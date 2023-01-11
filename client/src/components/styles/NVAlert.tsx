@@ -59,7 +59,7 @@ const TheCard = styled.div`
   height: 5rem;
   border: 2px ${colors.nevadaGold} solid;
   border-radius: 10px;
-  box-shadow: 0px 0px 10px black;
+  box-shadow: 0 0 10px black;
 `
 const LogoPlace = styled.div`
   position: absolute;
