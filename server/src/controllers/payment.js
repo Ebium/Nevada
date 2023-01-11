@@ -4,6 +4,31 @@ const Stripe = require("stripe")
 const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY);
 
 /* 
+ *  Create stripe account customer 
+ */
+const createStripeCustomer = async (user) => {
+  return await stripe.customers.create({
+    email : user.email,
+    name : user.pseudo,
+  });
+}
+
+/* 
+ *  Create stripe coupon
+ */
+const createStripeCoupon = () => {
+  expire = new Date(Date.now());
+  expire.setDate(expire.getDate()+7);
+
+  return stripe.coupons.create({
+    percent_off: 50,
+    redeem_by: expire,
+    max_redemptions : 1,
+    description : "50% de réduction la première semaine après la création de votre compte !"
+  });
+}
+
+/* 
  *  Get Payment Link of a Stripe Object
  */
 async function getStripeCheckoutSessionUrlFromStripeObject(stripeObject){
@@ -76,5 +101,6 @@ function requestStripeCheckoutObject(buy_products, products_data) {
 
 module.exports = { 
   getStripeCheckoutSessionUrl,
-  getStripeCheckoutSessionUrlFromStripeObject
+  getStripeCheckoutSessionUrlFromStripeObject,
+  createStripeCustomer
 }

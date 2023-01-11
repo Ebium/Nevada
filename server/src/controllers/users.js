@@ -1,5 +1,10 @@
+
+require("dotenv").config()
 const User = require("../models/User.js")
-const { hashedPassword, matchPassword } = require("./password")
+const Stripe = require("stripe")
+const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY);
+const { matchPassword } = require("./password")
+const { createStripeCustomer } = require("./payment")
 
 /* ========================================
     Search functions
@@ -117,12 +122,12 @@ const userExist = async (user) => {
  *  pseudo and email
  *  don't exist in database
  */
-const createValidUser = async (user) => {
+const registerValidUser = async (user) => {
   var errors = await userExist(user)
 
   if (errors.exist) return { user: null, errors: errors }
 
-  const userObject = createNewUserObject(user)
+  const userObject = await createNewUserObject(user)
   return createUser(userObject)
 }
 
@@ -131,14 +136,14 @@ const createValidUser = async (user) => {
  *  email and password
  *  match with the database
  */
-const updateUserAuth = async (user) => {
+const loginUserAuth = async (user) => {
   if (!(await userEmailExist(user.email))) {
     return "Your email is not registered."
   }
   if (!(await userAccountPasswordMatch(user.email, user.password)))
     return "Your password is incorrect."
 
-  return User.updateOne({ email: user.email }, { auth: user.auth }).then(
+  return User.findOne({ email: user.email }).then(
     (result) => {
       result.user = user
       return result
@@ -150,17 +155,19 @@ const updateUserAuth = async (user) => {
     User Object type 
 ********************************************/
 
-const createNewUserObject = (user) => {
+const createNewUserObject = async(user) => {
+  const cus = await createStripeCustomer(user)
   return {
     email: user.email,
-    password: hashedPassword(user.password),
+    password: user.password,
     pseudo: user.pseudo,
+    cusId : cus.id
   }
 }
 
 module.exports = {
-  updateUserAuth,
-  createValidUser,
+  loginUserAuth,
+  registerValidUser,
   get_current_user,
   findUsers,
 }
