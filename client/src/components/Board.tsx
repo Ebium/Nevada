@@ -34,24 +34,25 @@ export const Board = () => {
       // Si le coup est possible on met à jour les cases possibles du plateau
       if (payload !== undefined) {
         let boardWithDisabledPad = payload.boardArray
-        let index = getPadIndex({x: cell.x, y: cell.y}, pads)
+        let padIndex = getPadIndex({x: cell.x, y: cell.y}, pads)
 
-        if (index !== -1) {
+        if (padIndex !== -1) {
           console.log(disabledIndexPads)
           if (disabledIndexPads.length > 1) {
             let enablePadIndex = disabledIndexPads.shift()
             boardWithDisabledPad = enablePads(boardWithDisabledPad, enablePadIndex, pads, initialBoard)
           }
           console.log(disabledIndexPads)
+          console.log("non ", boardWithDisabledPad)
 
-          boardWithDisabledPad = (disablePads(boardWithDisabledPad, index, pads))
-          disabledIndexPads.push(index)
+          boardWithDisabledPad = (disablePads(boardWithDisabledPad, padIndex, pads))
+          disabledIndexPads.push(padIndex)
           dispatch(updateDisabledIndexPads(disabledIndexPads))
         } else {
           console.log("LE JEU EST CASSéE OMG OMMGMG OOGMOGMOMMGO MOMGOOMGMOG MOGU MOGU NORDVPN")
           return
         }
-
+        console.log("oui ou pas ? ", boardWithDisabledPad)
         // Si un coup a déjà été joué, on enlève les anciens coup possible, sinon on ne fait rien
         const boardWithoutPreviousMoves = movesHistory.length > 1 ? removeOldPossibleMoves(movesHistory[movesHistory.length - 2], boardWithDisabledPad, initialBoard) : boardWithDisabledPad
 
@@ -62,13 +63,14 @@ export const Board = () => {
           console.log("game end")
           // faire fin de jeu ici où un truc du genre dispatch ....
         }
-
+        console.log("yes",payload.boardArray[cell.x][cell.y])
         dispatch(updateMovesHistory(payload.newMovesHistory, payload.movesCount))
         dispatch(updateBoardArray(boardWithMoves.board))
       }
       return
     }
 
+    let dx = 0, dy = 0
     // Sinon rentre dans la fonction qui permet de placer les pièces,
     if (currentPad.nbHole === 0 || cell.isFilled) return
     const padNum = currentPad.nbHole
@@ -88,299 +90,62 @@ export const Board = () => {
 
     if (padStore[padNum - 1].remaining === 0) return
     if (padNum === 2) {
-      const ax = [cell.x, cell.x + 1, cell.x, cell.x - 1][
-        currentPad.orientation - 1
-      ]
-      const ay = [cell.y + 1, cell.y, cell.y - 1, cell.y][
-        currentPad.orientation - 1
-      ]
-
-      if (boardArray[ax][ay].isFilled) return
-
-      switch (currentPad.orientation) {
-        case 1:
-          if (cell.y === 9) return
-          break
-        case 2:
-          if (cell.x === 9) return
-          break
-        case 3:
-          if (cell.y === 0) return
-          break
-        case 4:
-          if (cell.x === 0) return
-          break
-      }
-
-      updatedBoard[ax][ay] = {
-        x: ax,
-        y: ay,
-        isFilled: true,
-        color: currentPad.color,
-        holeFilled: false,
-        holeColor: "black",
-      }
-
-      padHistory.coord = [
-        [cell.x, cell.y],
-        [ax, ay],
-      ]
-      pad.xCoords = Array.from(new Set([cell.x, ax]))
-      pad.yCoords = Array.from(new Set([cell.y, ay]))
+      dx = 1
+      dy = 2
     }
 
     if (padNum === 3) {
-      const ax1 = [cell.x, cell.x + 1, cell.x, cell.x - 1][
-        currentPad.orientation - 1
-      ]
-      const ax2 = [cell.x, cell.x + 2, cell.x, cell.x - 2][
-        currentPad.orientation - 1
-      ]
-      const ay1 = [cell.y + 1, cell.y, cell.y - 1, cell.y][
-        currentPad.orientation - 1
-      ]
-      const ay2 = [cell.y + 2, cell.y, cell.y - 2, cell.y][
-        currentPad.orientation - 1
-      ]
-
-      if (boardArray[ax1][ay1].isFilled || boardArray[ax2][ay2].isFilled) return
-
-      switch (currentPad.orientation) {
-        case 1:
-          if ([8, 9].includes(cell.y)) return
-          break
-        case 2:
-          if ([8, 9].includes(cell.x)) return
-          break
-        case 3:
-          if ([0, 1].includes(cell.y)) return
-          break
-        case 4:
-          if ([0, 1].includes(cell.x)) return
-          break
-      }
-
-      updatedBoard[ax1][ay1] = {
-        x: ax1,
-        y: ay1,
-        isFilled: true,
-        color: currentPad.color,
-        holeFilled: false,
-        holeColor: "black",
-      }
-      updatedBoard[ax2][ay2] = {
-        x: ax2,
-        y: ay2,
-        isFilled: true,
-        color: currentPad.color,
-        holeFilled: false,
-        holeColor: "black",
-      }
-
-      padHistory.coord = [
-        [cell.x, cell.y],
-        [ax1, ay1],
-        [ax2, ay2],
-      ]
-
-      pad.xCoords = Array.from(new Set([cell.x, ax1, ax2]))
-      pad.yCoords = Array.from(new Set([cell.y, ay1, ay2]))
+      dx = 1
+      dy = 3
     }
 
     if (padNum === 4) {
-      const ax1 = [cell.x, cell.x, cell.x, cell.x][currentPad.orientation - 1]
-      const ax2 = [cell.x + 1, cell.x + 1, cell.x - 1, cell.x - 1][
-        currentPad.orientation - 1
-      ]
-      const ax3 = [cell.x + 1, cell.x + 1, cell.x - 1, cell.x - 1][
-        currentPad.orientation - 1
-      ]
-      const ay1 = [cell.y + 1, cell.y - 1, cell.y - 1, cell.y + 1][
-        currentPad.orientation - 1
-      ]
-      const ay2 = [cell.y + 1, cell.y - 1, cell.y - 1, cell.y + 1][
-        currentPad.orientation - 1
-      ]
-      const ay3 = [cell.y, cell.y, cell.y, cell.y][currentPad.orientation - 1]
-
-      if (
-        boardArray[ax1][ay1].isFilled ||
-        boardArray[ax2][ay2].isFilled ||
-        boardArray[ax3][ay3].isFilled
-      )
-        return
-
-      switch (currentPad.orientation) {
-        case 1:
-          if (cell.y === 9 || cell.x === 9) return
-          break
-        case 2:
-          if (cell.x === 9 || cell.y === 0) return
-          break
-        case 3:
-          if (cell.y === 0 || cell.x === 0) return
-          break
-        case 4:
-          if (cell.x === 0 || cell.y === 9) return
-          break
-      }
-
-      updatedBoard[ax1][ay1] = {
-        x: ax1,
-        y: ay1,
-        isFilled: true,
-        color: currentPad.color,
-        holeFilled: false,
-        holeColor: "black",
-      }
-      updatedBoard[ax2][ay2] = {
-        x: ax2,
-        y: ay2,
-        isFilled: true,
-        color: currentPad.color,
-        holeFilled: false,
-        holeColor: "black",
-      }
-      updatedBoard[ax3][ay3] = {
-        x: ax3,
-        y: ay3,
-        isFilled: true,
-        color: currentPad.color,
-        holeFilled: false,
-        holeColor: "black",
-      }
-
-      padHistory.coord = [
-        [cell.x, cell.y],
-        [ax1, ay1],
-        [ax2, ay2],
-        [ax3, ay3],
-      ]
-
-      pad.xCoords = Array.from(new Set([cell.x, ax1, ax2, ax3]))
-      pad.yCoords = Array.from(new Set([cell.y, ay1, ay2, ay3]))
+      dx = 2
+      dy = 2
     }
 
     if (padNum === 6) {
-      switch (currentPad.orientation) {
-        case 1:
-          if ([8, 9].includes(cell.y) || cell.x === 9) return
-          break
-        case 2:
-          if ([8, 9].includes(cell.x) || cell.y === 0) return
-          break
-        case 3:
-          if ([0, 1].includes(cell.y) || cell.x === 0) return
-          break
-        case 4:
-          if ([0, 1].includes(cell.x) || cell.y === 9) return
-          break
-      }
-
-      const ax1 = [cell.x, cell.x, cell.x, cell.x][currentPad.orientation - 1]
-      const ax2 = [cell.x + 1, cell.x + 1, cell.x - 1, cell.x - 1][
-        currentPad.orientation - 1
-      ]
-      const ax3 = [cell.x + 1, cell.x + 1, cell.x - 1, cell.x - 1][
-        currentPad.orientation - 1
-      ]
-      const ax4 = [cell.x, cell.x + 2, cell.x, cell.x - 2][
-        currentPad.orientation - 1
-      ]
-      const ax5 = [cell.x + 1, cell.x + 2, cell.x - 1, cell.x - 2][
-        currentPad.orientation - 1
-      ]
-      const ay1 = [cell.y + 1, cell.y - 1, cell.y - 1, cell.y + 1][
-        currentPad.orientation - 1
-      ]
-      const ay2 = [cell.y + 1, cell.y - 1, cell.y - 1, cell.y + 1][
-        currentPad.orientation - 1
-      ]
-      const ay3 = [cell.y, cell.y, cell.y, cell.y][currentPad.orientation - 1]
-      const ay4 = [cell.y + 2, cell.y, cell.y - 2, cell.y][
-        currentPad.orientation - 1
-      ]
-      const ay5 = [cell.y + 2, cell.y - 1, cell.y - 2, cell.y + 1][
-        currentPad.orientation - 1
-      ]
-
-      if (
-        boardArray[ax1][ay1].isFilled ||
-        boardArray[ax2][ay2].isFilled ||
-        boardArray[ax3][ay3].isFilled ||
-        boardArray[ax4][ay4].isFilled ||
-        boardArray[ax5][ay5].isFilled
-      )
-        return
-
-      updatedBoard[ax1][ay1] = {
-        x: ax1,
-        y: ay1,
-        isFilled: true,
-        color: currentPad.color,
-        holeFilled: false,
-        holeColor: "black",
-      }
-      updatedBoard[ax2][ay2] = {
-        x: ax2,
-        y: ay2,
-        isFilled: true,
-        color: currentPad.color,
-        holeFilled: false,
-        holeColor: "black",
-      }
-      updatedBoard[ax3][ay3] = {
-        x: ax3,
-        y: ay3,
-        isFilled: true,
-        color: currentPad.color,
-        holeFilled: false,
-        holeColor: "black",
-      }
-      updatedBoard[ax4][ay4] = {
-        x: ax4,
-        y: ay4,
-        isFilled: true,
-        color: currentPad.color,
-        holeFilled: false,
-        holeColor: "black",
-      }
-      updatedBoard[ax5][ay5] = {
-        x: ax5,
-        y: ay5,
-        isFilled: true,
-        color: currentPad.color,
-        holeFilled: false,
-        holeColor: "black",
-      }
-
-      padHistory.coord = [
-        [cell.x, cell.y],
-        [ax1, ay1],
-        [ax2, ay2],
-        [ax3, ay3],
-        [ax4, ay4],
-        [ax5, ay5],
-      ]
-
-      pad.xCoords = Array.from(new Set([cell.x, ax1, ax2, ax3, ax4, ax5]))
-      pad.yCoords = Array.from(new Set([cell.y, ay1, ay2, ay3, ay4, ay5]))
+      dx = 2
+      dy = 3
     }
+
+    let xTmp = dx
+    let yTmp = dy
+
+    dx = currentPad.orientation % 2 !== 0 ? xTmp : yTmp
+    dy = currentPad.orientation % 2 !== 0 ? yTmp : xTmp
+
+    let ySet: Set<number> = new Set()
+    let xCoords = []
+
+    for(let x = cell.x; x < cell.x + dx; x++){
+      if(x < 0 || x > 9) return 
+      for(let y = cell.y; y< cell.y + dy; y++){
+        if(y < 0 || y > 9) return 
+        if(boardArray[x][y].isFilled) return
+
+        updatedBoard[x][y] = {
+          x: x,
+          y: y,
+          isFilled: true,
+          color: currentPad.color,
+          holeFilled: false,
+          holeColor: "black",
+          disabled: false,
+        }
+        padHistory.coord.push([x,y])
+        ySet.add(y)
+      }
+      xCoords.push(x)
+    }
+    
+    pad.xCoords = xCoords
+    pad.yCoords = Array.from(ySet)
 
     historyBoard.push(padHistory)
     dispatch(updateHistoryBoard(historyBoard))
     // pads.push(pad)
-    // console.log()
     dispatch(updatePads([...pads, pad]))
-
-    updatedBoard[cell.x][cell.y] = {
-      x: cell.x,
-      y: cell.y,
-      isFilled: true,
-      color: currentPad.color,
-      holeFilled: false,
-      holeColor: "black",
-    }
 
     updatePadStoreFunction(padNum, -1)
     dispatch(updateDroppedCounter(droppedPadCounter + 1))
@@ -394,32 +159,57 @@ export const Board = () => {
     dispatch(updatePadStore(updatedPadStore))
   }
 
-  let keyVar = 0
+  let cellId = 0
   return (
     <>
       <StyledBoard>
-        {boardArray.map((key) => {
-          return key.map(
-            (key: CellType) => {
-              keyVar++
+        {boardArray.map((cell) => {
+          return cell.map(
+            (cell: CellType) => {
+              cellId++
               return (
                 <Cellule
-                  key={keyVar}
+                  key={cellId}
+                  onMouseOver={()=>{
+                    // console.log("...oui")
+                    // console.log(boardArray[cell.x][cell.y]);
+                    // const updatedBoard = R.clone(boardArray)
+                    // updatedBoard[cell.x][cell.y].color = "blue"
+                    // let dx = 2
+                    // let dy = 2
+                    // for(let i = cell.x; i < cell.x + dx; i++){
+                    //   for(let j = cell.y; j< cell.y + dy; j++){
+                    //     console.log("x : " +i + " yzzz: "+j)
+                        
+                    //     updatedBoard[i][j].color = "purple"
+                    //     console.log(updatedBoard[i][j]);
+                        
+                    //   }
+                    // }
+                    // dispatch(updateBoardArray(updatedBoard))
+                    
+                  }
+
+                  }
                   onClick={() => {
-                    handleBoardClick(key)
+                    handleBoardClick(cell)
                   }}
                   style={{
-                    backgroundColor: key.isFilled
-                      ? key.color
+                    opacity: cell.disabled? 0.5 : 1,
+                    backgroundColor: cell.isFilled
+                      ? cell.color
                       : gameStarted
                         ? "transparent"
                         : "#D3D3D3",
+                    // backgroundColor: cell.color 
+                    //       ? cell.color
+                    //       : "#D3D3D3",
                     border:
-                      gameStarted && !key.isFilled ? "none" : "1px red solid",
+                      gameStarted && !cell.isFilled ? "none" : "1px red solid",
                   }}
                 >
-                  {key.isFilled ? (
-                    <HoleForCellule color={key.holeColor}></HoleForCellule>
+                  {cell.isFilled ? (
+                    <HoleForCellule color={cell.holeColor}></HoleForCellule>
                   ) : (
                     // gameStarted ? (
                     //   <>
@@ -427,7 +217,7 @@ export const Board = () => {
                     //   </>
                     // ) : (
                     <>
-                      {key.x},{key.y}
+                      {cell.x},{cell.y}
                     </>
                     // )
                   )}
