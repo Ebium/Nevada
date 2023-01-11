@@ -12,6 +12,7 @@ interface InputProps {
   svg?: ReactNode
   colorSchem?: "black" | "blue" | "gold"
   required?: boolean
+  width?: number
 }
 
 export const NVInput = ({
@@ -23,6 +24,7 @@ export const NVInput = ({
   svg,
   required,
   colorSchem,
+  width,
 }: InputProps) => {
   const hasSvg = svg ? true : false
 
@@ -30,6 +32,7 @@ export const NVInput = ({
     <RowContent>
       {svg && type !== "submit" ? <StyledSvg>{svg}</StyledSvg> : <></>}
       <StyledInput
+        width={width}
         colorSchem={colorSchem ? colorSchem : ""}
         isSubmit={type === "submit"}
         disabled={disabled}
@@ -49,6 +52,7 @@ interface StyledInputProps {
   hasSvg: boolean
   isSubmit: boolean
   colorSchem: "black" | "blue" | "gold" | ""
+  width?: number
 }
 
 const RowContent = styled.div`
@@ -67,8 +71,9 @@ const StyledInput = styled.input<StyledInputProps>`
       : colorSchem === "blue"
       ? colors.nevadaBlue
       : colors.nevadaBlack};
-  width: ${({ hasSvg }) => (hasSvg ? "14rem" : "14.5rem")};
-  height: ${({ isSubmit }) => (isSubmit ? "3rem" : "1rem")};
+  width: ${({ hasSvg, width }) =>
+    hasSvg ? "14rem" : width ? width + "rem" : "12rem"};
+  min-height: ${({ isSubmit }) => (isSubmit ? "2.5rem" : "1rem")};
   border: none;
   border-radius: ${({ hasSvg }) => (hasSvg ? "0 10px 10px 0" : "10px")};
   padding: ${({ hasSvg }) => (hasSvg ? "1rem 3rem 1rem 1rem" : "1rem 3rem")};
@@ -76,7 +81,7 @@ const StyledInput = styled.input<StyledInputProps>`
   align-items: center;
   justify-content: center;
   letter-spacing: 0.1rem;
-  font-size: ${({ isSubmit }) => (isSubmit ? "1rem" : "0.9rem")};
+  font-size: ${({ isSubmit }) => (isSubmit ? "0.8rem" : "0.9rem")};
   font-weight: ${({ isSubmit }) => (isSubmit ? "600" : "unset")};
   font-family: "Inter";
   color: ${({ colorSchem }) =>
@@ -85,23 +90,40 @@ const StyledInput = styled.input<StyledInputProps>`
       : colors.nevadaBlack};
 
   ::placeholder {
-    color: ${colors.midGrey};
+    color: ${colors.backgroundGrey};
   }
+
+  box-shadow: 0 6px 0 0
+    ${({ colorSchem, isSubmit }) =>
+      !isSubmit
+        ? "unset"
+        : colorSchem === "gold"
+        ? colors.nevadaGoldLess
+        : colorSchem === "blue"
+        ? colors.nevadaBlueLess
+        : colorSchem === "black"
+        ? "black"
+        : colors.midGrey};
 
   :hover {
     box-shadow: ${({ isSubmit, colorSchem }) =>
       !isSubmit
         ? "unset"
-        : `0px 0px 0.3rem ${
-            colorSchem === "gold" ? colors.nevadaBlack : colors.nevadaGold
-          }`};
+        : `0 4px 0 0
+        ${
+          colorSchem === "gold"
+            ? colors.nevadaGoldLess
+            : colorSchem === "blue"
+            ? colors.nevadaBlueLess
+            : "black"
+        }`};
   }
 `
 
 const StyledSvg = styled.div`
   background-color: ${colors.midGrey};
   width: 2.5rem;
-  height: 3rem;
+  min-height: 3rem;
   display: flex;
   align-items: center;
   justify-content: center;

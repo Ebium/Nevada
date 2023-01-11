@@ -2,6 +2,8 @@ import { useIntl } from "react-intl"
 import { useLocation, useNavigate } from "react-router-dom"
 import styled from "styled-components/macro"
 import { ReactComponent as NevadaLogo } from "../assets/nevada_logo_1.svg"
+import { ReactComponent as LogoutSVG } from "../assets/logout.svg"
+import { ReactComponent as LoginSVG } from "../assets/login.svg"
 import { useNevadaSelector } from "../store/rootReducer"
 import { colors } from "./styles/design.config"
 import { NVButton } from "./styles/NVButton"
@@ -39,7 +41,7 @@ export const NevadaHeader = () => {
                 cursor={"unset"}
                 colorSchem={"blue"}
                 onClick={() => {
-                  navigate("/main/login")
+                  navigate("/main/profil")
                 }}
               />
               <NVButton
@@ -49,6 +51,7 @@ export const NevadaHeader = () => {
               onClick={() => {
                 navigate("/main/login")
               }}
+              svg={<StyledLogoutSVG />}
             />
             </>
           ) : (
@@ -59,6 +62,7 @@ export const NevadaHeader = () => {
               onClick={() => {
                 navigate("/main/login")
               }}
+              svg={<StyledLoginSVG />}
             />
           )}
         </ButtonsPannel>
@@ -90,4 +94,15 @@ const CenteredTitle = styled.div`
   width: 100%;
   display: flex;
   justify-content: center;
+`
+
+const StyledLogoutSVG= styled(LogoutSVG)`
+& path {
+  fill: black;
+}
+`
+const StyledLoginSVG= styled(LoginSVG)`
+& path {
+  fill: black;
+}
 `

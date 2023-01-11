@@ -245,7 +245,7 @@ export const LoginSignup = () => {
           }}
         />
       </MidDiv>
-      <form onSubmit={handleSignupSubmit}>
+      <form onSubmit={handleSignupSubmit} autoComplete="off">
         <RightDiv>
           <NVText
             text={intl.formatMessage({ id: "loginsignup.signup" })}
