@@ -1,5 +1,6 @@
 import { boardType } from "../store/ducks/Board.ducks";
 import * as R from "ramda"
+import { ReactNode } from "react";
 
 
 // Joue un coup remplissant le trou, et mettant une couleur, et ajoute dans movesHistory le coup joué
@@ -185,3 +186,15 @@ export interface Pad {
     secondPlayerCounter: number,
 }
 
+
+export interface GraphicPad {
+    x: number
+    y: number
+    compo: ReactNode
+}
+
+/* Interface d'une palette graphique (graphique = avec du design)
+ * x: coordonnée x de la case 
+ * y: coordonnée y de la case
+ * compo: component correspondant à une palette designée
+ */

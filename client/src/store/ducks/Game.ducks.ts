@@ -1,4 +1,4 @@
-import { Move, Pad } from "../../utils/Moves"
+import { GraphicPad, Move, Pad } from "../../utils/Moves"
 export const enum GameActionsEnum {
   UPDATE_GAME_STARTED = "GAME/updateGameStarted",
 
@@ -6,71 +6,86 @@ export const enum GameActionsEnum {
 
   UPDATE_PADS = "GAME/updatePads",
 
+  UPDATE_GRAPHIC_PADS = "GAME/updateGraphicPads",
+
   UPDATE_DISABLED_INDEX_PADS = "GAME/updateDisabledIndexPads",
 
-  RESTART_GAME = "GAME/restartGame"
+  RESTART_GAME = "GAME/restartGame",
 }
 
 export const updateGameStarted = (bool: boolean) =>
-({
-  type: GameActionsEnum.UPDATE_GAME_STARTED,
-  bool
-} as const)
+  ({
+    type: GameActionsEnum.UPDATE_GAME_STARTED,
+    bool,
+  } as const)
 export const updateMovesHistory = (moves: Move[], count: number) =>
-({
-  type: GameActionsEnum.UPDATE_MOVES_HISTORY,
-  moves,
-  count
-} as const)
+  ({
+    type: GameActionsEnum.UPDATE_MOVES_HISTORY,
+    moves,
+    count,
+  } as const)
 export const updatePads = (pads: Pad[]) =>
-({
-  type: GameActionsEnum.UPDATE_PADS,
-  pads
-} as const)
+  ({
+    type: GameActionsEnum.UPDATE_PADS,
+    pads,
+  } as const)
+export const updateGraphicPads = (graphicPads: GraphicPad[]) =>
+  ({
+    type: GameActionsEnum.UPDATE_GRAPHIC_PADS,
+    graphicPads,
+  } as const)
 export const updateDisabledIndexPads = (disabledIndexPads: number[]) =>
-({
-  type: GameActionsEnum.UPDATE_DISABLED_INDEX_PADS,
-  disabledIndexPads
-} as const)
-export const restartGame = () => 
-({
-  type: GameActionsEnum.RESTART_GAME
-} as const)
+  ({
+    type: GameActionsEnum.UPDATE_DISABLED_INDEX_PADS,
+    disabledIndexPads,
+  } as const)
+export const restartGame = () =>
+  ({
+    type: GameActionsEnum.RESTART_GAME,
+  } as const)
 
 type GameActionsType = ReturnType<
   | typeof updateGameStarted
   | typeof updateMovesHistory
   | typeof updatePads
+  | typeof updateGraphicPads
   | typeof updateDisabledIndexPads
   | typeof restartGame
 >
 
 export interface GameState {
   started: boolean
+  //status de la partie en cours
 
-  status: "idle" | "loading" | "failed"
+  movesHistory: Move[]
+  // Contient l'ancienne valeur des cases avant le coup joué permettant de d'annuler le dernier coup joué
 
-  movesHistory: Move[] // Contient l'ancienne valeur des cases avant le coup joué permettant de d'annuler le dernier coup joué
+  movesCount: number
+  // Contient le nombre de coup joué permettant d'alterner la couleurs des joueurs
 
-  movesCount: number // Contient le nombre de coup joué permettant d'alterner la couleurs des joueurs
+  pads: Pad[]
+  /* Contient le tableau les Pads/Palettes du jeu permettant de trouver une palette grâce à des coordonnées x et y
+   * contient aussi les boules des adversaires
+   */
 
-  pads: Pad[] // Contient le tableau les Pads/Palettes du jeu permettant de trouver une palette grâce à des coordonnées x et y
-              // contient aussi les boules des adversaires
-
-  disabledIndexPads: number[] // Contient l'indice des palettes désactivés, 
-                              // structure de données : file
-                              // dès qu'un coup est joué, la palette sera désactivée, son indice sera mis dans la file
-                              // lorsque la taille dépasse 2, le premier arrivé quitte la file 
-                              //  FIFO
+  disabledIndexPads: number[]
+  /* Contient l'indice des palettes désactivés,
+   * structure de données : file
+   * dès qu'un coup est joué, la palette sera désactivée, son indice sera mis dans la file
+   * lorsque la taille dépasse 2, le premier arrivé quitte la file
+   *  FIFO
+   * */
+  graphicPads: GraphicPad[]
+  // Contient le tableau des palettes designées
 }
 
 export const gameInitialState: GameState = {
   started: false,
-  status: "idle",
-  movesHistory: [], 
-  movesCount: 0, 
+  movesHistory: [],
+  movesCount: 0,
   pads: [],
-  disabledIndexPads: []
+  disabledIndexPads: [],
+  graphicPads: [],
 }
 
 export function GameReducer(
@@ -79,13 +94,23 @@ export function GameReducer(
 ): GameState {
   switch (action.type) {
     case GameActionsEnum.UPDATE_GAME_STARTED:
-      return { ...state, started: action.bool, movesCount: 0, movesHistory: []}
+      return { ...state, started: action.bool, movesCount: 0, movesHistory: [] }
     case GameActionsEnum.RESTART_GAME:
-      return { ...state, started: false, movesCount: 0, movesHistory: [], pads: [], disabledIndexPads: []}
+      return {
+        ...state,
+        started: false,
+        movesCount: 0,
+        movesHistory: [],
+        pads: [],
+        disabledIndexPads: [],
+        graphicPads: [],
+      }
     case GameActionsEnum.UPDATE_MOVES_HISTORY:
       return { ...state, movesHistory: action.moves, movesCount: action.count }
     case GameActionsEnum.UPDATE_PADS:
       return { ...state, pads: action.pads }
+    case GameActionsEnum.UPDATE_GRAPHIC_PADS:
+      return { ...state, graphicPads: action.graphicPads }
     case GameActionsEnum.UPDATE_DISABLED_INDEX_PADS:
       return { ...state, disabledIndexPads: action.disabledIndexPads }
     default:
