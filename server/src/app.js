@@ -1,11 +1,12 @@
 const express = require("express")
 const mongoose = require("mongoose")
+const jwt = require("jsonwebtoken")
 const app = express()
 const cors = require("cors")
 const products_routes = require("./routes/products.js")
 const users_routes = require("./routes/users.js")
 const { getStripeCheckoutSessionUrl, getStripeCheckoutSessionUrlFromStripeObject } = require("./controllers/payment")
-const { createValidUser, updateUserAuth } = require("./controllers/users") 
+const { registerValidUser, loginUserAuth } = require("./controllers/users") 
 const { createRoom, updateANewPlayerRoom, updateAQuitPlayerRoom, clearRooms } = require("./controllers/room.js")
 
 const PORT = 5050
@@ -14,7 +15,6 @@ const corsOptions = {
   origin: "http://localhost:3000",
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
-
 
 require("dotenv").config()
 
@@ -35,42 +35,57 @@ const io = socketIo(server,{
 clearRooms()
 
 /*
- *  client/server : user account request
+ *  client/server : authentification user account request
+ */
+io.use(function (socket, next){
+  if (socket.handshake.query){
+    jwt.verify(socket.handshake.query.token, process.env.JWT_SECRET, async (err, decoded) => {
+
+      //format incorrect
+      if(err ||  decoded==undefined || decoded.isRegistered == null || decoded.email == null || decoded.password == null ) {
+        next(new Error("not_connected"))
+        return
+      }
+
+      //signup
+      if(decoded.isRegistered==false) {
+        const result = await registerValidUser(decoded);
+        if(result==null || result.user==null)  { 
+          if(result.errors.email != null) {
+            next(new Error("This email already exists", { cause : result.errors}))
+            return
+          }
+          if(result.errors.pseudo != null) {
+            next(new Error("This pseudonym already exists.", { cause : result.errors}))
+            return
+          }
+        }
+        console.log("new user registered : "+ decoded.email)
+      }      
+
+      //connection 
+      if(decoded.isRegistered==true) {
+        const result = await loginUserAuth(decoded);
+        if(typeof result == "string" ) {
+          next(new Error(result)) // email or password incorrect
+          return
+        } 
+        console.log("user connected : ", decoded.email)
+      }
+      
+      socket.decoded = decoded
+      next();
+    });
+  }
+  else {
+    next(new Error('Authentication vide'));
+  }    
+})
+
+/*
+ *  client/server : client connection
  */
 io.on("connection",(socket)=>{
-  console.log("client connected: ",socket.id)
-
-  socket.on("Register a new user", async(user)=> {
-    const result = await createValidUser(user);
-    if(result.user==null) 
-      socket.emit("Register a new user", result, false)
-    else{
-      socket.emit("Register a new user", result, true)
-      console.log("new user registered : "+ user.email)
-    } 
-  })
-
-  socket.on("Login an user", async(user)=> {
-    const result = await updateUserAuth(user);
-    if(!result.modifiedCount) 
-      socket.emit("Login an user", result, false)
-    else{
-      socket.emit("Login an user", result, true)
-      console.log("user connected : "+ user.email)
-    } 
-  })
-
-  socket.on("Login an user", async(user)=> {
-    const result = await updateUserAuth(user);
-
-    if(!result.modifiedCount) 
-      socket.emit("Login an user", result, false)
-    else{
-      socket.emit("Login an user", result, true)
-      console.log("user connected : "+ user.email)
-    } 
-  })
-
   socket.on("disconnect",(reason)=>{
     console.log(reason)
   })
@@ -139,7 +154,7 @@ mongoose
 
   .catch((err) => {
     console.log("Impossible de démarrer le serveur !")
-    console.log(Error)
+    console.log(err)
   })
 
 app.use(express.json())

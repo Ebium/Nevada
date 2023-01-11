@@ -5,28 +5,27 @@
     <link rel="icon" href="favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#262626" />
-    <meta
-      name="description"
-      content="Nev"
-    />
+    <meta name="description" content="Nev" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>Nevada</title>
+    <style>
+      .loader {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #262626;
+        color: #e7bd70;
+        top: 0;
+        left: 0;
+        position: absolute;
+      }
+    </style>
+    <script id="react-dotenv" src="/nevada/env.js"></script>
   </head>
-  <style>
-    .loader {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background-color: #262626;
-      color: #E7BD70;
-      top: 0;
-      left: 0;
-      position: absolute;
-    }
-  </style>
+
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
