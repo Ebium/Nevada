@@ -120,11 +120,10 @@ io.on("connection", (socket) => {
       socket.join(roomId)
       currentRoomId=roomId;
       usersRoom = await io.sockets.adapter.rooms.get(currentRoomId)
-
-      socket.emit("Join a room", true)
+      socket.emit("Join a room", true, roomId)
       io.to(currentRoomId).emit("An user joined the room",  Array.from(usersRoom))
     } else
-      socket.emit("Join a room", false)
+      socket.emit("Join a room", false, "")
   })
 
   socket.on("disconnect", async()=> {

@@ -28,6 +28,7 @@ import {
 } from "../../store/ducks/General.ducks"
 import { getUsersRankingThunk } from "../../store/ducks/User.ducks"
 import { createRoom, getServerResponse } from "../../utils/Rooms"
+import { socket } from '../../socket-context';
 
 export const Home = () => {
   const navigate = useNavigate()
@@ -46,6 +47,10 @@ export const Home = () => {
   )
   const gamesCounter = useNevadaSelector((state) => state.general.games)
   const playersRanking = useNevadaSelector((state) => state.user.usersRanking)
+  const baseURL = "http://localhost:3000/nevada/main/game/"
+
+  const [gameCode, setGameCode] = useState("")
+  const [gameCodeAlertDisplayed, setGameCodeAlertDisplayed] = useState(false)
 
   useEffect(() => {
     dispatch(getPlayersCounterThunk())
@@ -58,7 +63,17 @@ export const Home = () => {
   useEffect(() => {
     dispatch(getUsersRankingThunk())
     getServerResponse()
-  },[])
+
+    socket.on("Join a room", (joined, roomId) => {
+      if (joined && roomId !== "") {
+        window.location.href = baseURL + roomId;
+      }
+      else
+        alert("An internal problem has occurred.");
+    })
+
+
+  }, [])
 
 
   const CenterCard = (props: {
@@ -166,8 +181,6 @@ export const Home = () => {
     )
   }
 
-  const [gameCode, setGameCode] = useState("")
-  const [gameCodeAlertDisplayed, setGameCodeAlertDisplayed] = useState(false)
 
   const handleGameCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
     setGameCode(event.target.value)
@@ -179,8 +192,11 @@ export const Home = () => {
     else {
       setGameCodeAlertDisplayed(false)
       console.log("SIUUUUUUUUU")
+      console.log(gameCode)
+      socket.emit("Join a room", gameCode)
+
     }
-    
+
   }
 
   return (
@@ -541,8 +557,8 @@ const LeftBarRow = styled.div<LeftBarRowProps>`
     schema === 2
       ? colors.nevadaBlue
       : schema
-      ? colors.midGrey
-      : colors.topGrey};
+        ? colors.midGrey
+        : colors.topGrey};
   display: flex;
   align-items: center;
   height: 2.5rem;

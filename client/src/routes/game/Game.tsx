@@ -63,7 +63,7 @@ export const Game = () => {
   }, [droppedCounter])
 
   const baseURL = "http://localhost:3000/nevada/main/game/"
-  const roomId = window.location.pathname.slice(13);
+  const roomId = window.location.pathname.slice(18);
 
   useEffect(() => {
     socket.on("emitGameStarted", () => {
@@ -78,16 +78,6 @@ export const Game = () => {
       setUsers(userslist)
     })
 
-    socket.on("Join a room", (joined) => {
-      if (joined)
-        alert("joined the room")
-      else
-        window.location.href = baseURL
-    })
-
-    socket.once("connect", () => {
-      socket.emit("Join a room", roomId)
-    })
   }, [dispatch])
 
   const updatePadStoreFunction = (padToUpdate: number, by: number) => {

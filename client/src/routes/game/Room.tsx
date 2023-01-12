@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { socket } from '../../socket-context';
 
 const Room = () => {
-    const roomId = window.location.pathname.slice(13);
+    const roomId = window.location.pathname.slice(18);
     const homeURL = "http://localhost:3000/nevada/main/home" //update URL of home
     const [users, setUsers] = useState([socket.id])
-
+    console.log(" ou osqidj qsojd qisojdq vrai vrai vrai")
     useEffect(()=>{
         askJoinRoom()
         getServerReponse()
