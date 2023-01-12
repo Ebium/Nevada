@@ -10,8 +10,16 @@ export const enum GameActionsEnum {
 
   RESTART_GAME = "GAME/restartGame",
 
+  UPDATE_POINT_END = "GAME/updatePointEnd"
+
 }
 
+
+export const updatePointEnd = (pointsFirstPlayer : number, pointsSecondPlayer : number) => ({
+  type : GameActionsEnum.UPDATE_POINT_END,
+  pointsFirstPlayer,
+  pointsSecondPlayer
+}as const)
 
 export const updateGameStarted = (bool: boolean) =>
 ({
@@ -45,6 +53,7 @@ type GameActionsType = ReturnType<
   | typeof updatePads
   | typeof updateDisabledIndexPads
   | typeof restartGame
+  | typeof updatePointEnd
 >
 
 export interface GameState {
@@ -64,6 +73,11 @@ export interface GameState {
                               // dès qu'un coup est joué, la palette sera désactivée, son indice sera mis dans la file
                               // lorsque la taille dépasse 2, le premier arrivé quitte la file 
                               //  FIFO
+  
+  pointsFirstPlayer : number
+
+
+  pointsSecondPlayer : number
 }
 
 export const gameInitialState: GameState = {
@@ -73,6 +87,8 @@ export const gameInitialState: GameState = {
   movesCount: 0, 
   pads: [],
   disabledIndexPads: [],
+  pointsFirstPlayer : 0,
+  pointsSecondPlayer : 0
 
 }
 
@@ -91,6 +107,8 @@ export function GameReducer(
       return { ...state, pads: action.pads }
     case GameActionsEnum.UPDATE_DISABLED_INDEX_PADS:
       return { ...state, disabledIndexPads: action.disabledIndexPads }
+    case GameActionsEnum.UPDATE_POINT_END:
+      return { ...state, pointsFirstPlayer: action.pointsFirstPlayer, pointsSecondPlayer : action.pointsSecondPlayer }
     default:
       return { ...state }
   }

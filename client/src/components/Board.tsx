@@ -8,7 +8,7 @@ import {
 import { CellType, Coord, disablePads, enablePads, getPadIndex, Pad, PadHistory, playMove, removeOldPossibleMoves, showPossibleMoves } from "../utils/Moves"
 import { updateDroppedCounter, updatePadStore } from "../store/ducks/Pad.ducks"
 import { useNevadaSelector } from "../store/rootReducer"
-import { updateDisabledIndexPads, updateMovesHistory, updatePads } from "../store/ducks/Game.ducks"
+import { updateDisabledIndexPads, updateMovesHistory, updatePads, updatePointEnd } from "../store/ducks/Game.ducks"
 
 export const Board = () => {
   const dispatch = useDispatch()
@@ -74,6 +74,8 @@ export const Board = () => {
             }
             
           });
+
+          dispatch(updatePointEnd(pointsFirstPlayer,pointsSecondPlayer))
 
           console.log("Premier Joueur :", pointsFirstPlayer, "Second Joueur :", pointsSecondPlayer)
           if(pointsFirstPlayer>pointsSecondPlayer){
