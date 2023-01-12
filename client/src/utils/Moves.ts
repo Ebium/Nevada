@@ -4,7 +4,7 @@ import { Pion } from "../store/ducks/Game.ducks";
 
 
 // Joue un coup remplissant le trou, et mettant une couleur, et ajoute dans movesHistory le coup joué
-export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[], boardArray: boardType, pads:Pad[], pion : Pion) => {
+export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[], boardArray: boardType, pads:Pad[]) => {
     if (movesCount === 0 || cell.color === "orange") {
         if (!cell?.holeFilled) {
             const oldMove: Move = {
@@ -29,7 +29,6 @@ export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[
                 if (movesCount % 2 === 0){
                     color = "red"
                     pads[indi].firstPlayerCounter +=1
-                    pion.pionrge.push(coo)
                     
                     //tableau de coordonnées des pions rouge placés
                     //tri tableau
@@ -38,7 +37,6 @@ export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[
                 else{
                     color = "blue"
                     pads[indi].secondPlayerCounter +=1
-                    pion.pionble.push(coo)
                     
                     //tableau de coordonnées des pions bleu placés
                     //tri tableau
@@ -62,7 +60,7 @@ export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[
             const newMovesHistory = movesHistory
             newMovesHistory.push(oldMove)
 
-            return { newMovesHistory: newMovesHistory, movesCount: movesCount + 1, boardArray: boardArray , pion : pion}
+            return { newMovesHistory: newMovesHistory, movesCount: movesCount + 1, boardArray: boardArray}
         }
     }
     return

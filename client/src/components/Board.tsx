@@ -23,14 +23,13 @@ export const Board = () => {
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
   const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
-  const pion = useNevadaSelector((state) => state.game.pion)
   const pads = useNevadaSelector((state) => state.game.pads)
   const disabledIndexPads = useNevadaSelector((state) => state.game.disabledIndexPads)
 
   const handleBoardClick = (cell: CellType) => {
     // Si la partie a commencé, joue un coup
     if (gameStarted) {
-      const payload = playMove(cell, movesCount, movesHistory, boardArray,pads,pion)
+      const payload = playMove(cell, movesCount, movesHistory, boardArray,pads)
 
       // Si le coup est possible on met à jour les cases possibles du plateau
       if (payload !== undefined) {
@@ -63,52 +62,27 @@ export const Board = () => {
           // faire fin de jeu ici où un truc du genre dispatch ....
           console.log("game end")
           console.log(pads)
-          let ptFirstPlay = 0
-          let ptSecondPlay = 0
+          let pointsFirstPlayer = 0
+          let pointsSecondPlayer = 0
 
           pads.forEach(tui => {
             if (tui.firstPlayerCounter > tui.secondPlayerCounter){
-              ptFirstPlay += tui.xCoords.length*tui.yCoords.length
+              pointsFirstPlayer += tui.xCoords.length*tui.yCoords.length
             }
             if (tui.firstPlayerCounter < tui.secondPlayerCounter){
-              ptSecondPlay += tui.xCoords.length*tui.yCoords.length
+              pointsSecondPlayer += tui.xCoords.length*tui.yCoords.length
             }
             
           });
 
-          console.log ("Rouge : ", pion.pionrge, " Bleu : ", pion.pionble)
-          let zonepionrge = []
-          let keeppionrge: Coord[] = []
-          let zonepionble = []
-          let keeppionble : Coord[]= []
-          
-          for (let i=0; i<10; i++){
-            for (let j=0; j<10; j++){
-              pion.pionrge.forEach(pio =>{
-                if (pio.x === i && pio.y === j ){
-                  keeppionrge.push(pio)
-                }
-              })
-              pion.pionble.forEach(pio =>{
-                if (pio.x === i && pio.y === j ){
-                  keeppionble.push(pio)
-                }
-              })
-            }
-          }
-          pion.pionrge = keeppionrge
-          pion.pionble = keeppionble
-
-          console.log ("Rouge : ", keeppionrge, " Bleu : ", keeppionble)
-          
-          console.log("Premier Joueur :", ptFirstPlay, "Second Joueur :", ptSecondPlay)
-          if(ptFirstPlay>ptSecondPlay){
+          console.log("Premier Joueur :", pointsFirstPlayer, "Second Joueur :", pointsSecondPlayer)
+          if(pointsFirstPlayer>pointsSecondPlayer){
             console.log("Le Joueur rouge est gagnant")
           }
-          if(ptFirstPlay<ptSecondPlay){
+          if(pointsFirstPlayer<pointsSecondPlayer){
             console.log("Le Joueur Bleu est gagnant")
           }
-          if(ptFirstPlay===ptSecondPlay){
+          if(pointsFirstPlayer===pointsSecondPlayer){
             console.log("Les 2 Joueurs sont ex aequo")
           }
         }
