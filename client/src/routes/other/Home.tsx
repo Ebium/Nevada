@@ -374,7 +374,7 @@ export const Home = () => {
                 textId={
                   "home.center.card.online.player-stats.content.created-at"
                 }
-                data={userCreatedAt.slice(0,10)}
+                data={userCreatedAt.slice(0, 10)}
               />
             </>
           ) : (
@@ -390,7 +390,7 @@ export const Home = () => {
                 content={intl.formatMessage({ id: "button.connect" })}
                 colorSchem={"black"}
                 onClick={() => {
-                  navigate("/main/payment")
+                  navigate("/main/login")
                 }}
               />
             </>
@@ -442,7 +442,7 @@ export const Home = () => {
                 content={intl.formatMessage({ id: "button.connect" })}
                 colorSchem={"black"}
                 onClick={() => {
-                  navigate("/main/payment")
+                  navigate("/main/login")
                 }}
               />
             </>
