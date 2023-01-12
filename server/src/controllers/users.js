@@ -154,6 +154,7 @@ const registerValidUser = async (user) => {
  *  if email and password
  *  match with the database 
  *  and is not connected
+ *  update user in database
  *  return user
  */
 const loginUserAuth = async (user) => {
@@ -169,24 +170,12 @@ const loginUserAuth = async (user) => {
 
   const userFind = await findUserByEmail(user.email)
 
-  var userEdited = user 
+  var userEdited = userFind
   userEdited.socketId = user.socketId
   const userUpdated = await updateUser(userEdited)
+  
   return await findUserByEmail(user.email)
 }
-
-
-// /*
-//  *  disconnect an user 
-//  *  that left the website
-//  */
-// const disconnectUserBySocketId = async(socketId)=> {
-//   var user = await findUserBySocketId(socketId)
-//   if(user) {
-//     user.socketId = ""
-//     return await updateUser(user)
-//   }
-// }
 
 /*******************************************
     User Object type 
