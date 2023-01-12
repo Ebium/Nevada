@@ -5,10 +5,11 @@ import { IntlProvider } from "react-intl"
 import { routes } from "./routes/router"
 import { useNevadaSelector } from "./store/rootReducer"
 import { useDispatch } from "react-redux"
-import { updateSocketID } from "./store/ducks/User.ducks"
+import { updateSocketID, updateUserThunk } from "./store/ducks/User.ducks"
 import Payer from "./Paiement/Pay"
 import { socket } from "./socket-context"
 import { translations } from "./i18n"
+import { getEmailFromToken } from "./utils/Token"
 
 interface ChildrenProp {
   children: React.ReactNode
@@ -45,11 +46,12 @@ const UserPermission = () => {
   useEffect(() => {
     socket.on("connect", () => {
       console.log(socket.id)
+      dispatch(updateUserThunk(getEmailFromToken()))
       dispatch(updateSocketID(socket.id))
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
+  
   // mettre un setter avec les différents champs de connexion
   // si personne est co , alors le useeffect fera une redirection
 
