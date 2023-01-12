@@ -107,17 +107,14 @@ export const showPossibleMoves = (cell: Coord, boardArray: boardType) => {
 }
 
 // Retourne la grille sans les coups possibles de l'ancien coup,
-// Remet seulement les couleurs du plateau initiale par rapport au coup possible de l'ancien coup
 export const removeOldPossibleMoves = (
   previousMove: Coord,
   boardArray: boardType,
-  initalBoard: boardType
 ) => {
   const copy = R.clone(boardArray)
   for (let y = 0; y < 10; y++) {
     const tmpCell = copy[previousMove.x][y]
     if (tmpCell.isFilled) {
-      copy[previousMove.x][y].color = initalBoard[previousMove.x][y].color
       copy[previousMove.x][y].possibleMove = false
       // copy[previousMove.x][y].disabled = false
     }
@@ -125,7 +122,6 @@ export const removeOldPossibleMoves = (
   for (let x = 0; x < 10; x++) {
     const tmpCell = copy[x][previousMove.y]
     if (tmpCell.isFilled) {
-      copy[x][previousMove.y].color = initalBoard[x][previousMove.y].color
       copy[x][previousMove.y].possibleMove = false
       // copy[x][previousMove.y].disabled = false
     }
@@ -158,7 +154,6 @@ export const disablePads = (
       pad.xCoords.forEach((x) => {
         pad.yCoords.forEach((y) => {
           copy[x][y].disabled = true
-          // copy[x][y].color = "black"
         })
       })
     }
@@ -170,14 +165,12 @@ export const enablePads = (
   boardArray: boardType,
   index: number | undefined,
   pads: Pad[],
-  initalBoard: boardType
 ) => {
   const copy = R.clone(boardArray)
   if (index !== undefined) {
     let pad = pads[index]
     pad.xCoords.forEach((x) => {
       pad.yCoords.forEach((y) => {
-        copy[x][y].color = initalBoard[x][y].color
         copy[x][y].disabled = false
       })
     })

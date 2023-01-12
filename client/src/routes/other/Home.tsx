@@ -27,6 +27,7 @@ import {
   getSpectatorsCounterThunk,
 } from "../../store/ducks/General.ducks"
 import { getUsersRankingThunk } from "../../store/ducks/User.ducks"
+import { createRoom, getServerResponse } from "../../utils/Rooms"
 
 export const Home = () => {
   const navigate = useNavigate()
@@ -56,7 +57,10 @@ export const Home = () => {
 
   useEffect(() => {
     dispatch(getUsersRankingThunk())
-  }, [])
+    getServerResponse()
+  },[])
+
+
   const CenterCard = (props: {
     children: any
     title: string
@@ -176,6 +180,7 @@ export const Home = () => {
       setGameCodeAlertDisplayed(false)
       console.log("SIUUUUUUUUU")
     }
+    
   }
 
   return (
@@ -429,7 +434,7 @@ export const Home = () => {
                 content={intl.formatMessage({ id: "button.game.create" })}
                 colorSchem={"black"}
                 onClick={() => {
-                  navigate("/game2")
+                  createRoom()
                 }}
               />
             </>

@@ -37,7 +37,7 @@ const io = socketIo(server,{
  * When we launch the server or reset the server
  * Rooms should not exist
  */
-// clearRooms()
+ clearRooms()
 
 /*
  *  client/server : authentification user account request
@@ -150,6 +150,37 @@ io.on("connection", (socket) => {
     const subscriptionUrl = await getStripeCheckoutSessionUrlFromStripeObject(subscriptionStripeObject)
     socket.emit("Premium subscription", subscriptionUrl);
   })
+})
+
+// client : jeu
+io.on("connection", (socket) => {
+
+  socket.on("emitBoard", (historyBoard, pads, graphicPads, updatedBoard) => {
+    io.emit("board",historyBoard, pads, graphicPads, updatedBoard)
+    
+  })
+  
+  socket.on("emitok",() => {
+    console.log("server emitok")
+    io.emit("ok")
+  })
+
+  socket.on("updateDisabledIndexPads", (disabledIndexPads) => {
+    io.emit("emitUpdateDisabledIndexPads",disabledIndexPads)
+  })
+
+  socket.on("MoveHistoryAndBoardArray",(newMovesHistory, movesCount, board) => {
+    io.emit("emitMoveHistoryAndBoardArray",newMovesHistory, movesCount, board)
+
+  })
+
+  socket.on("GameStarted",() => {
+    io.emit("emitGameStarted")
+
+  })
+
+  // socket.emit
+
 })
 
 mongoose

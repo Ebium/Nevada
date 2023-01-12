@@ -28,6 +28,8 @@ import {
 } from "../store/ducks/Game.ducks"
 import { Pad2, Pad3, Pad4, Pad6 } from "./GraphicPads"
 import { colors } from "./styles/design.config"
+import { useEffect, useState } from "react"
+import { socket } from "../socket-context"
 
 export const Board = () => {
   const dispatch = useDispatch()
@@ -41,108 +43,137 @@ export const Board = () => {
   )
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
-  const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
   const pads = useNevadaSelector((state) => state.game.pads)
   const graphicPads = useNevadaSelector((state) => state.game.graphicPads)
   const disabledIndexPads = useNevadaSelector(
     (state) => state.game.disabledIndexPads
   )
 
-  const handleBoardClick = (cell: CellType) => {
-    // Si la partie a commencé, joue un coup
-    if (gameStarted) {
-      const payload = playMove(cell, movesCount, movesHistory, boardArray, pads)
+  const [playerId, setPlayerId] = useState(0)
 
-      // Si le coup est possible on met à jour les cases possibles du plateau
-      if (payload !== undefined) {
-        let boardWithDisabledPad = payload.boardArray
+  useEffect(() => {
+    console.log("test")
+    console.log(socket.id)
 
-        let padIndex = getPadIndex({ x: cell.x, y: cell.y }, pads)
 
-        if (padIndex !== -1) {
-          console.log(disabledIndexPads)
-          if (disabledIndexPads.length > 1) {
-            let enablePadIndex = disabledIndexPads.shift()
-            boardWithDisabledPad = enablePads(
-              boardWithDisabledPad,
-              enablePadIndex,
-              pads,
-              initialBoard
-            )
-          }
+    
 
-          boardWithDisabledPad = disablePads(
+    socket.on("board", (historyBoard, pads, graphicPads, updatedBoard) => {
+      console.log("board oui ouoi ouio")
+      dispatch(updateHistoryBoard(historyBoard))
+      dispatch(updatePads(pads))
+      dispatch(updateGraphicPads(graphicPads))
+      dispatch(updateBoardArray(updatedBoard))
+    })
+    socket.on("ok", () => {
+      console.log("ok ok")
+    })
+    socket.on("emitUpdateDisabledIndexPads",(disabledIndexPads) => {
+      dispatch(updateDisabledIndexPads(disabledIndexPads))
+    })
+    socket.on("emitMoveHistoryAndBoardArray",(newMovesHistory, movesCount, board) => {
+      dispatch(
+        updateMovesHistory(newMovesHistory, movesCount)
+      )
+      dispatch(updateBoardArray(board))
+    })
+  }, [dispatch])
+
+  //Permet jouer un coup
+  const makeMove = (cell: CellType) => {
+    const payload = playMove(cell, movesCount, movesHistory, boardArray, pads)
+
+    // Si le coup est possible on met à jour les cases possibles du plateau
+    if (payload !== undefined) {
+      let boardWithDisabledPad = payload.boardArray
+
+      let padIndex = getPadIndex({ x: cell.x, y: cell.y }, pads)
+
+      if (padIndex !== -1) {
+        console.log(disabledIndexPads)
+        if (disabledIndexPads.length > 1) {
+          let enablePadIndex = disabledIndexPads.shift()
+          boardWithDisabledPad = enablePads(
             boardWithDisabledPad,
-            padIndex,
+            enablePadIndex,
             pads
           )
-          disabledIndexPads.push(padIndex)
-
-          dispatch(updateDisabledIndexPads(disabledIndexPads))
-        } else {
-          console.log(
-            "LE JEU EST CASSéE OMG OMMGMG OOGMOGMOMMGO MOMGOOMGMOG MOGU MOGU NORDVPN"
-          )
-          return
         }
-        // Si un coup a déjà été joué, on enlève les anciens coup possible, sinon on ne fait rien
-        const boardWithoutPreviousMoves =
-          movesHistory.length > 1
-            ? removeOldPossibleMoves(
-                movesHistory[movesHistory.length - 2],
-                boardWithDisabledPad,
-                initialBoard
-              )
-            : boardWithDisabledPad
 
-        // Puis on met à jour les coups possibles pour le coup joué
-        let boardWithMoves = showPossibleMoves(cell, boardWithoutPreviousMoves)
-        if (boardWithMoves.possibleMoves === 0 || movesCount > 60) {
-          console.log("game end")
-          console.log(pads)
-          let pointsFirstPlayer = 0
-          let pointsSecondPlayer = 0
-
-          pads.forEach((tui) => {
-            if (tui.firstPlayerCounter > tui.secondPlayerCounter) {
-              pointsFirstPlayer += tui.xCoords.length * tui.yCoords.length
-            }
-            if (tui.firstPlayerCounter < tui.secondPlayerCounter) {
-              pointsSecondPlayer += tui.xCoords.length * tui.yCoords.length
-            }
-          })
-
-          dispatch(updatePointEnd(pointsFirstPlayer, pointsSecondPlayer))
-
-          console.log(
-            "Premier Joueur :",
-            pointsFirstPlayer,
-            "Second Joueur :",
-            pointsSecondPlayer
-          )
-          if (pointsFirstPlayer > pointsSecondPlayer) {
-            console.log("Le Joueur rouge est gagnant")
-          }
-          if (pointsFirstPlayer < pointsSecondPlayer) {
-            console.log("Le Joueur Bleu est gagnant")
-          }
-          if (pointsFirstPlayer === pointsSecondPlayer) {
-            console.log("Les 2 Joueurs sont ex aequo")
-          }
-          // faire fin de jeu ici où un truc du genre dispatch ....
-        }
-        dispatch(
-          updateMovesHistory(payload.newMovesHistory, payload.movesCount)
+        boardWithDisabledPad = disablePads(
+          boardWithDisabledPad,
+          padIndex,
+          pads
         )
-        dispatch(updateBoardArray(boardWithMoves.board))
-      }
-      return
-    }
+        disabledIndexPads.push(padIndex)
 
-    let dx = 0,
-      dy = 0
-    // Sinon rentre dans la fonction qui permet de placer les pièces,
+        dispatch(updateDisabledIndexPads(disabledIndexPads))
+        socket.emit("updateDisabledIndexPads",disabledIndexPads)
+      } else {
+        console.log(
+          "LE JEU EST CASSéE OMG OMMGMG OOGMOGMOMMGO MOMGOOMGMOG MOGU MOGU NORDVPN"
+        )
+        return
+      }
+      // Si un coup a déjà été joué, on enlève les anciens coup possible, sinon on ne fait rien
+      const boardWithoutPreviousMoves =
+        movesHistory.length > 1
+          ? removeOldPossibleMoves(
+            movesHistory[movesHistory.length - 2],
+            boardWithDisabledPad
+          )
+          : boardWithDisabledPad
+
+      // Puis on met à jour les coups possibles pour le coup joué
+      let boardWithMoves = showPossibleMoves(cell, boardWithoutPreviousMoves)
+      if (boardWithMoves.possibleMoves === 0 || movesCount > 60) {
+        console.log("game end")
+        console.log(pads)
+        let pointsFirstPlayer = 0
+        let pointsSecondPlayer = 0
+
+        pads.forEach((tui) => {
+          if (tui.firstPlayerCounter > tui.secondPlayerCounter) {
+            pointsFirstPlayer += tui.xCoords.length * tui.yCoords.length
+          }
+          if (tui.firstPlayerCounter < tui.secondPlayerCounter) {
+            pointsSecondPlayer += tui.xCoords.length * tui.yCoords.length
+          }
+        })
+
+        dispatch(updatePointEnd(pointsFirstPlayer, pointsSecondPlayer))
+
+        console.log(
+          "Premier Joueur :",
+          pointsFirstPlayer,
+          "Second Joueur :",
+          pointsSecondPlayer
+        )
+        if (pointsFirstPlayer > pointsSecondPlayer) {
+          console.log("Le Joueur rouge est gagnant")
+        }
+        if (pointsFirstPlayer < pointsSecondPlayer) {
+          console.log("Le Joueur Bleu est gagnant")
+        }
+        if (pointsFirstPlayer === pointsSecondPlayer) {
+          console.log("Les 2 Joueurs sont ex aequo")
+        }
+        // faire fin de jeu ici où un truc du genre dispatch ....
+      }
+      // dispatch(
+      //   updateMovesHistory(payload.newMovesHistory, payload.movesCount)
+      // )
+      // dispatch(updateBoardArray(boardWithMoves.board))
+      socket.emit("MoveHistoryAndBoardArray",payload.newMovesHistory, payload.movesCount, boardWithMoves.board)
+    }
+    return
+  }
+
+  // Permet de placer une tuile
+  const placePad = (cell: CellType) => {
     if (currentPad.nbHole === 0 || cell.isFilled) return
+    let dx = 0, dy = 0
+    const calculatedOrientation = currentPad.orientation
     const padNum = currentPad.nbHole
     const updatedBoard = R.clone(boardArray)
     const padHistory: PadHistory = {
@@ -157,8 +188,8 @@ export const Board = () => {
     }
 
     const graphicPad: GraphicPad = {
-      x: 0,
-      y: 0,
+      x: cell.x,
+      y: cell.y,
       compo: <></>,
     }
 
@@ -166,26 +197,29 @@ export const Board = () => {
     if (padNum === 2) {
       dx = 1
       dy = 2
+      graphicPad.compo = `2${calculatedOrientation}`
     }
 
     if (padNum === 3) {
       dx = 1
       dy = 3
+      graphicPad.compo = `3${calculatedOrientation}`
     }
 
     if (padNum === 4) {
       dx = 2
       dy = 2
+      graphicPad.compo = `4`
     }
 
     if (padNum === 6) {
       dx = 2
       dy = 3
+      graphicPad.compo = `6${calculatedOrientation}`
     }
 
     let xTmp = dx
     let yTmp = dy
-    const calculatedOrientation = currentPad.orientation % 2 !== 0 ? 1 : 0
     dx = calculatedOrientation ? xTmp : yTmp
     dy = calculatedOrientation ? yTmp : xTmp
 
@@ -214,24 +248,15 @@ export const Board = () => {
       xCoords.push(x)
     }
 
-    graphicPad.x = cell.x
-    graphicPad.y = cell.y
-    if (padNum === 2) graphicPad.compo = `2${calculatedOrientation}`
-    if (padNum === 3) graphicPad.compo = `3${calculatedOrientation}`
-    if (padNum === 4) graphicPad.compo = `4`
-    if (padNum === 6) graphicPad.compo = `6${calculatedOrientation}`
-
     pad.xCoords = xCoords
     pad.yCoords = Array.from(ySet)
 
     historyBoard.push(padHistory)
-    dispatch(updateHistoryBoard(historyBoard))
-    // pads.push(pad)
-    dispatch(updatePads([...pads, pad]))
-    dispatch(updateGraphicPads([...graphicPads, graphicPad]))
     updatePadStoreFunction(padNum, -1)
     dispatch(updateDroppedCounter(droppedPadCounter + 1))
-    dispatch(updateBoardArray(updatedBoard))
+    // changer ça ??????????? après dans tous les cas le Joueur 1 contruit 
+    // et attends donc pas besoin de faire un socket emit à voir plus tard
+    socket.emit("emitBoard", historyBoard, [...pads, pad], [...graphicPads, graphicPad], updatedBoard)
   }
 
   const updatePadStoreFunction = (padToUpdate: number, by: number) => {
@@ -252,32 +277,25 @@ export const Board = () => {
               <Cellule
                 gamestarted={gameStarted}
                 key={cellId}
-                onMouseOver={() => {
-                  // console.log("...oui")
-                  // console.log(boardArray[cell.x][cell.y]);
-                  // const updatedBoard = R.clone(boardArray)
-                  // updatedBoard[cell.x][cell.y].color = "blue"
-                  // let dx = 2
-                  // let dy = 2
-                  // for(let i = cell.x; i < cell.x + dx; i++){
-                  //   for(let j = cell.y; j< cell.y + dy; j++){
-                  //     console.log("x : " +i + " yzzz: "+j)
-                  //     updatedBoard[i][j].color = "purple"
-                  //     console.log(updatedBoard[i][j]);
-                  //   }
-                  // }
-                  // dispatch(updateBoardArray(updatedBoard))
-                }}
                 onClick={() => {
-                  handleBoardClick(cell)
+                  console.log("onClick,", cell.x, cell.y)
+                  socket.emit("emitok")
+                  if (!gameStarted) {
+                    placePad(cell)
+                  }
                 }}
               >
                 {cell.isFilled ? (
                   <HoleForCellule
                     color={cell.possibleMove ? "green" : cell.holeColor}
-                  ></HoleForCellule>
+                    onClick={()=>{
+                      if (gameStarted) {
+                        makeMove(cell)
+                      }
+                    }}
+                  >{cell.x} {cell.y}</HoleForCellule>
                 ) : (
-                  <></>
+                  <>{cell.x} {cell.y}</>
                 )}
 
                 {graphicPads.map((ah) =>
