@@ -8,7 +8,6 @@ import { useNevadaSelector } from "../store/rootReducer"
 import { colors } from "./styles/design.config"
 import { NVButton } from "./styles/NVButton"
 import { NVText } from "./styles/NVText"
-import { userDisconnect } from "../utils/Deconnection"
 
 export const NevadaHeader = () => {
   const intl = useIntl()
@@ -50,8 +49,7 @@ export const NevadaHeader = () => {
               content={intl.formatMessage({ id: "header.logout" })}
               colorSchem={"gold"}
               onClick={() => {
-                userDisconnect()
-                // navigate("/main/login")
+                navigate("/main/login")
               }}
               svg={<StyledLogoutSVG />}
             />

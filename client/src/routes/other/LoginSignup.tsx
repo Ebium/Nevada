@@ -156,7 +156,6 @@ export const LoginSignup = () => {
     socket.on("connect",()=> {
       if(submitSignup) {
         setSignupToken()
-        dispatch(updateUserThunk(signupEmail))
         dispatch(updateSocketID(socket.id))
         navigate("/main/home")
       }

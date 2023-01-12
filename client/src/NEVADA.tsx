@@ -8,7 +8,6 @@ import { updateSocketID } from "./store/ducks/User.ducks"
 import { socket } from "./socket-context"
 import { translations } from "./i18n"
 import { ConfigureAxios } from "./axios.config"
-import { getEmailFromToken } from "./utils/Token"
 
 interface ChildrenProp {
   children: React.ReactNode
@@ -45,12 +44,11 @@ const UserPermission = () => {
   useEffect(() => {
     socket.on("connect", () => {
       console.log(socket.id)
-      dispatch(updateUserThunk(getEmailFromToken()))
       dispatch(updateSocketID(socket.id))
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  
+
   // mettre un setter avec les différents champs de connexion
   // si personne est co , alors le useeffect fera une redirection
 
