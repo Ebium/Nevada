@@ -16,7 +16,7 @@ const corsOptions = {
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 
-require("dotenv").config() 
+require("dotenv").config()
 
 const socketIo = require("socket.io")
 const http = require("http")
@@ -32,7 +32,7 @@ const io = socketIo(server,{
  * When we launch the server or reset the server
  * Rooms should not exist
  */
-// clearRooms()
+clearRooms()
 
 /*
  *  client/server : authentification user account request
@@ -40,12 +40,12 @@ const io = socketIo(server,{
 io.use(function (socket, next){
   if (socket.handshake.query){
     jwt.verify(socket.handshake.query.token, process.env.JWT_SECRET, async (err, decoded) => {
+
       //format incorrect
       if(err ||  decoded==undefined || decoded.isRegistered == null || decoded.email == null || decoded.password == null ) {
         next(new Error("not_connected"))
         return
       }
-      decoded.socketId = socket.id
 
       //signup
       if(decoded.isRegistered==false) {
@@ -65,16 +65,15 @@ io.use(function (socket, next){
 
       //connection 
       if(decoded.isRegistered==true) {
-        var user = decoded
-        user.socketId = socket.id 
-        user.sockets = io.sockets.sockets
-        const result = await loginUserAuth(user);
+        const result = await loginUserAuth(decoded);
         if(typeof result == "string" ) {
           next(new Error(result)) // email or password incorrect
           return
         } 
         console.log("user connected : ", decoded.email)
       }
+      
+      socket.decoded = decoded
       next();
     });
   }
@@ -87,7 +86,6 @@ io.use(function (socket, next){
  *  client/server : client connection
  */
 io.on("connection",(socket)=>{
-  console.log( io.sockets.sockets.get(socket.id).id)
   socket.on("disconnect",(reason)=>{
     console.log(reason)
   })
