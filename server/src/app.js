@@ -5,9 +5,12 @@ const app = express()
 const cors = require("cors")
 const products_routes = require("./routes/products.js")
 const users_routes = require("./routes/users.js")
+const general_routes = require("./routes/general.js")
 const { getStripeCheckoutSessionUrl, getStripeCheckoutSessionUrlFromStripeObject } = require("./controllers/payment")
 const { registerValidUser, loginUserAuth } = require("./controllers/users") 
 const { createRoom, updateANewPlayerRoom, updateAQuitPlayerRoom, clearRooms } = require("./controllers/room.js")
+var spectatorsCounter = 0
+
 
 const PORT = 5050
 
@@ -27,6 +30,8 @@ const io = socketIo(server,{
       origin: ["http://localhost:3000"]
     }
 })
+
+
 
 /* 
  * When we launch the server or reset the server
@@ -160,5 +165,9 @@ mongoose
   })
 
 app.use(express.json())
+app.set('socketio', io);
+app.set('spectatorsCounter', spectatorsCounter)
 app.use("/users", cors(corsOptions), users_routes)
+app.use("/general", cors(corsOptions), general_routes)
 app.use("/api/products", cors(corsOptions), products_routes)
+  

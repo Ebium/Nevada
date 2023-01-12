@@ -19,7 +19,7 @@ export const NevadaHeader = () => {
 
   return (
     <Content>
-      <NevadaLogo height={125} width={260} />
+      <StyledNevadaLogo />
       <CenteredTitle>
         <NVText
           text={intl.formatMessage({ id: "header.title" })}
@@ -28,6 +28,10 @@ export const NevadaHeader = () => {
             textTransform: "uppercase",
             fontSize: 4,
             letterSpacing: 2,
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            navigate("/showroom")
           }}
         />
       </CenteredTitle>
@@ -46,15 +50,15 @@ export const NevadaHeader = () => {
                 }}
               />
               <NVButton
-              disabled={false}
-              content={intl.formatMessage({ id: "header.logout" })}
-              colorSchem={"gold"}
-              onClick={() => {
-                userDisconnect()
-                // navigate("/main/login")
-              }}
-              svg={<StyledLogoutSVG />}
-            />
+                disabled={false}
+                content={intl.formatMessage({ id: "header.logout" })}
+                colorSchem={"gold"}
+                onClick={() => {
+                  userDisconnect()
+                  // navigate("/main/login")
+                }}
+                svg={<StyledLogoutSVG />}
+              />
             </>
           ) : (
             <NVButton
@@ -98,13 +102,17 @@ const CenteredTitle = styled.div`
   justify-content: center;
 `
 
-const StyledLogoutSVG= styled(LogoutSVG)`
-& path {
-  fill: black;
-}
+const StyledLogoutSVG = styled(LogoutSVG)`
+  & path {
+    fill: black;
+  }
 `
-const StyledLoginSVG= styled(LoginSVG)`
-& path {
-  fill: black;
-}
+const StyledLoginSVG = styled(LoginSVG)`
+  & path {
+    fill: black;
+  }
+`
+const StyledNevadaLogo = styled(NevadaLogo)`
+  height: 125px;
+  width: 260px;
 `

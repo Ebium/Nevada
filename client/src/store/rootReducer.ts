@@ -2,6 +2,7 @@ import { TypedUseSelectorHook, useSelector } from "react-redux"
 import { AnyAction, CombinedState, combineReducers } from "redux"
 import { boardInitialState, BoardReducer, BoardState } from "./ducks/Board.ducks"
 import { gameInitialState, GameReducer, GameState } from "./ducks/Game.ducks"
+import { generalInitialState, GeneralReducer, GeneralState } from "./ducks/General.ducks"
 import { PadReducer, padInitialState, PadState } from "./ducks/Pad.ducks"
 import { UserReducer, userInitialState, UserState } from "./ducks/User.ducks"
 import { RootActionsEnum } from "./rootActions"
@@ -13,6 +14,7 @@ export const INITIAL_ROOTSTATE = {
   pad: padInitialState,
   board: boardInitialState,
   game: gameInitialState,
+  general: generalInitialState,
 }
 
 const NevadaReducer = combineReducers({
@@ -20,6 +22,7 @@ const NevadaReducer = combineReducers({
     pad: PadReducer,
     board: BoardReducer,
     game: GameReducer,
+    general: GeneralReducer
 })
 
 const rootReducer = (
@@ -29,6 +32,7 @@ const rootReducer = (
           pad: PadState
           game: GameState
           board: BoardState
+          general: GeneralState
         }>
       | undefined,
     action: AnyAction

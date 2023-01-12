@@ -18,19 +18,38 @@ import {
   StyledWinSerieSVG,
 } from "../../components/styles/CommonSvg"
 import { NVInput } from "../../components/styles/NVInput"
-import { ChangeEvent, FormEvent, ReactNode, useState } from "react"
+import { ChangeEvent, FormEvent, useEffect, useState } from "react"
 import { NVAlert } from "../../components/styles/NVAlert"
+import { useDispatch } from "react-redux"
+import {
+  getGamesCounterThunk,
+  getPlayersCounterThunk,
+  getSpectatorsCounterThunk,
+} from "../../store/ducks/General.ducks"
 
 export const Home = () => {
   const navigate = useNavigate()
   const intl = useIntl()
-  // const userPseudo = useNevadaSelector((state) => state.user.pseudo)
-  const userPseudo = "a"
+  const dispatch = useDispatch()
+  const userPseudo = useNevadaSelector((state) => state.user.pseudo)
+  const userSocket = useNevadaSelector((state) => state.user.socketId)
   const userPremium = useNevadaSelector((state) => state.user.isPremium)
   const userGamesPlayed = useNevadaSelector((state) => state.user.nbGames)
   const userGamesWon = useNevadaSelector((state) => state.user.nbGamesWin)
   const userGamesSerie = useNevadaSelector((state) => state.user.winStreak)
   const userCreatedAt = useNevadaSelector((state) => state.user.creationDate)
+  const playersCounter = useNevadaSelector((state) => state.general.players)
+  const spectatorsCounter = useNevadaSelector(
+    (state) => state.general.spectators
+  )
+  const gamesCounter = useNevadaSelector((state) => state.general.games)
+
+  useEffect(() => {
+    dispatch(getPlayersCounterThunk())
+    dispatch(getGamesCounterThunk())
+    dispatch(getSpectatorsCounterThunk())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userSocket])
 
   const CenterCard = (props: {
     children: any
@@ -181,9 +200,13 @@ export const Home = () => {
           />
           <NVSpacer height={1} />
           <NVLine width={17} height={0.2} color={"nevadaBlack"} />
-          <LeftBarLine schema={1} data={-1} text={"players"} />
-          <LeftBarLine schema={0} data={-1} text={"games"} />
-          <LeftBarLine schema={1} data={-1} text={"spectators"} />
+          <LeftBarLine schema={1} data={playersCounter} text={"players"} />
+          <LeftBarLine schema={0} data={gamesCounter} text={"games"} />
+          <LeftBarLine
+            schema={1}
+            data={spectatorsCounter}
+            text={"spectators"}
+          />
 
           <NVLine width={17} height={0.2} color={"nevadaBlack"} />
         </LeftBarStats>
