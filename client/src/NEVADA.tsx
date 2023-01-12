@@ -3,12 +3,14 @@ import { useNavigate, useRoutes } from "react-router-dom"
 import { StyledToastContainer } from "./components/other/Toaster"
 import { IntlProvider } from "react-intl"
 import { routes } from "./routes/router"
+import { useNevadaSelector } from "./store/rootReducer"
 import { useDispatch } from "react-redux"
-import { updateSocketID } from "./store/ducks/User.ducks"
+import { updateSocketID, updateUserThunk } from "./store/ducks/User.ducks"
+import Payer from "./Paiement/Pay"
 import { socket } from "./socket-context"
 import { translations } from "./i18n"
-import { ConfigureAxios } from "./axios.config"
 import { getEmailFromToken } from "./utils/Token"
+import { ConfigureAxios } from "./axios.config"
 
 interface ChildrenProp {
   children: React.ReactNode
@@ -64,13 +66,13 @@ const UserPermission = () => {
 function NEVADA() {
   //ConfigureAxios()  <-  a faire
   // le configure axios sert a faire en sortes que si on est pas connecté, alors on ne peut pas faire de requêtes vers le back
-  // on peut faire en sorte d'autoriser certaines requêtes néanmoins / certaines pages / routes
+  // on peut faire en sorte d'autoriser certaines requêtes néanmoins
   ConfigureAxios()
   const element = useRoutes(routes)
   return (
     <CustomIntlProvider>
       {element}
-      <StyledToastContainer hideProgressBar={true} />
+      <StyledToastContainer data-cy="toast-error" hideProgressBar={true} />
       <UserPermission />
     </CustomIntlProvider>
   )
