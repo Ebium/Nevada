@@ -1,9 +1,9 @@
 import styled from "styled-components/macro"
 import { colors } from "./styles/design.config"
 
-export const Pad2 = (props: { orientation: number }) => {
+export const Pad2 = (props: { orientation: number, disabled: boolean}) => {
   return (
-    <Plaquette nbHole={2} orientation={props.orientation}>
+    <Plaquette nbHole={2} orientation={props.orientation} disabled={props.disabled}>
       {props.orientation ? (
         <RowS>
           <Cell right={13.5} />
@@ -19,9 +19,9 @@ export const Pad2 = (props: { orientation: number }) => {
   )
 }
 
-export const Pad3 = (props: { orientation: number }) => {
+export const Pad3 = (props: { orientation: number, disabled: boolean}) => {
   return (
-    <Plaquette nbHole={3} orientation={props.orientation}>
+    <Plaquette nbHole={3} orientation={props.orientation} disabled={props.disabled}>
       {props.orientation ? (
         <RowS>
           <Cell right={13.5} />
@@ -39,9 +39,9 @@ export const Pad3 = (props: { orientation: number }) => {
   )
 }
 
-export const Pad4 = () => {
+export const Pad4 = (props: { disabled: boolean}) => {
   return (
-    <Plaquette nbHole={4}>
+    <Plaquette nbHole={4} disabled={props.disabled}>
       <ColumnS>
         <RowS>
           <Cell right={13.5} bottom={13.5} />
@@ -56,9 +56,9 @@ export const Pad4 = () => {
   )
 }
 
-export const Pad6 = (props: { orientation: number }) => {
+export const Pad6 = (props: { orientation: number, disabled: boolean}) => {
   return (
-    <Plaquette nbHole={6} orientation={props.orientation}>
+    <Plaquette nbHole={6} orientation={props.orientation} disabled={props.disabled}>
       {props.orientation ? (
         <ColumnS>
           <RowS>
@@ -93,6 +93,7 @@ export const Pad6 = (props: { orientation: number }) => {
 interface PlaquetteProps {
   nbHole: number
   orientation?: number
+  disabled: boolean
 }
 
 const Plaquette = styled.div<PlaquetteProps>`
@@ -139,6 +140,7 @@ const Plaquette = styled.div<PlaquetteProps>`
   width: fit-content;
   border-radius: 15px;
   background-color: ${colors.nevadaBlue};
+  opacity: ${({ disabled }) => (disabled ? 0.7 : 1)};
 `
 const RowS = styled.div`
   display: flex;

@@ -69,8 +69,6 @@ export const Board = () => {
               initialBoard
             )
           }
-          console.log(disabledIndexPads)
-          console.log("non ", boardWithDisabledPad)
 
           boardWithDisabledPad = disablePads(
             boardWithDisabledPad,
@@ -86,7 +84,6 @@ export const Board = () => {
           )
           return
         }
-        console.log("oui ou pas ? ", boardWithDisabledPad)
         // Si un coup a déjà été joué, on enlève les anciens coup possible, sinon on ne fait rien
         const boardWithoutPreviousMoves =
           movesHistory.length > 1
@@ -103,11 +100,7 @@ export const Board = () => {
           console.log("game end")
           // faire fin de jeu ici où un truc du genre dispatch ....
         }
-
-        console.log("yes", payload.boardArray[cell.x][cell.y])
-        dispatch(
-          updateMovesHistory(payload.newMovesHistory, payload.movesCount)
-        )
+        dispatch(updateMovesHistory(payload.newMovesHistory, payload.movesCount))
         dispatch(updateBoardArray(boardWithMoves.board))
       }
       return
@@ -180,6 +173,7 @@ export const Board = () => {
           holeFilled: false,
           holeColor: "white",
           disabled: false,
+          possibleMove: false,
         }
         padHistory.coord.push([x, y])
         ySet.add(y)
@@ -246,34 +240,28 @@ export const Board = () => {
                 }}
               >
                 {cell.isFilled ? (
-                  <HoleForCellule color={cell.holeColor}></HoleForCellule>
-                ) : (
-                  // gameStarted ? (
-                  //   <>
-                  //     {/* Couleur? */}
-                  //   </>
-                  // ) : (
+                  <HoleForCellule color={cell.possibleMove ? "green" : cell.holeColor}></HoleForCellule>
+                  ) : (
                   <></>
-                  // )
                 )}
 
                 {graphicPads.map((ah) =>
                   cell.x === ah.x && cell.y === ah.y ? (
                     <>
                       {ah.compo === "20" ? (
-                        <Pad2 orientation={0} />
+                        <Pad2 orientation={0} disabled={cell.disabled}/>
                       ) : ah.compo === "21" ? (
-                        <Pad2 orientation={1} />
+                        <Pad2 orientation={1} disabled={cell.disabled}/>
                       ) : ah.compo === "30" ? (
-                        <Pad3 orientation={0} />
+                        <Pad3 orientation={0} disabled={cell.disabled}/>
                       ) : ah.compo === "31" ? (
-                        <Pad3 orientation={1} />
+                        <Pad3 orientation={1} disabled={cell.disabled}/>
                       ) : ah.compo === "60" ? (
-                        <Pad6 orientation={0} />
+                        <Pad6 orientation={0} disabled={cell.disabled}/>
                       ) : ah.compo === "61" ? (
-                        <Pad6 orientation={1} />
+                        <Pad6 orientation={1} disabled={cell.disabled}/>
                       ) : ah.compo === "4" ? (
-                        <Pad4 />
+                        <Pad4 disabled={cell.disabled}/>
                       ) : (
                         <></>
                       )}
