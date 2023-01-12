@@ -240,56 +240,28 @@ export const Board = () => {
                 }}
               >
                 {cell.isFilled ? (
-                  <HoleForCellule color={cell.holeColor}></HoleForCellule>
-                ) : (
-                  // gameStarted ? (
-                  //   <>
-                  //     {/* Couleur? */}
-                  //   </>
-                  // ) : (
+                  <HoleForCellule color={cell.possibleMove ? "green" : cell.holeColor}></HoleForCellule>
+                  ) : (
                   <></>
-                  // )
                 )}
 
                 {graphicPads.map((ah) =>
                   cell.x === ah.x && cell.y === ah.y ? (
-                //   }
-                //   onClick={() => {
-                //     handleBoardClick(cell)
-                //   }}
-                //   style={{
-                //     opacity: cell.disabled? 0.33 : 1,
-                //     backgroundColor: cell.isFilled
-                //       ? cell.color
-                //       : gameStarted
-                //         ? "transparent"
-                //         : "#D3D3D3",
-                //     // backgroundColor: cell.color 
-                //     //       ? cell.color
-                //     //       : "#D3D3D3",
-                //     border:
-                //       gameStarted && !cell.isFilled ? "none" : "1px red solid",
-                //   }}
-                // >
-                //   {cell.isFilled ? (
-                //     <HoleForCellule color={cell.possibleMove ? "green" : cell.holeColor}></HoleForCellule>
-                //   ) : (
-
                     <>
                       {ah.compo === "20" ? (
-                        <Pad2 orientation={0} />
+                        <Pad2 orientation={0} disabled={cell.disabled}/>
                       ) : ah.compo === "21" ? (
-                        <Pad2 orientation={1} />
+                        <Pad2 orientation={1} disabled={cell.disabled}/>
                       ) : ah.compo === "30" ? (
-                        <Pad3 orientation={0} />
+                        <Pad3 orientation={0} disabled={cell.disabled}/>
                       ) : ah.compo === "31" ? (
-                        <Pad3 orientation={1} />
+                        <Pad3 orientation={1} disabled={cell.disabled}/>
                       ) : ah.compo === "60" ? (
-                        <Pad6 orientation={0} />
+                        <Pad6 orientation={0} disabled={cell.disabled}/>
                       ) : ah.compo === "61" ? (
-                        <Pad6 orientation={1} />
+                        <Pad6 orientation={1} disabled={cell.disabled}/>
                       ) : ah.compo === "4" ? (
-                        <Pad4 />
+                        <Pad4 disabled={cell.disabled}/>
                       ) : (
                         <></>
                       )}
