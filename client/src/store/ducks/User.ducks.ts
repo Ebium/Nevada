@@ -105,7 +105,6 @@ export const updateUserThunk =
       .get(`/users/${email}`)
       .then(({ data }: AxiosResponse) => {
         console.log(data)
-        data.result.premium = true
         const updatedPseudo = data.result.premium
           ? "👑 " + data.result.pseudo
           : data.result.pseudo

@@ -172,7 +172,7 @@ export const Payment = () => {
           <NVSpacer height={4} />
           <RowDiv>
             <NVButton
-              disabled={false}
+              disabled={!userPseudo}
               content={intl.formatMessage({ id: "payment.choice.1" })}
               colorSchem={"black"}
               onClick={() => {
@@ -183,7 +183,7 @@ export const Payment = () => {
             <NVSpacer width={6} />
 
             <NVButton
-              disabled={false}
+              disabled={!userPseudo}
               content={intl.formatMessage({ id: "payment.choice.2" })}
               colorSchem={"black"}
               onClick={() => {
@@ -194,7 +194,7 @@ export const Payment = () => {
             <NVSpacer width={6} />
 
             <NVButton
-              disabled={false}
+              disabled={!userPseudo}
               content={intl.formatMessage({ id: "payment.choice.3" })}
               colorSchem={"black"}
               onClick={() => {
