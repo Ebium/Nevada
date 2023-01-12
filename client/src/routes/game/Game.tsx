@@ -16,9 +16,21 @@ import {
   updateBoardArray,
   updateHistoryBoard,
 } from "../../store/ducks/Board.ducks"
-import { restartGame, updateDisabledIndexPads, updateGameStarted, updateMovesHistory } from "../../store/ducks/Game.ducks"
+import {
+  restartGame,
+  updateDisabledIndexPads,
+  updateGameStarted,
+  updateMovesHistory,
+  updatePointEnd,
+} from "../../store/ducks/Game.ducks"
 import { useNavigate } from "react-router-dom"
-import { disablePads, enablePads, getPadIndex, removeOldPossibleMoves, showPossibleMoves } from "../../utils/Moves"
+import {
+  disablePads,
+  enablePads,
+  getPadIndex,
+  removeOldPossibleMoves,
+  showPossibleMoves,
+} from "../../utils/Moves"
 
 export const Game = () => {
   const dispatch = useDispatch()
@@ -34,11 +46,14 @@ export const Game = () => {
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
   const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
   const pads = useNevadaSelector((state) => state.game.pads)
-  const disabledIndexPads = useNevadaSelector((state) => state.game.disabledIndexPads)
+  const disabledIndexPads = useNevadaSelector(
+    (state) => state.game.disabledIndexPads
+  )
 
   useEffect(() => {
     if (droppedCounter === 17) {
       dispatch(updateGameStarted(true))
+      dispatch(initializeInitialBoard(board))
     } else {
       if (gameStarted) {
         dispatch(updateGameStarted(false))
@@ -109,18 +124,19 @@ export const Game = () => {
     resetBoard()
     dispatch(updateGameStarted(false))
     dispatch(restartGame())
+    dispatch(updatePointEnd(0, 0))
   }
-
 
   // Enlève la dernière pièce/Pad/Palette/Plaquette mise
   const undoBoard = () => {
     if (padHistory.length === 0) return
-    if(!gameStarted){
+    if (!gameStarted) {
       const updatedBoard = R.clone(board)
       let updatedHistory = R.clone(padHistory)
       padHistory[padHistory.length - 1].coord.map(
         (cell) =>
-          (updatedBoard[cell[0]][cell[1]] = initialeBoardArray[cell[0]][cell[1]])
+          (updatedBoard[cell[0]][cell[1]] =
+            initialeBoardArray[cell[0]][cell[1]])
       )
       updatePadStoreFunction(padHistory[padHistory.length - 1].coord.length, +1)
       updatedHistory.pop()
@@ -134,52 +150,71 @@ export const Game = () => {
   // Enlève la dernière boule jouée
   const undoMove = () => {
     if (movesHistory.length === 0) return
-    if(gameStarted){
+    if (gameStarted) {
       // Contient l'ancienne valeur de la case jouée
       const move = movesHistory.pop()
-      if(!move) return
+      if (!move) return
 
       let boardWithDisabledPad = board
-      
+
       // On active la palette du dernier coup joué
-      let enableIndexPad = getPadIndex({x: move.x, y: move.y }, pads)
+      let enableIndexPad = getPadIndex({ x: move.x, y: move.y }, pads)
       if (enableIndexPad !== -1) {
-        boardWithDisabledPad = enablePads(boardWithDisabledPad, enableIndexPad, pads,initialBoard)
+        boardWithDisabledPad = enablePads(
+          boardWithDisabledPad,
+          enableIndexPad,
+          pads,
+          initialBoard
+        )
         disabledIndexPads.pop()
-      } else 
+      }
 
       // Ensuite l'avant dernier coup devient le dernier coup
-      // on doit donc désactiver l'avant dernier coup du nouveau dernier coup 
-      if(movesHistory.length>1){
-        const disableBeforeLastMove = movesHistory[movesHistory.length-2]
-        const disableBeforeLastMovePadIndex =  getPadIndex({x: disableBeforeLastMove.x, y: disableBeforeLastMove.y},pads)
-        if(disableBeforeLastMovePadIndex !== -1){
-          boardWithDisabledPad = disablePads(boardWithDisabledPad,disableBeforeLastMovePadIndex, pads)
-        } 
+      // on doit donc désactiver l'avant dernier coup du nouveau dernier coup
+      else if (movesHistory.length > 1) {
+        const disableBeforeLastMove = movesHistory[movesHistory.length - 2]
+        const disableBeforeLastMovePadIndex = getPadIndex(
+          { x: disableBeforeLastMove.x, y: disableBeforeLastMove.y },
+          pads
+        )
+        if (disableBeforeLastMovePadIndex !== -1) {
+          boardWithDisabledPad = disablePads(
+            boardWithDisabledPad,
+            disableBeforeLastMovePadIndex,
+            pads
+          )
+        }
       }
 
       // Puis on enlève les coups possibles de l'ancien dernier coup joué
-      let updatedBoard = removeOldPossibleMoves(move,boardWithDisabledPad,initialBoard)
+      let updatedBoard = removeOldPossibleMoves(
+        move,
+        boardWithDisabledPad,
+        initialBoard
+      )
 
-      // On remet à jour la valeur de la case avant l'ancien dernier coup joué 
+      // On remet à jour la valeur de la case avant l'ancien dernier coup joué
       updatedBoard[move.x][move.y].holeColor = move.holeColor
-      updatedBoard[move.x][move.y].holeFilled = move.holeFilled 
-  
+      updatedBoard[move.x][move.y].holeFilled = move.holeFilled
+
       // S'il y avait des coups joués, on ajoute les coups possibles de l'avant dernier coup joué
       // sinon on ajoute rien
-      if(movesHistory.length>0){
-        updatedBoard = showPossibleMoves(movesHistory[movesHistory.length-1],updatedBoard).board
+      if (movesHistory.length > 0) {
+        updatedBoard = showPossibleMoves(
+          movesHistory[movesHistory.length - 1],
+          updatedBoard
+        ).board
       }
 
       dispatch(updateDisabledIndexPads(disabledIndexPads))
-      dispatch(updateMovesHistory(movesHistory,movesCount-1))
+      dispatch(updateMovesHistory(movesHistory, movesCount - 1))
       dispatch(updateBoardArray(updatedBoard))
     }
   }
 
   const startGame = () => {
     console.log("game started")
-    if(!gameStarted){
+    if (!gameStarted) {
       dispatch(updateGameStarted(true))
       dispatch(initializeInitialBoard(board))
     }
@@ -187,8 +222,8 @@ export const Game = () => {
 
   const oui = () => {
     const test = {
-      x: [1,2,3],
-      y: [1,2],
+      x: [1, 2, 3],
+      y: [1, 2],
       coord: [],
     }
 
@@ -200,9 +235,7 @@ export const Game = () => {
     //   }
     // }
 
-    console.log([...[test,{      x: [3],
-      y: [2],
-      coord: [],}],test])
+    console.log([...[test, { x: [3], y: [2], coord: [] }], test])
   }
 
   return (
@@ -236,10 +269,7 @@ export const Game = () => {
             Undo
           </StyledButton>
           <HeightSpacer></HeightSpacer>
-          <StyledButton
-            disabled={movesCount === 0}
-            onClick={() => undoMove()}
-          >
+          <StyledButton disabled={movesCount === 0} onClick={() => undoMove()}>
             Undo Move
           </StyledButton>
           <HeightSpacer></HeightSpacer>
@@ -250,15 +280,15 @@ export const Game = () => {
             Reset Game
           </StyledButton>
           <HeightSpacer></HeightSpacer>
-          <StyledButton 
-            // disabled={!gameStarted} 
+          <StyledButton
+            // disabled={!gameStarted}
             onClick={() => startGame()}
           >
             StartGame
           </StyledButton>
           <HeightSpacer></HeightSpacer>
-          <StyledButton 
-            // disabled={!gameStarted} 
+          <StyledButton
+            // disabled={!gameStarted}
             onClick={() => oui()}
           >
             oui
@@ -379,8 +409,7 @@ const HeaderButton = styled.button`
   }
 `
 
-const Content = styled.div`
-`
+const Content = styled.div``
 const Page = styled.div`
   color: black;
   width: 100vw;

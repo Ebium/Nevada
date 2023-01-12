@@ -11,6 +11,8 @@ export const enum GameActionsEnum {
   UPDATE_DISABLED_INDEX_PADS = "GAME/updateDisabledIndexPads",
 
   RESTART_GAME = "GAME/restartGame",
+
+  UPDATE_POINT_END = "GAME/updatePointEnd",
 }
 
 export const updateGameStarted = (bool: boolean) =>
@@ -23,6 +25,15 @@ export const updateMovesHistory = (moves: Move[], count: number) =>
     type: GameActionsEnum.UPDATE_MOVES_HISTORY,
     moves,
     count,
+  } as const)
+export const updatePointEnd = (
+  pointsFirstPlayer: number,
+  pointsSecondPlayer: number
+) =>
+  ({
+    type: GameActionsEnum.UPDATE_POINT_END,
+    pointsFirstPlayer,
+    pointsSecondPlayer,
   } as const)
 export const updatePads = (pads: Pad[]) =>
   ({
@@ -51,11 +62,15 @@ type GameActionsType = ReturnType<
   | typeof updateGraphicPads
   | typeof updateDisabledIndexPads
   | typeof restartGame
+  | typeof updatePointEnd
 >
 
 export interface GameState {
   started: boolean
   //status de la partie en cours
+  pointsFirstPlayer: number
+
+  pointsSecondPlayer: number
 
   movesHistory: Move[]
   // Contient l'ancienne valeur des cases avant le coup joué permettant de d'annuler le dernier coup joué
@@ -85,6 +100,8 @@ export const gameInitialState: GameState = {
   movesCount: 0,
   pads: [],
   disabledIndexPads: [],
+  pointsFirstPlayer: 0,
+  pointsSecondPlayer: 0,
   graphicPads: [],
 }
 
@@ -113,6 +130,12 @@ export function GameReducer(
       return { ...state, graphicPads: action.graphicPads }
     case GameActionsEnum.UPDATE_DISABLED_INDEX_PADS:
       return { ...state, disabledIndexPads: action.disabledIndexPads }
+    case GameActionsEnum.UPDATE_POINT_END:
+      return {
+        ...state,
+        pointsFirstPlayer: action.pointsFirstPlayer,
+        pointsSecondPlayer: action.pointsSecondPlayer,
+      }
     default:
       return { ...state }
   }

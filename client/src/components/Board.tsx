@@ -24,6 +24,7 @@ import {
   updateGraphicPads,
   updateMovesHistory,
   updatePads,
+  updatePointEnd,
 } from "../store/ducks/Game.ducks"
 import { Pad2, Pad3, Pad4, Pad6 } from "./GraphicPads"
 import { colors } from "./styles/design.config"
@@ -50,7 +51,7 @@ export const Board = () => {
   const handleBoardClick = (cell: CellType) => {
     // Si la partie a commencé, joue un coup
     if (gameStarted) {
-      const payload = playMove(cell, movesCount, movesHistory, boardArray)
+      const payload = playMove(cell, movesCount, movesHistory, boardArray, pads)
 
       // Si le coup est possible on met à jour les cases possibles du plateau
       if (payload !== undefined) {
@@ -98,9 +99,41 @@ export const Board = () => {
         let boardWithMoves = showPossibleMoves(cell, boardWithoutPreviousMoves)
         if (boardWithMoves.possibleMoves === 0 || movesCount > 60) {
           console.log("game end")
+          console.log(pads)
+          let pointsFirstPlayer = 0
+          let pointsSecondPlayer = 0
+
+          pads.forEach((tui) => {
+            if (tui.firstPlayerCounter > tui.secondPlayerCounter) {
+              pointsFirstPlayer += tui.xCoords.length * tui.yCoords.length
+            }
+            if (tui.firstPlayerCounter < tui.secondPlayerCounter) {
+              pointsSecondPlayer += tui.xCoords.length * tui.yCoords.length
+            }
+          })
+
+          dispatch(updatePointEnd(pointsFirstPlayer, pointsSecondPlayer))
+
+          console.log(
+            "Premier Joueur :",
+            pointsFirstPlayer,
+            "Second Joueur :",
+            pointsSecondPlayer
+          )
+          if (pointsFirstPlayer > pointsSecondPlayer) {
+            console.log("Le Joueur rouge est gagnant")
+          }
+          if (pointsFirstPlayer < pointsSecondPlayer) {
+            console.log("Le Joueur Bleu est gagnant")
+          }
+          if (pointsFirstPlayer === pointsSecondPlayer) {
+            console.log("Les 2 Joueurs sont ex aequo")
+          }
           // faire fin de jeu ici où un truc du genre dispatch ....
         }
-        dispatch(updateMovesHistory(payload.newMovesHistory, payload.movesCount))
+        dispatch(
+          updateMovesHistory(payload.newMovesHistory, payload.movesCount)
+        )
         dispatch(updateBoardArray(boardWithMoves.board))
       }
       return
@@ -240,8 +273,10 @@ export const Board = () => {
                 }}
               >
                 {cell.isFilled ? (
-                  <HoleForCellule color={cell.possibleMove ? "green" : cell.holeColor}></HoleForCellule>
-                  ) : (
+                  <HoleForCellule
+                    color={cell.possibleMove ? "green" : cell.holeColor}
+                  ></HoleForCellule>
+                ) : (
                   <></>
                 )}
 
@@ -249,19 +284,19 @@ export const Board = () => {
                   cell.x === ah.x && cell.y === ah.y ? (
                     <>
                       {ah.compo === "20" ? (
-                        <Pad2 orientation={0} disabled={cell.disabled}/>
+                        <Pad2 orientation={0} disabled={cell.disabled} />
                       ) : ah.compo === "21" ? (
-                        <Pad2 orientation={1} disabled={cell.disabled}/>
+                        <Pad2 orientation={1} disabled={cell.disabled} />
                       ) : ah.compo === "30" ? (
-                        <Pad3 orientation={0} disabled={cell.disabled}/>
+                        <Pad3 orientation={0} disabled={cell.disabled} />
                       ) : ah.compo === "31" ? (
-                        <Pad3 orientation={1} disabled={cell.disabled}/>
+                        <Pad3 orientation={1} disabled={cell.disabled} />
                       ) : ah.compo === "60" ? (
-                        <Pad6 orientation={0} disabled={cell.disabled}/>
+                        <Pad6 orientation={0} disabled={cell.disabled} />
                       ) : ah.compo === "61" ? (
-                        <Pad6 orientation={1} disabled={cell.disabled}/>
+                        <Pad6 orientation={1} disabled={cell.disabled} />
                       ) : ah.compo === "4" ? (
-                        <Pad4 disabled={cell.disabled}/>
+                        <Pad4 disabled={cell.disabled} />
                       ) : (
                         <></>
                       )}
