@@ -3,7 +3,7 @@ import JWT from "expo-jwt"
 
 //Create a new socket
 const createSocket = () =>  {
-  const token = !localStorage.getItem("Nevada_Token") ? JWT.encode({},"abcdef") : localStorage.getItem("Nevada_Token")
+  const token = !localStorage.getItem("Nevada_Token") ? JWT.encode({},"error") : localStorage.getItem("Nevada_Token")
   return io("http://localhost:5050", {
     autoConnect : true,
     reconnection : false,

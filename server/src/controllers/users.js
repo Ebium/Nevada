@@ -47,6 +47,14 @@ const findUserByPseudo = async (pseudo) => {
     .catch((error) => console.log(error))
 }
 
+const findUserBySocketId = async (socketId) => {
+  return User.findOne({ socketId: socketId })
+    .then((result) => {
+      return result
+    })
+    .catch((error) => console.log(error))
+}
+
 /* ========================================
     Update functions
  ======================================== */
@@ -60,7 +68,7 @@ const createUser = async (user) => {
 }
 
 const updateUser = async (user) => {
-  return User.findOneAndUpdate({ _id: user.UserID }, user, {
+  return User.findOneAndUpdate({ _id: user._id }, user, {
     new: true,
     runValidators: true,
   })
@@ -113,6 +121,17 @@ const userExist = async (user) => {
   return errors
 }
 
+//à modifier
+const userIsConnected = async(user) => {
+  const userDB = await findUserByEmail(user.email)
+  if(userDB==null)
+  return false
+
+  const userSocketId = userDB.socketId
+
+  return user.sockets.get(userSocketId) ? true : false
+}
+
 /* ========================================
     Personalized functions
 ======================================== */
@@ -132,9 +151,10 @@ const registerValidUser = async (user) => {
 }
 
 /*
- *  Update auth only if
- *  email and password
- *  match with the database
+ *  if email and password
+ *  match with the database 
+ *  and is not connected
+ *  return user
  */
 const loginUserAuth = async (user) => {
   if (!(await userEmailExist(user.email))) {
@@ -143,13 +163,30 @@ const loginUserAuth = async (user) => {
   if (!(await userAccountPasswordMatch(user.email, user.password)))
     return "Your password is incorrect."
 
-  return User.findOne({ email: user.email }).then(
-    (result) => {
-      result.user = user
-      return result
-    }
-  )
+  if(await userIsConnected(user)) {
+    return "The account is already connected."
+  }
+
+  const userFind = await findUserByEmail(user.email)
+
+  var userEdited = user 
+  userEdited.socketId = user.socketId
+  const userUpdated = await updateUser(userEdited)
+  return await findUserByEmail(user.email)
 }
+
+
+// /*
+//  *  disconnect an user 
+//  *  that left the website
+//  */
+// const disconnectUserBySocketId = async(socketId)=> {
+//   var user = await findUserBySocketId(socketId)
+//   if(user) {
+//     user.socketId = ""
+//     return await updateUser(user)
+//   }
+// }
 
 /*******************************************
     User Object type 
@@ -161,7 +198,8 @@ const createNewUserObject = async(user) => {
     email: user.email,
     password: user.password,
     pseudo: user.pseudo,
-    cusId : cus.id
+    cusId : cus.id,
+    socketId : user.socketId
   }
 }
 
@@ -169,5 +207,5 @@ module.exports = {
   loginUserAuth,
   registerValidUser,
   get_current_user,
-  findUsers,
+  findUsers
 }
