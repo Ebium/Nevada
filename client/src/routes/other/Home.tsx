@@ -26,6 +26,7 @@ import {
   getPlayersCounterThunk,
   getSpectatorsCounterThunk,
 } from "../../store/ducks/General.ducks"
+import { getUsersRankingThunk } from "../../store/ducks/User.ducks"
 
 export const Home = () => {
   const navigate = useNavigate()
@@ -43,14 +44,19 @@ export const Home = () => {
     (state) => state.general.spectators
   )
   const gamesCounter = useNevadaSelector((state) => state.general.games)
+  const playersRanking = useNevadaSelector((state) => state.user.usersRanking)
 
   useEffect(() => {
     dispatch(getPlayersCounterThunk())
     dispatch(getGamesCounterThunk())
     dispatch(getSpectatorsCounterThunk())
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userSocket])
 
+  useEffect(() => {
+    dispatch(getUsersRankingThunk())
+  }, [])
   const CenterCard = (props: {
     children: any
     title: string
@@ -443,7 +449,27 @@ export const Home = () => {
           )}
         </CenterCard>
         <CenterCard title="ranking" color="nevadaBlue">
-          VIDE
+          {playersRanking.length !== 0 ? (
+            playersRanking.map((value, index) => (
+              <>
+                <NVText
+                  text={"Place : " + (index + 1)}
+                  textStyle={{ color: "nevadaGold" }}
+                />
+                <NVText
+                  text={value.pseudo}
+                  textStyle={{ color: "nevadaGold" }}
+                />
+                <NVText
+                  text={value.won + " victoires"}
+                  textStyle={{ color: "nevadaGold" }}
+                />
+                <NVLine width={18} height={0.1} color={"nevadaGold"} />
+              </>
+            ))
+          ) : (
+            <></>
+          )}
         </CenterCard>
         <NVSpacer width={1} />
       </CenterContent>

@@ -7,6 +7,10 @@ export const enum UserActionsEnum {
   UPDATE_USER = "USER/updateUser",
   UPDATE_USER_FAILED = "USER/updateUserFailed",
   UPDATE_USER_LOADING = "USER/updateUserLoading",
+
+  UPDATE_USERS_RANKING = "USER/updateUsersRanking",
+  UPDATE_USERS_RANKING_FAILED = "USER/updateUsersRankingFailed",
+  UPDATE_USERS_RANKING_LOADING = "USER/updateUsersRankingLoading",
 }
 
 export const updateSocketID = (sock: string) =>
@@ -21,11 +25,23 @@ const updateUserFailed = () =>
 const updateUserLoading = () =>
   ({ type: UserActionsEnum.UPDATE_USER_LOADING } as const)
 
+  const updateUsersRanking = (payload: Array<UserInfos>) =>
+  ({ type: UserActionsEnum.UPDATE_USERS_RANKING, payload } as const)
+
+const updateUsersRankingFailed = () =>
+  ({ type: UserActionsEnum.UPDATE_USERS_RANKING_FAILED } as const)
+
+const updateUsersRankingLoading = () =>
+  ({ type: UserActionsEnum.UPDATE_USERS_RANKING_LOADING } as const)
+
 type UserActionsType = ReturnType<
   | typeof updateSocketID
   | typeof updateUser
   | typeof updateUserFailed
   | typeof updateUserLoading
+  | typeof updateUsersRanking
+  | typeof updateUsersRankingFailed
+  | typeof updateUsersRankingLoading
 >
 
 interface UserInfos {
@@ -52,6 +68,7 @@ export interface UserState {
   nbGamesWin: number
   winStreak: number
   colorPseudo: string
+  usersRanking: Array<UserInfos>
 }
 
 export const userInitialState: UserState = {
@@ -66,6 +83,7 @@ export const userInitialState: UserState = {
   nbGamesWin: 0,
   winStreak: 0,
   colorPseudo: "gold",
+  usersRanking: []
 }
 
 export function UserReducer(
@@ -92,6 +110,16 @@ export function UserReducer(
     case UserActionsEnum.UPDATE_USER_FAILED:
       return { ...state, status: "failed" }
     case UserActionsEnum.UPDATE_USER_LOADING:
+      return { ...state, status: "loading" }
+      case UserActionsEnum.UPDATE_USERS_RANKING:
+      return {
+        ...state,
+        status: "idle",
+        usersRanking: action.payload
+      }
+    case UserActionsEnum.UPDATE_USERS_RANKING_FAILED:
+      return { ...state, status: "failed" }
+    case UserActionsEnum.UPDATE_USERS_RANKING_LOADING:
       return { ...state, status: "loading" }
     default:
       return { ...state }
@@ -124,5 +152,21 @@ export const updateUserThunk =
       })
       .catch((e: AxiosError) => {
         dispatch(updateUserFailed())
+      })
+  }
+
+  export const getUsersRankingThunk =
+  () => (dispatch: Dispatch<AnyAction>) => {
+    dispatch(updateUsersRankingLoading())
+    return axios
+      .get(`/users/ranking`)
+      .then(({ data }: AxiosResponse) => {
+        console.log(data)
+        dispatch(
+          updateUsersRanking(data)
+        )
+      })
+      .catch((e: AxiosError) => {
+        dispatch(updateUsersRankingFailed())
       })
   }
