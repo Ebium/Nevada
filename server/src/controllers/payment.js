@@ -67,11 +67,8 @@ async function getStripeCheckoutSessionUrl(products) {
   return {url, error};
 }
 
-async function expireSubscriptionStripeById(subId, expireDate) {
-  const subscription = await stripe.subscriptions.update(
-    subId,
-    { cancel_at_period_end : expireDate }
-  );
+async function deleteSubscriptionStripeById(subId) {
+  const deleted =  await stripe.subscriptions.del(subId);
 }
 
 /* 
@@ -205,5 +202,5 @@ module.exports = {
   createStripeCustomer,
   searchStripeSubscriptionPaidByCusId,
   searchStripePaymentIntentPaidByCusId,
-  expireSubscriptionStripeById
+  deleteSubscriptionStripeById
 }

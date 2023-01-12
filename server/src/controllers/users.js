@@ -3,7 +3,7 @@ const User = require("../models/User.js")
 const Stripe = require("stripe")
 const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY)
 const { matchPassword } = require("./password")
-const { createStripeCustomer, searchStripePaymentIntentPaidByCusId, searchStripeSubscriptionPaidByCusId, expireSubscriptionStripeById } = require("./payment")
+const { createStripeCustomer, searchStripePaymentIntentPaidByCusId, searchStripeSubscriptionPaidByCusId, deleteSubscriptionStripeById } = require("./payment")
 
 /* ========================================
     Search functions
@@ -217,7 +217,6 @@ const userPayment = async(user) => {
   const paymentIntent = await searchStripePaymentIntentPaidByCusId(user.cusId)
   const subscription = await searchStripeSubscriptionPaidByCusId(user.cusId)
 
-  console.log(paymentIntent.data[0])
   //est premium life
   if(paymentIntent.data[0] != null  && paymentIntent.data[0].amount == 1999) {
       userEdited.premium = true
@@ -237,17 +236,11 @@ const userPayment = async(user) => {
 }
 
 const userUnsubscribe = async(user)=> {
+  const subscription = await searchStripeSubscriptionPaidByCusId(user.cusId)
   var userEdited = user
   user.premium = false
 
-  const subscription = await searchStripeSubscriptionPaidByCusId(user.cusId)
-  var expireDate = new Date(user.paidDate)
-  const now = new Date(Date.now())
-
-  expireDate.setMonth(now.getMonth()+1)
-  expireDate.setFullYear(now.getFullYear())
-  expireSubscriptionStripeById(subscription.data[0].id)
-  
+  deleteSubscriptionStripeById(subscription.data[0].id)
   updateUser(userEdited)
 }
 

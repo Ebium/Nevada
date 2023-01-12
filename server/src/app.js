@@ -92,7 +92,6 @@ io.use(function (socket, next){
  *  client/server : client connection
  */
 io.on("connection",(socket)=>{
-  console.log( io.sockets.sockets.get(socket.id).id)
   socket.on("disconnect",(reason)=>{
     console.log(reason)
   })
@@ -163,7 +162,7 @@ io.on("connection", async(socket) => {
     const user = await findUserBySocketId(socket.id)
     userUnsubscribe(user)
     socket.emit("User unsubscription")
-  })
+  }) 
 
   socket.on("User become premium", async()=> {
     const user = await findUserBySocketId(socket.id)
