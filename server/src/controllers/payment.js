@@ -1,6 +1,6 @@
 require("dotenv").config()
 const Product = require('../models/Product.js')
-const Stripe = require("stripe")
+const Stripe = require("stripe");
 const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY);
 
 /* 
@@ -29,13 +29,28 @@ const createStripeCoupon = () => {
 }
 
 /* 
- *  Get Payment Link of a Stripe Object
+ *  Get Payment Link of a Premium Stripe Object
  */
-async function getStripeCheckoutSessionUrlFromStripeObject(stripeObject){
-  return stripe.checkout.sessions.create(stripeObject).then((stripeData) => {
+async function getStripeCheckoutSessionUrlFromPremiumStripeObject(subscription, cusId){
+  const stripeObject = requestPremiumSubscriptionStripeObject(subscription, cusId)
+  
+  return await stripe.checkout.sessions.create(stripeObject).then((stripeData) => {
     return stripeData.url;
   })
 }
+
+/* 
+ *  Get Payment Link of a Premium LIFE Stripe Object
+ */
+async function getStripeCheckoutSessionUrlFromPremiumLifeStripeObject(subscription, cusId){
+  const stripeObject = requestPremiumLifeSubscriptionStripeObject(subscription, cusId)
+  
+  return await stripe.checkout.sessions.create(stripeObject).then((stripeData) => {
+    return stripeData.url;
+  })
+}
+
+
 
 /* 
  *  Get Payment Link of products
@@ -50,6 +65,13 @@ async function getStripeCheckoutSessionUrl(products) {
         error = "Un problème interne est survenu.";
     }
   return {url, error};
+}
+
+async function expireSubscriptionStripeById(subId, expireDate) {
+  const subscription = await stripe.subscriptions.update(
+    subId,
+    { cancel_at_period_end : expireDate }
+  );
 }
 
 /* 
@@ -67,11 +89,29 @@ async function requestSessionCheckoutStripeUrl(products) {
  *  Return Url sended by Stripe 
  */
 async function createStripeCheckoutSessionUrl(object) {
-    return stripe.checkout.sessions.create(object).then((stripeData) => {
+    return await stripe.checkout.sessions.create(object).then((stripeData) => {
       return stripeData.url;
     })
 }
 
+/*
+ *  Return payment intent list from a customer
+ */
+async function searchStripePaymentIntentPaidByCusId(cusId) {
+  return await stripe.paymentIntents.search({
+    query: 'customer:\''+cusId+'\' AND status:\'succeeded\'',
+  });
+}
+
+/*
+ *  Return subscription list from a customer
+ */
+async function searchStripeSubscriptionPaidByCusId(cusId) {
+  return await stripe.subscriptions.list({
+    customer : cusId,
+    status : "active"
+  });
+}
 
 /* 
  *  Object request to send to Stripe
@@ -99,8 +139,71 @@ function requestStripeCheckoutObject(buy_products, products_data) {
 }
 
 
+/* 
+ * Create an premium subscription Object
+ * for Stripe Api request
+ */ 
+const requestPremiumSubscriptionStripeObject = (sub, cusId) => {
+  return {
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+              product_data : {
+                  name : "Premium subscription",
+                  description : "Devenez premium et obtenez des avantages !"
+              },
+              recurring : {
+                  interval : "month"
+              },
+              unit_amount : sub.price, //in cents
+              currency:"eur",
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: sub.success_url,
+      cancel_url: sub.cancel_url,
+      customer: cusId
+    }
+}
+
+
+/* 
+ * Create an premium LIFE subscription Object
+ * for Stripe Api request
+ */ 
+const requestPremiumLifeSubscriptionStripeObject = (sub, cusId) => {
+  return {
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+              product_data : {
+                  name : "Premium subscription",
+                  description : "Devenez premium à vie et obtenez des avantages !"
+              },
+              unit_amount : sub.price, //in cents
+              currency:"eur",
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: sub.success_url,
+      cancel_url: sub.cancel_url,
+      customer: cusId
+    }
+}
+
+
 module.exports = { 
   getStripeCheckoutSessionUrl,
-  getStripeCheckoutSessionUrlFromStripeObject,
-  createStripeCustomer
+  getStripeCheckoutSessionUrlFromPremiumStripeObject,
+  getStripeCheckoutSessionUrlFromPremiumLifeStripeObject,
+  createStripeCustomer,
+  searchStripeSubscriptionPaidByCusId,
+  searchStripePaymentIntentPaidByCusId,
+  expireSubscriptionStripeById
 }

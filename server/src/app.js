@@ -6,8 +6,8 @@ const cors = require("cors")
 const products_routes = require("./routes/products.js")
 const users_routes = require("./routes/users.js")
 const general_routes = require("./routes/general.js")
-const { getStripeCheckoutSessionUrl, getStripeCheckoutSessionUrlFromStripeObject } = require("./controllers/payment")
-const { registerValidUser, loginUserAuth } = require("./controllers/users") 
+const { getStripeCheckoutSessionUrl, getStripeCheckoutSessionUrlFromPremiumStripeObject, getStripeCheckoutSessionUrlFromPremiumLifeStripeObject } = require("./controllers/payment")
+const { registerValidUser, loginUserAuth, findUserBySocketId, userPayment, userUnsubscribe } = require("./controllers/users") 
 const { createRoom, updateANewPlayerRoom, updateAQuitPlayerRoom, clearRooms } = require("./controllers/room.js")
 var spectatorsCounter = 0
 
@@ -138,7 +138,8 @@ io.on("connection", (socket) => {
 /*
  *  client/user : payment request
  */
-io.on("connection", (socket) => {
+io.on("connection", async(socket) => {
+
   socket.on("pay_products", async(products) => {
     socket.emit("pay_products", await getStripeCheckoutSessionUrl(products) );
   })
@@ -146,9 +147,27 @@ io.on("connection", (socket) => {
     const donationUrl = await getStripeCheckoutSessionUrlFromStripeObject(donateStripeObject)
     socket.emit("Donate", donationUrl);
   })
-  socket.on("Premium subscription", async(subscriptionStripeObject)=> {
-    const subscriptionUrl = await getStripeCheckoutSessionUrlFromStripeObject(subscriptionStripeObject)
+  socket.on("Premium subscription", async(subscription)=> {
+    const user = await findUserBySocketId(socket.id)
+    const subscriptionUrl = await getStripeCheckoutSessionUrlFromPremiumStripeObject(subscription, user.cusId)
     socket.emit("Premium subscription", subscriptionUrl);
+  })
+
+  socket.on("Premium life subscription", async(subscription)=> {
+    const user = await findUserBySocketId(socket.id)
+    const subscriptionUrl = await getStripeCheckoutSessionUrlFromPremiumLifeStripeObject(subscription, user.cusId)
+    socket.emit("Premium life subscription", subscriptionUrl);
+  })
+
+  socket.on("User unsubscription", async() => {
+    const user = await findUserBySocketId(socket.id)
+    userUnsubscribe(user)
+    socket.emit("User unsubscription")
+  })
+
+  socket.on("User become premium", async()=> {
+    const user = await findUserBySocketId(socket.id)
+    userPayment(user)
   })
 })
 
@@ -159,7 +178,7 @@ mongoose
     server.listen(PORT)
   })
 
-  .catch((err) => {
+  .catch((err) => { 
     console.log("Impossible de démarrer le serveur !")
     console.log(err)
   })
