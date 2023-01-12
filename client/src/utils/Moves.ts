@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 
 // Joue un coup remplissant le trou, et mettant une couleur, et ajoute dans movesHistory le coup joué
 export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[], boardArray: boardType) => {
-    if (movesCount === 0 || !cell.disabled && cell.color === "orange") {
+    if (movesCount === 0 || !cell.disabled && cell.possibleMove) {
         if (!cell?.holeFilled) {
             const oldMove: Move = {
                 x: cell.x,
@@ -43,6 +43,7 @@ export const showPossibleMoves = (cell: Coord, boardArray: boardType) => {
         console.log("orange",tmpCell)
         if (tmpCell.isFilled && !tmpCell.holeFilled && !tmpCell.disabled) {
             // copy[cell.x][y].color = "orange"
+            copy[cell.x][y].possibleMove = true
             possibleMoves++
         }
     }
@@ -50,6 +51,7 @@ export const showPossibleMoves = (cell: Coord, boardArray: boardType) => {
         const tmpCell = copy[x][cell.y]
         if (tmpCell.isFilled && !tmpCell.holeFilled && !tmpCell.disabled) {
             // copy[x][cell.y].color = "orange"
+            copy[x][cell.y].possibleMove = true
             possibleMoves++
 
         }
@@ -65,15 +67,17 @@ export const removeOldPossibleMoves = (previousMove: Coord, boardArray: boardTyp
     const copy = R.clone(boardArray)
     for (let y = 0; y < 10; y++) {
         const tmpCell = copy[previousMove.x][y]
-        if (tmpCell.isFilled && !tmpCell.disabled) {
+        if (tmpCell.isFilled) {
             copy[previousMove.x][y].color = initalBoard[previousMove.x][y].color
+            copy[previousMove.x][y].possibleMove = false
             // copy[previousMove.x][y].disabled = false
         }
     }
     for (let x = 0; x < 10; x++) {
         const tmpCell = copy[x][previousMove.y]
-        if (tmpCell.isFilled && !tmpCell.disabled) {
+        if (tmpCell.isFilled) {
             copy[x][previousMove.y].color = initalBoard[x][previousMove.y].color
+            copy[x][previousMove.y].possibleMove = false
             // copy[x][previousMove.y].disabled = false
         }
     }
@@ -139,7 +143,8 @@ export interface CellType {
     y: number,
     holeColor: string,
     holeFilled: boolean,
-    disabled: boolean
+    disabled: boolean,
+    possibleMove: boolean
 }
 
 /* Interface d'un coup joué : utilisé pour le dernier coup joué

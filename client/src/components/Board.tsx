@@ -69,8 +69,6 @@ export const Board = () => {
               initialBoard
             )
           }
-          console.log(disabledIndexPads)
-          console.log("non ", boardWithDisabledPad)
 
           boardWithDisabledPad = disablePads(
             boardWithDisabledPad,
@@ -86,7 +84,6 @@ export const Board = () => {
           )
           return
         }
-        console.log("oui ou pas ? ", boardWithDisabledPad)
         // Si un coup a déjà été joué, on enlève les anciens coup possible, sinon on ne fait rien
         const boardWithoutPreviousMoves =
           movesHistory.length > 1
@@ -103,11 +100,7 @@ export const Board = () => {
           console.log("game end")
           // faire fin de jeu ici où un truc du genre dispatch ....
         }
-
-        console.log("yes", payload.boardArray[cell.x][cell.y])
-        dispatch(
-          updateMovesHistory(payload.newMovesHistory, payload.movesCount)
-        )
+        dispatch(updateMovesHistory(payload.newMovesHistory, payload.movesCount))
         dispatch(updateBoardArray(boardWithMoves.board))
       }
       return
@@ -180,6 +173,7 @@ export const Board = () => {
           holeFilled: false,
           holeColor: "white",
           disabled: false,
+          possibleMove: false,
         }
         padHistory.coord.push([x, y])
         ySet.add(y)
@@ -259,6 +253,28 @@ export const Board = () => {
 
                 {graphicPads.map((ah) =>
                   cell.x === ah.x && cell.y === ah.y ? (
+                //   }
+                //   onClick={() => {
+                //     handleBoardClick(cell)
+                //   }}
+                //   style={{
+                //     opacity: cell.disabled? 0.33 : 1,
+                //     backgroundColor: cell.isFilled
+                //       ? cell.color
+                //       : gameStarted
+                //         ? "transparent"
+                //         : "#D3D3D3",
+                //     // backgroundColor: cell.color 
+                //     //       ? cell.color
+                //     //       : "#D3D3D3",
+                //     border:
+                //       gameStarted && !cell.isFilled ? "none" : "1px red solid",
+                //   }}
+                // >
+                //   {cell.isFilled ? (
+                //     <HoleForCellule color={cell.possibleMove ? "green" : cell.holeColor}></HoleForCellule>
+                //   ) : (
+
                     <>
                       {ah.compo === "20" ? (
                         <Pad2 orientation={0} />
