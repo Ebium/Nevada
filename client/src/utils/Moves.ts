@@ -1,7 +1,5 @@
 import { boardType } from "../store/ducks/Board.ducks";
 import * as R from "ramda"
-import { Pion } from "../store/ducks/Game.ducks";
-
 
 // Joue un coup remplissant le trou, et mettant une couleur, et ajoute dans movesHistory le coup joué
 export const playMove = (cell: CellType, movesCount: number, movesHistory: Move[], boardArray: boardType, pads:Pad[]) => {

@@ -16,7 +16,7 @@ import {
   updateBoardArray,
   updateHistoryBoard,
 } from "../../store/ducks/Board.ducks"
-import { restartGame, updateDisabledIndexPads, updateGameStarted, updateMovesHistory, updatePion } from "../../store/ducks/Game.ducks"
+import { restartGame, updateDisabledIndexPads, updateGameStarted, updateMovesHistory} from "../../store/ducks/Game.ducks"
 import { useNavigate } from "react-router-dom"
 import { disablePads, enablePads, getPadIndex, removeOldPossibleMoves, showPossibleMoves } from "../../utils/Moves"
 
@@ -110,10 +110,6 @@ export const Game = () => {
     resetBoard()
     dispatch(updateGameStarted(false))
     dispatch(restartGame())
-    dispatch(updatePion({
-      pionrge : [],
-      pionble : []
-    }))
   }
 
 

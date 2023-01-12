@@ -10,16 +10,9 @@ export const enum GameActionsEnum {
 
   RESTART_GAME = "GAME/restartGame",
 
-  UPDATE_PION = "GAME/updatePion"
 }
 
 
-
-
-export const updatePion = (pion : Pion) => ({
-  type : GameActionsEnum.UPDATE_PION,
-  pion
-} as const)
 export const updateGameStarted = (bool: boolean) =>
 ({
   type: GameActionsEnum.UPDATE_GAME_STARTED,
@@ -52,13 +45,8 @@ type GameActionsType = ReturnType<
   | typeof updatePads
   | typeof updateDisabledIndexPads
   | typeof restartGame
-  | typeof updatePion
 >
 
-export interface Pion {
-  pionrge : Coord[]
-  pionble : Coord[]
-}
 export interface GameState {
   started: boolean
 
@@ -76,7 +64,6 @@ export interface GameState {
                               // dès qu'un coup est joué, la palette sera désactivée, son indice sera mis dans la file
                               // lorsque la taille dépasse 2, le premier arrivé quitte la file 
                               //  FIFO
-  pion : Pion
 }
 
 export const gameInitialState: GameState = {
@@ -86,10 +73,7 @@ export const gameInitialState: GameState = {
   movesCount: 0, 
   pads: [],
   disabledIndexPads: [],
-  pion: {
-    pionrge : [],
-    pionble : []
-    }
+
 }
 
 export function GameReducer(
@@ -107,8 +91,6 @@ export function GameReducer(
       return { ...state, pads: action.pads }
     case GameActionsEnum.UPDATE_DISABLED_INDEX_PADS:
       return { ...state, disabledIndexPads: action.disabledIndexPads }
-    case GameActionsEnum.UPDATE_PION:
-      return { ...state, pion: action.pion}
     default:
       return { ...state }
   }
