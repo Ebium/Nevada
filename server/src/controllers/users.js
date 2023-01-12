@@ -1,8 +1,7 @@
-
 require("dotenv").config()
 const User = require("../models/User.js")
 const Stripe = require("stripe")
-const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY);
+const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY)
 const { matchPassword } = require("./password")
 const { createStripeCustomer } = require("./payment")
 
@@ -17,11 +16,11 @@ const findUsers = (req, res) => {
 }
 
 const get_current_user = (req, res) => {
-    console.log(req.params)
-    User.findOne({email: req.params.email})
+  console.log(req.params)
+  User.findOne({ email: req.params.email })
     .then((result) => res.status(200).json({ result }))
     .catch((error) => res.status(500).json({ msg: error }))
-  }
+}
 
 const findUserById = async (userId) => {
   return User.findOne({ _id: userId })
@@ -53,6 +52,34 @@ const findUserBySocketId = async (socketId) => {
       return result
     })
     .catch((error) => console.log(error))
+}
+
+const findUsersForRanking1 = (req, res) => {
+  const sortOption = { played: 1 }
+  const result = User.find({}).toArray
+  return res.status(200).json({ result })
+}
+
+const findUsersForRanking = (req, res) => {
+  User.find({})
+    .then((result) => {
+      let player1
+      let player2
+      let player3
+
+      const sortedResult = result.sort(function (a, b) {
+        return a.won > b.won ? -1 : 1
+      })
+
+      if (sortedResult.length >= 1) player1 = sortedResult[0]
+
+      if (sortedResult.length >= 2) player2 = sortedResult[1]
+
+      if (sortedResult.length >= 3) player3 = sortedResult[2]
+
+      return res.status(200).json([player1, player2, player3 ])
+    })
+    .catch((error) => res.status(500).json({ msg: error }))
 }
 
 /* ========================================
@@ -122,10 +149,9 @@ const userExist = async (user) => {
 }
 
 //à modifier
-const userIsConnected = async(user) => {
+const userIsConnected = async (user) => {
   const userDB = await findUserByEmail(user.email)
-  if(userDB==null)
-  return false
+  if (userDB == null) return false
 
   const userSocketId = userDB.socketId
 
@@ -152,7 +178,7 @@ const registerValidUser = async (user) => {
 
 /*
  *  if email and password
- *  match with the database 
+ *  match with the database
  *  and is not connected
  *  update user in database
  *  return user
@@ -164,7 +190,7 @@ const loginUserAuth = async (user) => {
   if (!(await userAccountPasswordMatch(user.email, user.password)))
     return "Your password is incorrect."
 
-  if(await userIsConnected(user)) {
+  if (await userIsConnected(user)) {
     return "The account is already connected."
   }
 
@@ -173,7 +199,7 @@ const loginUserAuth = async (user) => {
   var userEdited = userFind
   userEdited.socketId = user.socketId
   const userUpdated = await updateUser(userEdited)
-  
+
   return await findUserByEmail(user.email)
 }
 
@@ -181,14 +207,14 @@ const loginUserAuth = async (user) => {
     User Object type 
 ********************************************/
 
-const createNewUserObject = async(user) => {
+const createNewUserObject = async (user) => {
   const cus = await createStripeCustomer(user)
   return {
     email: user.email,
     password: user.password,
     pseudo: user.pseudo,
-    cusId : cus.id,
-    socketId : user.socketId
+    cusId: cus.id,
+    socketId: user.socketId,
   }
 }
 
@@ -196,5 +222,6 @@ module.exports = {
   loginUserAuth,
   registerValidUser,
   get_current_user,
-  findUsers
+  findUsers,
+  findUsersForRanking,
 }
