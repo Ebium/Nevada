@@ -42,7 +42,7 @@ export const Game2 = () => {
 
   const gameCode = "randomCode"
   const [gameType, setGameType] = useState<
-    "boarding" | "building" | "playing" | "test"
+    "boarding" | "building" | "playing" | "test" | "finished"
   >("boarding")
 
   const copyToClipboard = () => {

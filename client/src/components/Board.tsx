@@ -103,6 +103,8 @@ export const Board = () => {
           let pointsFirstPlayer = 0
           let pointsSecondPlayer = 0
 
+
+          //parcours des tuiles pour déterminer sur chacune le joueur avec le plus de pion
           pads.forEach((tui) => {
             if (tui.firstPlayerCounter > tui.secondPlayerCounter) {
               pointsFirstPlayer += tui.xCoords.length * tui.yCoords.length
@@ -111,7 +113,8 @@ export const Board = () => {
               pointsSecondPlayer += tui.xCoords.length * tui.yCoords.length
             }
           })
-
+          
+          //actualisation des variables globales
           dispatch(updatePointEnd(pointsFirstPlayer, pointsSecondPlayer))
 
           console.log(

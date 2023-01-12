@@ -45,6 +45,8 @@ export const Game = () => {
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
   const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
+  const pointsFirstPlayer = useNevadaSelector((state) => state.game.pointsFirstPlayer)
+  const pointsSecondPlayer = useNevadaSelector((state) => state.game.pointsSecondPlayer)
   const pads = useNevadaSelector((state) => state.game.pads)
   const disabledIndexPads = useNevadaSelector(
     (state) => state.game.disabledIndexPads
@@ -217,6 +219,20 @@ export const Game = () => {
     if (!gameStarted) {
       dispatch(updateGameStarted(true))
       dispatch(initializeInitialBoard(board))
+    }
+  }
+
+
+  //fonction retournant le pseudo du gagnant
+  const endGame = () => {
+    if (pointsFirstPlayer>pointsSecondPlayer){
+      return ""
+    }
+    if (pointsFirstPlayer<pointsSecondPlayer){
+      return ""
+    }
+    else{
+      return ""
     }
   }
 

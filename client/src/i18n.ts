@@ -141,4 +141,6 @@ export const translations = {
   "game.playing.games.serie": "Série de victoire : {data}",
   "game.playing.remaining": "Pions restants : {data}",
 
+  "endmodal.winner": "Le joueur {data} a gagné",
+  "endmodal.equals": "Aucun joueur n'est gagnant"
 }
