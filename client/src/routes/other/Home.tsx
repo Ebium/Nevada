@@ -374,7 +374,7 @@ export const Home = () => {
                 textId={
                   "home.center.card.online.player-stats.content.created-at"
                 }
-                data={userCreatedAt}
+                data={userCreatedAt.slice(0,10)}
               />
             </>
           ) : (

@@ -143,7 +143,7 @@ export const updateUserThunk =
             createdAt: data.result.createdAt,
             premium: data.result.premium,
             premiumLifeTime: data.result.premiumLifeTime,
-            nbPlayed: data.result.nbPlayed,
+            nbPlayed: data.result.played,
             won: data.result.won,
             winStreak: data.result.winStreak,
             colorPseudo: data.result.colorPseudo,
