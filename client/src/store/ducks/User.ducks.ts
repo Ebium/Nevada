@@ -102,7 +102,7 @@ export const updateUserThunk =
   (email: string) => (dispatch: Dispatch<AnyAction>) => {
     dispatch(updateUserLoading())
     return axios
-      .get(`http://localhost:5050/users/${email}`)
+      .get(`/users/${email}`)
       .then(({ data }: AxiosResponse) => {
         console.log(data)
         data.result.premium = true
