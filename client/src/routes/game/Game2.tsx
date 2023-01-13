@@ -111,10 +111,10 @@ export const Game2 = ({ gameCode }: GameProps) => {
         dispatch(updateGameStarted(false))
       }
     }
-    socket.on("Winner user", (pseudoWinner)=> {
+    socket.on("Winner user", (pseudoWinner) => {
       setWinner(pseudoWinner)
       setDisplayed(true)
-      console.log("winner : " ,pseudoWinner)
+      console.log("winner : ", pseudoWinner)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [droppedCounter])
@@ -124,7 +124,6 @@ export const Game2 = ({ gameCode }: GameProps) => {
   })
 
   useEffect(() => {
- 
     socket.on("emitGameStarted", () => {
       dispatch(updateGameStarted(true))
     })
@@ -179,8 +178,6 @@ export const Game2 = ({ gameCode }: GameProps) => {
         )
       )
     })
-
-    
   }, [dispatch, droppedCounter, displayed])
 
   const changeCurrentPad = (
@@ -302,6 +299,14 @@ export const Game2 = ({ gameCode }: GameProps) => {
 
   return (
     <Content>
+      <EndGameModal
+        isDisplayed={displayed}
+        onClose={() => {
+          navigate("/main")
+          window.location.reload()
+        }}
+        winner={winner}
+      />
       <LeftBar leftbarcollapsed={leftBarCollapsed ? 1 : 0}>
         <StyledMenuCollapseSVG
           leftbarcollapsed={leftBarCollapsed ? 1 : 0}
@@ -810,13 +815,6 @@ export const Game2 = ({ gameCode }: GameProps) => {
             </>
           )}
         </MidDivGame>
-        <EndGameModal 
-          isDisplayed={displayed} 
-          onClose={()=> {
-            navigate("/main")
-            window.location.reload()
-          }} 
-          winner={winner}/>
       </MidDiv>
     </Content>
   )
