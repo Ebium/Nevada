@@ -1,5 +1,4 @@
-import { GraphicPad, Move, Pad } from "../../utils/Moves"
-import { UserInfos } from "./User.ducks"
+import { Move, Pad } from "../../utils/Moves"
 export const enum GameActionsEnum {
   UPDATE_GAME_STARTED = "GAME/updateGameStarted",
 

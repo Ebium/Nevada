@@ -9,44 +9,45 @@ import { NVSpacer } from "./styles/NVSpacer"
 
 interface EndProps {
   isDisplayed: boolean
-  winner : string
+  winner: string
   onClose: () => void
 }
 
 //Modal s'affichant à la fin de la partie pour signaler qui est le gagnant
 export const EndGameModal = ({ isDisplayed, onClose, winner }: EndProps) => {
-
   const intl = useIntl()
   const navigate = useNavigate()
   return (
     <>
       <Content isDisplayed={isDisplayed}>
         <TheCard>
-            <NVText
-              text={intl.formatMessage({
-                id : winner !== "" ? "endmodal.winner" : "endmodal.equals"
+          <NVText
+            text={intl.formatMessage(
+              {
+                id: winner !== "" ? "endmodal.winner" : "endmodal.equals",
               },
               {
-                data : winner
-              })} 
-              textStyle={{
+                data: winner,
+              }
+            )}
+            textStyle={{
               color: "white",
-              }}
-            />
-            <NVSpacer/>
-            <NVButton
-                disabled={false}
-                content={"Retour à l'accueil"}
-                colorSchem={"black"}
-                onClick={() => {
-                  navigate("/main/home")
-                }}
-              />
-            <ClosePlace
-              onClick={() => {
-                onClose()
-              }}
-            >
+            }}
+          />
+          <NVSpacer />
+          <NVButton
+            disabled={false}
+            content={"Retour à l'accueil"}
+            colorSchem={"black"}
+            onClick={() => {
+              navigate("/main/home")
+            }}
+          />
+          <ClosePlace
+            onClick={() => {
+              onClose()
+            }}
+          >
             <CloseCross />
           </ClosePlace>
         </TheCard>
