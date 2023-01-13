@@ -34,6 +34,7 @@ import {
   StyledWinSerieSVG,
 } from "../../components/styles/CommonSvg"
 import { Board } from "../../components/Board"
+import { EndGameModal } from "../../components/EndGameModal"
 import { useDispatch } from "react-redux"
 import { useNevadaSelector } from "../../store/rootReducer"
 import {
@@ -62,6 +63,7 @@ import {
   updateHistoryBoard,
   updateGraphicPads,
 } from "../../store/ducks/Board.ducks"
+import { truncate } from "fs"
 
 interface GameProps {
   gameCode: string
@@ -93,16 +95,42 @@ export const Game2 = ({ gameCode }: GameProps) => {
 
   const [leftBarCollapsed, setLeftBarCollapsed] = useState(false)
   const [users, setUsers] = useState([socket.id])
+  const [displayed, setDisplayed] = useState(false)
+  const [winner, setWinner] = useState("")
 
   const [currentBuildingPad, setCurrentBuildingPad] = useState<ReactNode>(<></>)
+<<<<<<< Updated upstream
   const [currentPadOrientation, setCurrentPadOrientation] =
     useState<boolean>(false)
+=======
+
+  useEffect(() => {
+    if (droppedCounter === 17) {
+      socket.emit("GameStarted")
+      // dispatch(updateGameStarted(true))
+    } else {
+      if (gameStarted) {
+        dispatch(updateGameStarted(false))
+      }
+    }
+    socket.on("Winner user", (pseudoWinner)=> {
+      setWinner(pseudoWinner)
+      setDisplayed(true)
+      console.log("winner : " ,pseudoWinner)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [droppedCounter])
+>>>>>>> Stashed changes
 
   socket.on("update playerId", (playId) => {
     dispatch(updatePlayerId(playId))
   })
 
   useEffect(() => {
+<<<<<<< Updated upstream
+=======
+ 
+>>>>>>> Stashed changes
     socket.on("emitGameStarted", () => {
       dispatch(updateGameStarted(true))
     })
@@ -158,10 +186,15 @@ export const Game2 = ({ gameCode }: GameProps) => {
       )
     })
 
+<<<<<<< Updated upstream
     socket.on("emit pad rotated", () => {
       setCurrentPadOrientation(!currentPadOrientation)
     })
   }, [dispatch, droppedCounter])
+=======
+    
+  }, [dispatch, droppedCounter, displayed])
+>>>>>>> Stashed changes
 
   const changeCurrentPad = (
     nbTrous: number,
@@ -790,6 +823,13 @@ export const Game2 = ({ gameCode }: GameProps) => {
             </>
           )}
         </MidDivGame>
+        <EndGameModal 
+          isDisplayed={displayed} 
+          onClose={()=> {
+            navigate("/main")
+            window.location.reload()
+          }} 
+          winner={winner}/>
       </MidDiv>
     </Content>
   )

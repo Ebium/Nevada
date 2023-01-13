@@ -12,6 +12,8 @@ const Room = () => {
   const homeURL = "http://localhost:3000/nevada/main/home" //update URL of home
   const [users, setUsers] = useState([socket.id])
   const playerId = useNevadaSelector((state) => state.game.playerId)
+  const game = useNevadaSelector((state) => state.game)
+
 
   useEffect(() => {
     askJoinRoom()
@@ -23,13 +25,15 @@ const Room = () => {
   useEffect(() => {
     
 
-    socket.once("Player abandon", () => {
+    socket.on("Player abandon", (playerId) => {
       //je suis le joueur gagnant
       if (playerId >= 0) {
-        socket.emit("Winner room", playerId)
+        console.log("WESH WESH")
+        if(playerId==0)
+          socket.emit("Winner room", playerId, game.player2.pseudo)
+        else
+          socket.emit("Winner room", playerId, game.player1.pseudo)
       }
-      console.log("joueur abandonné looser")
-      //affichage du joueur gagnant à l'écran
     })
 
     socket.on("Room invalid", (message) => {
