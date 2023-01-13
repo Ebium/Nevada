@@ -103,7 +103,7 @@ export const Game2 = () => {
               navigate("/main")
             }}
           />
-
+          {/* 
           <NVSpacer height={3} />
           <NVButton
             disabled={false}
@@ -139,27 +139,26 @@ export const Game2 = () => {
             onClick={() => {
               setGameType("test")
             }}
-          />
+          /> */}
           <LeftBarButtons>
             <RulesButton />
           </LeftBarButtons>
         </LeftBarContent>
       </LeftBar>
       <MidDiv leftbarcollapsed={leftBarCollapsed ? 1 : 0}>
-        <MidDivContent leftbarcollapsed={leftBarCollapsed ? 1 : 0}>
-          <MidDivTopBar>
-            <NVBar
-              text="game.code"
-              data={gameCode}
-              clickable
-              onClick={copyToClipboard}
-            />
-          </MidDivTopBar>
-          <MidDivGame>
-            {gameType === "boarding" ? (
-              <>
-                <BoardingDiv>
-                  <NVSpacer height={3} />
+        <MidDivTopBar>
+          <NVBar
+            text="game.code"
+            data={gameCode}
+            clickable
+            onClick={copyToClipboard}
+          />
+        </MidDivTopBar>
+        <MidDivGame>
+          {gameType === "boarding" ? (
+            <>
+              <BoardingDiv>
+                <MarginAutoDiv>
                   <NVText
                     text={intl.formatMessage({ id: "game.boarding.title" })}
                     textStyle={{
@@ -170,7 +169,8 @@ export const Game2 = () => {
                     }}
                     width={50}
                   />
-                  <NVSpacer height={5} />
+                </MarginAutoDiv>
+                <MarginAutoDiv>
                   <NVBar
                     text="game.boarding.build"
                     data={gameCode}
@@ -180,73 +180,85 @@ export const Game2 = () => {
                     }}
                     svg={<BoardBuildSVG />}
                   />
-                  <NVSpacer height={2} />
+                </MarginAutoDiv>
+                <MarginAutoDiv>
                   <NVBar
                     text="game.boarding.preset"
                     data={gameCode}
                     svg={<PresetSVG />}
                   />
-                  <NVSpacer height={4} />
-                  <NVLine width={80} height={0.15} />
-                  <NVSpacer height={4} />
-                  <PresetsDiv>
-                    <Preset1SVG
-                      onClick={() => {
-                        pickBoardPreset(1)
-                      }}
-                      cursor={"pointer"}
-                    />
-                    <Preset2SVG
-                      onClick={() => {
-                        pickBoardPreset(2)
-                      }}
-                      cursor={"pointer"}
-                    />
-                    <Preset3SVG
-                      onClick={() => {
-                        pickBoardPreset(3)
-                      }}
-                      cursor={"pointer"}
-                    />
-                  </PresetsDiv>
-                </BoardingDiv>
-              </>
-            ) : gameType === "building" ? (
-              <>
-                <MidDivMidSection>
-                  <BoardDiv />
-                </MidDivMidSection>
-                <NVSpacer width={4} />
+                </MarginAutoDiv>
+                <MarginAutoDiv></MarginAutoDiv>
+                <PresetsDiv>
+                  <Preset1SVG
+                    onClick={() => {
+                      pickBoardPreset(1)
+                    }}
+                    cursor={"pointer"}
+                    height={336}
+                    width={336}
+                  />
+                  <Preset2SVG
+                    onClick={() => {
+                      pickBoardPreset(2)
+                    }}
+                    cursor={"pointer"}
+                    height={336}
+                    width={336}
+                  />
+                  <Preset3SVG
+                    onClick={() => {
+                      pickBoardPreset(3)
+                    }}
+                    cursor={"pointer"}
+                    height={336}
+                    width={336}
+                  />
+                </PresetsDiv>
+              </BoardingDiv>
+            </>
+          ) : gameType === "building" ? (
+            <>
+              <MidDivMidSection>
+                <Board />
+              </MidDivMidSection>
+              <NVSpacer width={4} />
 
-                <MidDivRightSection>
+              <MidDivRightSection>
+                <RowStyle>
                   <NVBar
                     text="game.building.reset"
                     data={gameCode}
                     svg={<ResetSVG />}
+                    width={9}
                     clickable={nbPad !== 17}
                     fillsvg={nbPad === 17 ? "red" : "green"}
                   />
-                  <NVSpacer height={1} />
+                  <NVSpacer width={1} />
                   <NVBar
                     text="game.building.undo"
                     data={gameCode}
                     svg={<UndoSVG />}
+                    width={9}
                     clickable={nbPad !== 17}
                     fillsvg={nbPad === 17 ? "red" : "green"}
                   />
-                  <NVSpacer height={1} />
+                </RowStyle>
+                <NVSpacer height={1} />
+                <RowStyle>
                   <NVBar
                     text="game.building.rotate-pad"
                     data={gameCode}
                     svg={<PadRotateSVG />}
+                    width={9}
                     clickable={nbPad !== 17}
                     fillsvg={nbPad === 17 || nbPad === 0 ? "red" : "green"}
                   />
-                  <NVSpacer height={1} />
                   <NVBar
                     text="game.building.start-game"
                     data={gameCode}
                     svg={<GameStartSVG />}
+                    width={9}
                     clickable={nbPad === 0}
                     fillsvg={nbPad === 0 ? "green" : "red"}
                     onClick={() => {
@@ -254,226 +266,229 @@ export const Game2 = () => {
                       console.log(nbPad)
                     }}
                   />
-                  <NVSpacer height={1} />
-                  <NVText
-                    text={intl.formatMessage({
-                      id: "game.building.pad.preview",
-                    })}
-                    textStyle={{
-                      color: "white",
-                    }}
-                  />
-                  <NVSpacer height={1} />
-                  <PadPreview>{currentPad}</PadPreview>
-                  <NVSpacer height={1} />
-                  <NVText
-                    text={intl.formatMessage({
-                      id: "game.building.pad.select",
-                    })}
-                    textStyle={{
-                      color: "white",
-                    }}
-                  />
-                  <NVSpacer height={1} />
-                  <PadsDiv>
-                    <PadRow>
-                      <StyledPad2SVG
-                        onClick={() => {
-                          handlePadChoiceClick(<StyledPad2SVG />)
-                        }}
-                      />
-                      <NVText
-                        text={intl.formatMessage(
-                          {
-                            id: "game.building.pad.remaining",
-                          },
-                          { data: -1 }
-                        )}
-                        textStyle={{
-                          color: "white",
-                        }}
-                      />
-                    </PadRow>
-                    <PadRow>
-                      <StyledPad4SVG
-                        onClick={() => {
-                          handlePadChoiceClick(<StyledPad4SVG />)
-                        }}
-                      />
-                      <NVText
-                        text={intl.formatMessage(
-                          {
-                            id: "game.building.pad.remaining",
-                          },
-                          { data: -1 }
-                        )}
-                        textStyle={{
-                          color: "white",
-                        }}
-                      />
-                    </PadRow>
-                    <PadRow>
-                      <StyledPad3SVG
-                        onClick={() => {
-                          handlePadChoiceClick(<StyledPad3SVG />)
-                          setNbPad(nbPad - 1)
-                        }}
-                      />
-                      <NVText
-                        text={intl.formatMessage(
-                          {
-                            id: "game.building.pad.remaining",
-                          },
-                          { data: -1 }
-                        )}
-                        textStyle={{
-                          color: "white",
-                        }}
-                      />
-                    </PadRow>
-                    <PadRow>
-                      <StyledPad6SVG
-                        onClick={() => {
-                          handlePadChoiceClick(<StyledPad6SVG />)
-                        }}
-                      />
-                      <NVText
-                        text={intl.formatMessage(
-                          {
-                            id: "game.building.pad.remaining",
-                          },
-                          { data: -1 }
-                        )}
-                        textStyle={{
-                          color: "white",
-                        }}
-                      />
-                    </PadRow>
-                  </PadsDiv>
-                </MidDivRightSection>
-              </>
-            ) : gameType === "playing" ? (
-              <>
-                <MidDivMidSection>
-                  <BoardDiv />
-                </MidDivMidSection>
-
-                <NVSpacer width={4} />
-                <MidDivRightSection>
-                  <NVText
-                    text={intl.formatMessage(
-                      {
-                        id: "game.playing.actual-turn",
-                      },
-                      { data: "random" }
-                    )}
-                    textStyle={{
-                      color: "nevadaGold",
-                      fontSize: 1.8,
-                    }}
-                  />
-                  <NVSpacer height={2} />
-                  <NVLine width={17} />
-                  <NVSpacer height={2} />
-                  <NVBar
-                    text="game.playing.player.1"
-                    svg={<UserOctagonSVG />}
-                    clickable
-                  />
-                  <NVSpacer height={1} />
-                  <NVText
-                    text={"pseudo 1"}
-                    textStyle={{
-                      color: "white",
-                      fontSize: 1.2,
-                      fontWeight: 800,
-                    }}
-                  />
-                  <NVSpacer height={1} />
-
-                  {UserInfoRow(
-                    <StyledStatsSVG />,
-                    "game.playing.games.played",
-                    -1
-                  )}
-                  {UserInfoRow(
-                    <StyledGamesWinSVG />,
-                    "game.playing.games.won",
-                    -1
-                  )}
-                  {UserInfoRow(
-                    <StyledGamesLostSVG />,
-                    "game.playing.games.lost",
-                    -1
-                  )}
-                  {UserInfoRow(
-                    <StyledWinSerieSVG />,
-                    "game.playing.games.serie",
-                    -1
-                  )}
-                  <NVBar
-                    text="game.playing.remaining"
-                    data={-1}
-                    svg={<PionSVG />}
-                    clickable
-                  />
-
-                  <NVSpacer height={2} />
-                  <NVLine width={17} />
-
-                  <NVSpacer height={2} />
-                  <NVBar
-                    text="game.playing.player.2"
-                    svg={<UserOctagonSVG />}
-                    clickable
-                  />
-                  <NVSpacer height={1} />
-                  <NVText
-                    text={"pseudo 2"}
-                    textStyle={{
-                      color: "white",
-                      fontSize: 1.2,
-                      fontWeight: 800,
-                    }}
-                  />
-                  <NVSpacer height={1} />
-                  {UserInfoRow(
-                    <StyledStatsSVG />,
-                    "game.playing.games.played",
-                    -1
-                  )}
-                  {UserInfoRow(
-                    <StyledGamesWinSVG />,
-                    "game.playing.games.won",
-                    -1
-                  )}
-                  {UserInfoRow(
-                    <StyledGamesLostSVG />,
-                    "game.playing.games.lost",
-                    -1
-                  )}
-                  {UserInfoRow(
-                    <StyledWinSerieSVG />,
-                    "game.playing.games.serie",
-                    -1
-                  )}
-                  <NVBar
-                    text="game.playing.remaining"
-                    data={-1}
-                    svg={<PionSVG />}
-                    clickable
-                  />
-                  <NVSpacer height={2} />
-                  <NVLine width={17} />
-                </MidDivRightSection>
-              </>
-            ) : (
-              <>
+                </RowStyle>
+                <NVSpacer height={1} />
+                <NVText
+                  text={intl.formatMessage({
+                    id: "game.building.pad.preview",
+                  })}
+                  textStyle={{
+                    color: "white",
+                  }}
+                />
+                <NVSpacer height={1} />
+                <PadPreview>{currentPad}</PadPreview>
+                <NVSpacer height={1} />
+                <NVText
+                  text={intl.formatMessage({
+                    id: "game.building.pad.select",
+                  })}
+                  textStyle={{
+                    color: "white",
+                  }}
+                />
+                <NVSpacer height={1} />
+                <PadsDiv>
+                  <PadRow>
+                    <StyledPad2SVG
+                      onClick={() => {
+                        handlePadChoiceClick(<StyledPad2SVG />)
+                      }}
+                    />
+                    <NVText
+                      text={intl.formatMessage(
+                        {
+                          id: "game.building.pad.remaining",
+                        },
+                        { data: -1 }
+                      )}
+                      textStyle={{
+                        color: "white",
+                      }}
+                    />
+                  </PadRow>
+                  <PadRow>
+                    <StyledPad4SVG
+                      onClick={() => {
+                        handlePadChoiceClick(<StyledPad4SVG />)
+                      }}
+                    />
+                    <NVText
+                      text={intl.formatMessage(
+                        {
+                          id: "game.building.pad.remaining",
+                        },
+                        { data: -1 }
+                      )}
+                      textStyle={{
+                        color: "white",
+                      }}
+                    />
+                  </PadRow>
+                  <PadRow>
+                    <StyledPad3SVG
+                      onClick={() => {
+                        handlePadChoiceClick(<StyledPad3SVG />)
+                        setNbPad(nbPad - 1)
+                      }}
+                    />
+                    <NVText
+                      text={intl.formatMessage(
+                        {
+                          id: "game.building.pad.remaining",
+                        },
+                        { data: -1 }
+                      )}
+                      textStyle={{
+                        color: "white",
+                      }}
+                    />
+                  </PadRow>
+                  <PadRow>
+                    <StyledPad6SVG
+                      onClick={() => {
+                        handlePadChoiceClick(<StyledPad6SVG />)
+                      }}
+                    />
+                    <NVText
+                      text={intl.formatMessage(
+                        {
+                          id: "game.building.pad.remaining",
+                        },
+                        { data: -1 }
+                      )}
+                      textStyle={{
+                        color: "white",
+                      }}
+                    />
+                  </PadRow>
+                </PadsDiv>
+              </MidDivRightSection>
+            </>
+          ) : gameType === "playing" ? (
+            <>
+              <MidDivMidSection>
                 <Board />
-              </>
-            )}
-          </MidDivGame>
-        </MidDivContent>
+              </MidDivMidSection>
+
+              <NVSpacer width={4} />
+              <MidDivRightSection>
+                <NVText
+                  text={intl.formatMessage(
+                    {
+                      id: "game.playing.actual-turn",
+                    },
+                    { data: "random" }
+                  )}
+                  textStyle={{
+                    color: "nevadaGold",
+                    fontSize: 1.8,
+                  }}
+                />
+                <NVSpacer height={2} />
+                <NVLine width={17} />
+                <NVSpacer height={1} />
+                <NVBar
+                  text="game.playing.player.1"
+                  svg={<UserOctagonSVG />}
+                  bottomrightB={0}
+                  topleftB={0}
+                />
+                <NVSpacer height={0.5} />
+                <NVText
+                  text={"pseudo 1"}
+                  textStyle={{
+                    color: "white",
+                    fontSize: 1.2,
+                    fontWeight: 800,
+                  }}
+                />
+                <NVSpacer height={0.5} />
+
+                {UserInfoRow(
+                  <StyledStatsSVG />,
+                  "game.playing.games.played",
+                  -1
+                )}
+                {UserInfoRow(
+                  <StyledGamesWinSVG />,
+                  "game.playing.games.won",
+                  -1
+                )}
+                {UserInfoRow(
+                  <StyledGamesLostSVG />,
+                  "game.playing.games.lost",
+                  -1
+                )}
+                {UserInfoRow(
+                  <StyledWinSerieSVG />,
+                  "game.playing.games.serie",
+                  -1
+                )}
+                <NVBar
+                  text="game.playing.remaining"
+                  data={-1}
+                  svg={<PionSVG />}
+                  bottomleftB={0}
+                  toprightB={0}
+                />
+
+                <NVSpacer height={1} />
+                <NVLine width={17} />
+                <NVSpacer height={1} />
+
+                <NVBar
+                  text="game.playing.player.2"
+                  svg={<UserOctagonSVG />}
+                  bottomrightB={0}
+                />
+                <NVSpacer height={0.5} />
+                <NVText
+                  text={"pseudo 2"}
+                  textStyle={{
+                    color: "white",
+                    fontSize: 1.2,
+                    fontWeight: 800,
+                  }}
+                />
+                <NVSpacer height={0.5} />
+                {UserInfoRow(
+                  <StyledStatsSVG />,
+                  "game.playing.games.played",
+                  -1
+                )}
+                {UserInfoRow(
+                  <StyledGamesWinSVG />,
+                  "game.playing.games.won",
+                  -1
+                )}
+                {UserInfoRow(
+                  <StyledGamesLostSVG />,
+                  "game.playing.games.lost",
+                  -1
+                )}
+                {UserInfoRow(
+                  <StyledWinSerieSVG />,
+                  "game.playing.games.serie",
+                  -1
+                )}
+                <NVBar
+                  text="game.playing.remaining"
+                  data={-1}
+                  svg={<PionSVG />}
+                  bottomleftB={0}
+                  toprightB={0}
+                />
+                <NVSpacer height={1} />
+                <NVLine width={17} />
+              </MidDivRightSection>
+            </>
+          ) : (
+            <>
+              <Board />
+            </>
+          )}
+        </MidDivGame>
       </MidDiv>
     </Content>
   )
@@ -490,16 +505,13 @@ const Content = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  overflow: auto;
 `
 const LeftBar = styled.div<LeftBarProps>`
   width: ${({ leftbarcollapsed }) => (leftbarcollapsed ? "0" : "15rem")};
   transition: 0.1s all ease-in-out 0.1s;
   height: 100%;
   background-color: ${colors.topGrey};
-
-  @media (max-width: 1000px) {
-    background-color: red;
-  }
 `
 const LeftBarContent = styled.div<LeftBarProps>`
   transition: 0.1s all ease-in-out 0.1s;
@@ -547,43 +559,50 @@ const StyledNevadaLogo = styled(NevadaLogo)<LeftBarProps>`
 const LeftBarButtons = styled.div`
   position: absolute;
   bottom: 1rem;
+  @media (max-height: 320px) {
+    position: unset;
+    padding-top: 1rem;
+  }
 `
 const MidDiv = styled.div<LeftBarProps>`
   transition: all 0.1s ease-in-out;
-  width: ${({ leftbarcollapsed }) => (leftbarcollapsed ? "100vw" : "95%")};
-  height: ${({ leftbarcollapsed }) => (leftbarcollapsed ? "95vh" : "95%")};
+  width: 100%;
+  height: 96%;
   margin: ${({ leftbarcollapsed }) => (leftbarcollapsed ? "3rem" : "1rem")};
   display: flex;
   flex-direction: column;
-`
-const MidDivContent = styled.div<LeftBarProps>`
-  width: 100%;
-  height: 100%;
+  background-color: green;
 `
 const MidDivTopBar = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding-bottom: 2rem;
+  padding-bottom: 1rem;
 `
 const MidDivGame = styled.div`
   width: 100%;
+  height: 100%;
   display: flex;
-  align-items: center;
   flex-direction: row;
   justify-content: center;
+  overflow-y: auto;
 `
 const BoardingDiv = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  min-height: 100%;
+  width: 90%;
 `
 const PresetsDiv = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  width: 100%;
+  width: 80%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 21rem);
+  grid-template-rows: repeat(auto-fill, 21rem);
+  grid-column-gap: 3rem;
+  grid-row-gap: 1rem;
+  justify-content: center;
+  margin: auto;
 `
 const MidDivMidSection = styled.div`
   display: flex;
@@ -591,25 +610,20 @@ const MidDivMidSection = styled.div`
   justify-content: center;
   height: 100%;
   width: fit-content;
-`
-const BoardDiv = styled.div`
-  border: 2px solid ${colors.nevadaGold};
-  box-shadow: 0px 0px 10px 2px ${colors.nevadaGold};
-  width: 50rem;
-  height: 50rem;
+  margin: auto;
 `
 const MidDivRightSection = styled.div`
-  height: 100%;
+  height: fit-content;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  margin: auto;
 `
 const PadPreview = styled.div`
   border: 2px solid ${colors.nevadaGold};
   box-shadow: 0px 0px 10px 2px ${colors.nevadaGold};
-  height: 13rem;
-  width: 17rem;
+  min-height: 13rem;
+  min-width: 17rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -649,18 +663,21 @@ const StyledPad6SVG = styled(Pad6SVG)`
 const UserInfosRow = styled.div`
   display: flex;
   flex-direction: row;
-  margin-bottom: 1rem;
+  margin-bottom: 13px;
   align-items: center;
   width: 90%;
 `
-const LaGrid = styled.div`
-  margin: 0;
-  padding: 0;
-  width: 1000px;
+
+const MarginAutoDiv = styled.div`
+  margin: auto;
+  text-align: center;
+  @media (max-height: 1050px) {
+    margin: 1rem;
+  }
+`
+const RowStyle = styled.div`
   display: flex;
   flex-direction: row;
-  gridtemplatecolumns: repeat(auto-fill, 25px);
-  gridautorows: 1000px;
-  justify-content: center;
-  background-color: green;
+  justify-content: space-between;
+  width: 100%;
 `
