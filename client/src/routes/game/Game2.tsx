@@ -42,6 +42,7 @@ import {
   updateGamePhase,
   updateGameStarted,
   updatePads,
+  updatePlayerId,
   updatePlayersInfos,
   updatePointEnd,
 } from "../../store/ducks/Game.ducks"
@@ -83,6 +84,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
   const graphicPads = useNevadaSelector((state) => state.board.graphicPads)
   const player1Infos = useNevadaSelector((state) => state.game.player1)
   const player2Infos = useNevadaSelector((state) => state.game.player2)
+  const userPseudo = useNevadaSelector((state) => state.user.pseudo)
   console.log(player1Infos)
   console.log(player2Infos)
   const disabledIndexPads = useNevadaSelector(
@@ -111,7 +113,15 @@ export const Game2 = ({ gameCode }: GameProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [droppedCounter])
 
+  socket.on("update playerId", (playId) => {
+    console.log("allooooo ",playId)
+    dispatch(updatePlayerId(playId))
+  })
+  
+
   useEffect(() => {
+
+ 
     socket.on("emitGameStarted", () => {
       dispatch(updateGameStarted(true))
     })
@@ -148,14 +158,26 @@ export const Game2 = ({ gameCode }: GameProps) => {
     })
 
     socket.on("players info", (user1, user2) => {
-      console.log("uahziruhaiuzhruiahzr")
-      console.log(user1)
-      console.log(user2)
-      console.log("uahziruhaiuzhruiahzr")
-
       dispatch(updatePlayersInfos(user1, user2))
-      
     })
+
+    socket.on("emit update current pad", (pad) => {
+      setCurrentBuildingPad(
+        pad === "pad2" ? (
+          <StyledPad2SVG />
+        ) : pad === "pad3" ? (
+          <StyledPad3SVG />
+        ) : pad === "pad4" ? (
+          <StyledPad4SVG />
+        ) : pad === "pad6" ? (
+          <StyledPad6SVG />
+        ) : (
+          <></>
+        )
+      )
+    })
+
+    
   }, [dispatch, droppedCounter])
 
   const changeCurrentPad = (
@@ -200,9 +222,11 @@ export const Game2 = ({ gameCode }: GameProps) => {
     }
   }
 
-  const handlePadChoiceClick = (pad: ReactNode) => {
-    if (playerId !== -1 && movesCount % 2 === playerId)
+  const handlePadChoiceClick = (pad: ReactNode, nbHole: number) => {
+    if (playerId !== -1 && movesCount % 2 === playerId) {
       setCurrentBuildingPad(pad)
+      socket.emit("update current pad", `pad${nbHole}`)
+    }
   }
 
   const undoBoard = () => {
@@ -292,6 +316,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
             colorSchem={"red"}
             onClick={() => {
               navigate("/main")
+              window.location.reload()
             }}
           />
           <LeftBarButtons>
@@ -314,7 +339,12 @@ export const Game2 = ({ gameCode }: GameProps) => {
               <BoardingDiv>
                 <MarginAutoDiv>
                   <NVText
-                    text={intl.formatMessage({ id: movesCount % 2 === playerId ? "game.boarding.title1" :  "game.boarding.title2"})}
+                    text={intl.formatMessage({
+                      id:
+                        movesCount % 2 === playerId
+                          ? "game.boarding.title1"
+                          : "game.boarding.title2",
+                    })}
                     textStyle={{
                       color: "nevadaGold",
                       fontSize: 1.5,
@@ -482,7 +512,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       <PadRow>
                         <StyledPad2SVG
                           onClick={() => {
-                            handlePadChoiceClick(<StyledPad2SVG />)
+                            handlePadChoiceClick(<StyledPad2SVG />, 2)
                             changeCurrentPad(2, 1, "green")
                           }}
                           cursor={
@@ -506,7 +536,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       <PadRow>
                         <StyledPad4SVG
                           onClick={() => {
-                            handlePadChoiceClick(<StyledPad4SVG />)
+                            handlePadChoiceClick(<StyledPad4SVG />, 4)
                             changeCurrentPad(4, 1, "green")
                           }}
                           cursor={
@@ -530,7 +560,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       <PadRow>
                         <StyledPad3SVG
                           onClick={() => {
-                            handlePadChoiceClick(<StyledPad3SVG />)
+                            handlePadChoiceClick(<StyledPad3SVG />, 3)
                             changeCurrentPad(3, 1, "green")
                           }}
                           cursor={
@@ -554,7 +584,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       <PadRow>
                         <StyledPad6SVG
                           onClick={() => {
-                            handlePadChoiceClick(<StyledPad6SVG />)
+                            handlePadChoiceClick(<StyledPad6SVG />, 6)
                             changeCurrentPad(6, 1, "green")
                           }}
                           cursor={
@@ -600,7 +630,11 @@ export const Game2 = ({ gameCode }: GameProps) => {
                     <NVLine width={17} />
                     <NVSpacer height={1} />
                     <NVBar
-                      text="game.playing.player.1"
+                      text={
+                        playerId === -1
+                          ? "game.playing.player.1"
+                          : playerId === 0 ? "game.playing.player.me" : "game.playing.player.ennemy"
+                      }
                       svg={<UserOctagonSVG />}
                       bottomrightB={0}
                       topleftB={0}
@@ -649,7 +683,11 @@ export const Game2 = ({ gameCode }: GameProps) => {
                     <NVSpacer height={1} />
 
                     <NVBar
-                      text="game.playing.player.2"
+                      text={
+                        playerId === -1
+                          ? "game.playing.player.2"
+                           : playerId === 0 ? "game.playing.player.ennemy" : "game.playing.player.me"
+                      }
                       svg={<UserOctagonSVG />}
                       bottomrightB={0}
                     />
