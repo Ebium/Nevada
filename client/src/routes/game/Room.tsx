@@ -1,61 +1,59 @@
-import { useEffect, useState } from 'react';
-import { socket } from '../../socket-context';
-import { Game } from './Game';
+import { useEffect, useState } from "react"
+import { useDispatch } from "react-redux"
+import { socket } from "../../socket-context"
+import { updatePlayerId } from "../../store/ducks/Game.ducks"
+import { Game } from "./Game"
+import { Game2 } from "./Game2"
 
 const Room = () => {
-    const roomId = window.location.pathname.slice(18);
-    const homeURL = "http://localhost:3000/nevada/main/home" //update URL of home
-    const [users, setUsers] = useState([socket.id])
-    useEffect(()=>{
-        askJoinRoom()
-        getServerReponse()
-        AnUserJoined()
-        AnUserHasLeft()
-    },[users])
-    
+  const dispatch = useDispatch()
+  const roomId = window.location.pathname.slice(13)
+  const homeURL = "http://localhost:3000/nevada/main/home" //update URL of home
+  const [users, setUsers] = useState([socket.id])
+  useEffect(() => {
+    askJoinRoom()
+    getServerReponse()
+    AnUserJoined()
+    AnUserHasLeft()
+  }, [users])
 
-    function askJoinRoom() {
-        socket.once("connect", ()=> {
-            socket.emit("Join a room",roomId)
-        })
-    }
+  useEffect(() => {
+    socket.on("update playerId", (playId) => {
+      dispatch(updatePlayerId(playId))
+    })
+  }, [])
 
-    function getServerReponse() {
-        socket.on("Join a room", (joined)=> {
-            if(joined)
-                alert("joined the room")
-            else
-                window.location.href = homeURL
-        })
-    }
+  function askJoinRoom() {
+    socket.once("connect", () => {
+      socket.emit("Join a room", roomId)
+    })
+  }
 
-    function AnUserJoined() {
-        socket.on("An user joined the room", (userslist)=> {
-            setUsers(userslist)
-        })
-    }
+  function getServerReponse() {
+    socket.on("Join a room", (joined, gameCode) => {
+      if (!joined) window.location.href = homeURL
+    })
+  }
 
-    function AnUserHasLeft() {
-        socket.on("An user has left the room", (userslist)=> {
-            setUsers(userslist)
-        })
-    }
+  function AnUserJoined() {
+    socket.on("An user joined the room", (userslist) => {
+      setUsers(userslist)
+    })
+  }
 
-    function showPlayers() {
-        return users.map((user, index) => {
-            return (<li key={index}>{user}</li>)
-        })
-    }
+  function AnUserHasLeft() {
+    socket.on("An user has left the room", (userslist) => {
+      setUsers(userslist)
+    })
+  }
 
-    
+  function showPlayers() {
+    return users.map((user, index) => {
+      return <li key={index}>{user}</li>
+    })
+  }
 
-    return (
-        <div>
-            Room : {roomId}
-            <div>{showPlayers()}</div>
-            <Game></Game>
-        </div>
-    );
-};
+  return <Game2 gameCode={roomId} />
+}
 
-export default Room;
+export default Room

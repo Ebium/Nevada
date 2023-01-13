@@ -15,7 +15,7 @@ export interface TextProps {
     fontStyle?: "normal" | "italic"
     fontWeight?: number
     textTransform?: "uppercase" | "lowercase" | "capitalize" | "initial"
-    cursor?: "pointer" | "auto" | "default"
+    cursor?: "pointer" | "auto" | "default" | "not-allowed"
     textAlign?: "center" | "justify"
     letterSpacing?: number
   }
