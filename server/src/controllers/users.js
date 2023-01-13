@@ -213,19 +213,21 @@ const loginUserAuth = async (user) => {
  */
 const userPayment = async(user) => {
   var userEdited = user
+  var paymentIntent 
+  var subscription
 
-  const paymentIntent = await searchStripePaymentIntentPaidByCusId(user.cusId)
-  const subscription = await searchStripeSubscriptionPaidByCusId(user.cusId)
+  paymentIntent = await searchStripePaymentIntentPaidByCusId(user.cusId)
+  subscription = await searchStripeSubscriptionPaidByCusId(user.cusId)
 
   //est premium life
   if(paymentIntent.data[0] != null  && paymentIntent.data[0].amount == 1999) {
-      userEdited.premium = true
-      userEdited.premiumLifeTime = true
-      userEdited.paidDate = Date.now()
-      updateUser(userEdited)
-      return
-  } 
-  
+    userEdited.premium = true
+    userEdited.premiumLifeTime = true
+    userEdited.paidDate = Date.now()
+    updateUser(userEdited)
+    return
+} 
+
   //est premium
   if(subscription.data[0] !=null) {
       userEdited.premium = true
@@ -233,6 +235,7 @@ const userPayment = async(user) => {
       updateUser(userEdited)
       return
   } 
+
 }
 
 const userUnsubscribe = async(user)=> {

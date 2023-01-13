@@ -34,7 +34,7 @@ const io = socketIo(server, {
  * When we launch the server or reset the server
  * Rooms should not exist
  */
-clearRooms()
+// clearRooms()
 
 /*
  *  client/server : authentification user account request
