@@ -1,4 +1,5 @@
 const Room = require('../models/Room.js')
+const mongoose = require("mongoose")
 
 /*
  * Clean rooms at the start of the server
@@ -25,6 +26,12 @@ const findRoom = async(room) => {
         .catch(error => console.log(error))
 }
 
+const findRoomById = async(id) => {
+    return Room.findOne({ _id: id })
+        .then(result => { return result; } )
+        .catch(error => console.log(error))
+}
+
 
 /* ========================================
     Update functions
@@ -36,8 +43,8 @@ const createRoom = async(room) => {
         .catch(error => console.log(error))
 }
 
-const deleteRoom = async(room) => {
-    return Room.findOneAndDelete({ _id: room._id })
+const deleteRoom = async(roomId) => {
+    return Room.findOneAndDelete({ _id: mongoose.Types.ObjectId(roomId) })
         .then(result => { return result; } )
         .catch(error => console.log(error))
 }
@@ -46,6 +53,15 @@ const updateRoom = async(room) => {
     return Room.findOneAndUpdate({ _id: room._Id }, room, { new: true, runValidators: true })
         .then(result => { return result; } )
         .catch(error => console.log(error))
+}
+
+/* ========================================
+    Verify functions
+======================================== */
+
+const roomExist = async(id) => {
+    const room = await findRoomById(id)
+    return room ? true : false
 }
 
 /* ========================================
@@ -152,5 +168,6 @@ module.exports = {
     updateANewPlayerRoom,
     updateAQuitPlayerRoom,
     deleteRoom,
-    clearRooms
+    clearRooms,
+    roomExist, deleteRoom
 }
