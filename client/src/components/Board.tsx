@@ -162,11 +162,11 @@ export const Board = () => {
         )
         if (pointsFirstPlayer > pointsSecondPlayer) {
           console.log("Le Joueur rouge est gagnant")
-          socket.emit("Winner room", 0)
+          socket.emit("Winner room", 0, game.player1)
         }
         if (pointsFirstPlayer < pointsSecondPlayer) {
           console.log("Le Joueur Bleu est gagnant")
-          socket.emit("Winner room", 1)
+          socket.emit("Winner room", 1, game.player2)
         }
         if (pointsFirstPlayer === pointsSecondPlayer) {
           console.log("Les 2 Joueurs sont ex aequo")

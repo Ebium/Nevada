@@ -311,15 +311,22 @@ io.on("connection", (socket) => {
   })
 
   //un joueur a gagné la partie
-  socket.once("Winner room", async (playerId) => {
+  socket.on("Winner room", async (playerId, winnerPseudo) => {
     deleteRoom(currentRoomId)
 
     //la partie avait commencé
     if (gameStarted && playerId != -1) {
+      console.log("winner id : ",playersRoom[playerId])
       const user = await findUserBySocketId(playersRoom[playerId])
       var userEdited = user
+      console.log("winner user : ",user)
       userEdited.won += 1
       updateUser(user)
+      io.in(currentRoomId).emit("Winner user", winnerPseudo.pseudo)
+      io.in(currentRoomId).socketsLeave(currentRoomId)
+    } 
+    if(gameStarted && playerId==-1) {
+      io.in(currentRoomId).emit("Winner user", "")
       io.in(currentRoomId).socketsLeave(currentRoomId)
     }
   })
