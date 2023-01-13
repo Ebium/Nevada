@@ -85,8 +85,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
   const player1Infos = useNevadaSelector((state) => state.game.player1)
   const player2Infos = useNevadaSelector((state) => state.game.player2)
   const userPseudo = useNevadaSelector((state) => state.user.pseudo)
-  console.log(player1Infos)
-  console.log(player2Infos)
+
   const disabledIndexPads = useNevadaSelector(
     (state) => state.game.disabledIndexPads
   )
@@ -95,33 +94,15 @@ export const Game2 = ({ gameCode }: GameProps) => {
   const [leftBarCollapsed, setLeftBarCollapsed] = useState(false)
   const [users, setUsers] = useState([socket.id])
 
-  const [gameType, setGameType] = useState<
-    "boarding" | "building" | "playing" | "test" | "finished"
-  >("boarding")
-
   const [currentBuildingPad, setCurrentBuildingPad] = useState<ReactNode>(<></>)
-
-  useEffect(() => {
-    if (droppedCounter === 17) {
-      socket.emit("GameStarted")
-      // dispatch(updateGameStarted(true))
-    } else {
-      if (gameStarted) {
-        dispatch(updateGameStarted(false))
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [droppedCounter])
+  const [currentPadOrientation, setCurrentPadOrientation] =
+    useState<boolean>(false)
 
   socket.on("update playerId", (playId) => {
-    console.log("allooooo ",playId)
     dispatch(updatePlayerId(playId))
   })
-  
 
   useEffect(() => {
-
- 
     socket.on("emitGameStarted", () => {
       dispatch(updateGameStarted(true))
     })
@@ -164,20 +145,22 @@ export const Game2 = ({ gameCode }: GameProps) => {
     socket.on("emit update current pad", (pad) => {
       setCurrentBuildingPad(
         pad === "pad2" ? (
-          <StyledPad2SVG />
+          <StyledPad2SVG rotation={currentPadOrientation ? 1 : 0} />
         ) : pad === "pad3" ? (
-          <StyledPad3SVG />
+          <StyledPad3SVG rotation={currentPadOrientation ? 1 : 0} />
         ) : pad === "pad4" ? (
-          <StyledPad4SVG />
+          <StyledPad4SVG rotation={currentPadOrientation ? 1 : 0} />
         ) : pad === "pad6" ? (
-          <StyledPad6SVG />
+          <StyledPad6SVG rotation={currentPadOrientation ? 1 : 0} />
         ) : (
           <></>
         )
       )
     })
 
-    
+    socket.on("emit pad rotated", () => {
+      setCurrentPadOrientation(!currentPadOrientation)
+    })
   }, [dispatch, droppedCounter])
 
   const changeCurrentPad = (
@@ -206,6 +189,8 @@ export const Game2 = ({ gameCode }: GameProps) => {
         color: currentPad.color,
       })
     )
+    socket.emit("pad rotated")
+    socket.emit("update current pad", `pad${currentPad.nbHole}`)
   }
 
   const resetBoard = () => {
@@ -216,15 +201,11 @@ export const Game2 = ({ gameCode }: GameProps) => {
     navigator.clipboard.writeText(gameCode)
   }
 
-  const pickBoardPreset = (presetNum: number) => {
-    if (playerId !== -1 && movesCount % 2 === playerId) {
-      console.log("random preset = ", presetNum)
-    }
-  }
-
   const handlePadChoiceClick = (pad: ReactNode, nbHole: number) => {
     if (playerId !== -1 && movesCount % 2 === playerId) {
       setCurrentBuildingPad(pad)
+
+      socket.emit("pad rotated")
       socket.emit("update current pad", `pad${nbHole}`)
     }
   }
@@ -264,13 +245,6 @@ export const Game2 = ({ gameCode }: GameProps) => {
     }
   }
 
-  const startGame = () => {
-    console.log("game started")
-    if (!gameStarted) {
-      socket.emit("GameStarted")
-    }
-  }
-
   const UserInfoRow = (svg: ReactNode, text: string, data: any) => {
     return (
       <UserInfosRow>
@@ -293,8 +267,18 @@ export const Game2 = ({ gameCode }: GameProps) => {
   }
 
   const handleUpdateGamePhase = (phase: GamePhaseType) => {
+    if (phase === "playing" && !gameStarted) socket.emit("GameStarted")
+
     socket.emit("update game phase", phase)
   }
+
+  useEffect(() => {
+    if (player1Infos.pseudo && player2Infos.pseudo) {
+      if (playerId === 0) {
+        socket.emit("update game phase", "boarding")
+      }
+    }
+  }, [player1Infos, player2Infos])
 
   return (
     <Content>
@@ -311,7 +295,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
           </LeftBarTopBlock>
 
           <NVButton
-            disabled={false}
+            disabled={gamePhase === "waiting"}
             content={intl.formatMessage({ id: "button.game.forfait" })}
             colorSchem={"red"}
             onClick={() => {
@@ -319,6 +303,22 @@ export const Game2 = ({ gameCode }: GameProps) => {
               window.location.reload()
             }}
           />
+
+          {gamePhase === "waiting" && (
+            <>
+              <NVSpacer height={1} />
+
+              <NVButton
+                disabled={false}
+                content={intl.formatMessage({ id: "button.game.leave" })}
+                colorSchem={"blue"}
+                onClick={() => {
+                  navigate("/main")
+                }}
+              />
+            </>
+          )}
+
           <LeftBarButtons>
             <RulesButton />
           </LeftBarButtons>
@@ -332,9 +332,39 @@ export const Game2 = ({ gameCode }: GameProps) => {
             clickable
             onClick={copyToClipboard}
           />
+          {gamePhase === "building" && playerId !== 0 && (
+            <>
+              <NVText
+                text={intl.formatMessage({
+                  id: "game.building.building",
+                })}
+                textStyle={{
+                  color: "nevadaGold",
+                  fontSize: 1.4,
+                  textAlign: "center",
+                  fontWeight: 900,
+                }}
+              />
+              <NVSpacer width={30} />
+            </>
+          )}
         </MidDivTopBar>
-        <MidDivGame>
-          {gamePhase === "boarding" ? (
+        <MidDivGame centered={gamePhase === "waiting"}>
+          {gamePhase === "waiting" ? (
+            <>
+              <NVText
+                text={intl.formatMessage({
+                  id: "game.wait-2-users",
+                })}
+                textStyle={{
+                  color: "nevadaGold",
+                  fontSize: 1.5,
+                  textAlign: "center",
+                  fontWeight: 900,
+                }}
+              />
+            </>
+          ) : gamePhase === "boarding" ? (
             <>
               <BoardingDiv>
                 <MarginAutoDiv>
@@ -375,9 +405,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                 <MarginAutoDiv></MarginAutoDiv>
                 <PresetsDiv>
                   <Preset1SVG
-                    onClick={() => {
-                      pickBoardPreset(1)
-                    }}
+                    onClick={() => {}}
                     cursor={
                       playerId !== -1 && movesCount % 2 === playerId
                         ? "pointer"
@@ -387,9 +415,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                     width={336}
                   />
                   <Preset2SVG
-                    onClick={() => {
-                      pickBoardPreset(2)
-                    }}
+                    onClick={() => {}}
                     cursor={
                       playerId !== -1 && movesCount % 2 === playerId
                         ? "pointer"
@@ -399,9 +425,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                     width={336}
                   />
                   <Preset3SVG
-                    onClick={() => {
-                      pickBoardPreset(3)
-                    }}
+                    onClick={() => {}}
                     cursor={
                       playerId !== -1 && movesCount % 2 === playerId
                         ? "pointer"
@@ -512,7 +536,12 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       <PadRow>
                         <StyledPad2SVG
                           onClick={() => {
-                            handlePadChoiceClick(<StyledPad2SVG />, 2)
+                            handlePadChoiceClick(
+                              <StyledPad2SVG
+                                rotation={currentPadOrientation ? 1 : 0}
+                              />,
+                              2
+                            )
                             changeCurrentPad(2, 1, "green")
                           }}
                           cursor={
@@ -520,6 +549,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                               ? "pointer"
                               : "default"
                           }
+                          rotation={0}
                         />
                         <NVText
                           text={intl.formatMessage(
@@ -536,7 +566,12 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       <PadRow>
                         <StyledPad4SVG
                           onClick={() => {
-                            handlePadChoiceClick(<StyledPad4SVG />, 4)
+                            handlePadChoiceClick(
+                              <StyledPad4SVG
+                                rotation={currentPadOrientation ? 1 : 0}
+                              />,
+                              4
+                            )
                             changeCurrentPad(4, 1, "green")
                           }}
                           cursor={
@@ -544,6 +579,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                               ? "pointer"
                               : "default"
                           }
+                          rotation={0}
                         />
                         <NVText
                           text={intl.formatMessage(
@@ -560,7 +596,12 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       <PadRow>
                         <StyledPad3SVG
                           onClick={() => {
-                            handlePadChoiceClick(<StyledPad3SVG />, 3)
+                            handlePadChoiceClick(
+                              <StyledPad3SVG
+                                rotation={currentPadOrientation ? 1 : 0}
+                              />,
+                              3
+                            )
                             changeCurrentPad(3, 1, "green")
                           }}
                           cursor={
@@ -568,6 +609,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                               ? "pointer"
                               : "default"
                           }
+                          rotation={0}
                         />
                         <NVText
                           text={intl.formatMessage(
@@ -584,7 +626,12 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       <PadRow>
                         <StyledPad6SVG
                           onClick={() => {
-                            handlePadChoiceClick(<StyledPad6SVG />, 6)
+                            handlePadChoiceClick(
+                              <StyledPad6SVG
+                                rotation={currentPadOrientation ? 1 : 0}
+                              />,
+                              6
+                            )
                             changeCurrentPad(6, 1, "green")
                           }}
                           cursor={
@@ -592,6 +639,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                               ? "pointer"
                               : "default"
                           }
+                          rotation={0}
                         />
                         <NVText
                           text={intl.formatMessage(
@@ -633,7 +681,9 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       text={
                         playerId === -1
                           ? "game.playing.player.1"
-                          : playerId === 0 ? "game.playing.player.me" : "game.playing.player.ennemy"
+                          : playerId === 0
+                          ? "game.playing.player.me"
+                          : "game.playing.player.ennemy"
                       }
                       svg={<UserOctagonSVG />}
                       bottomrightB={0}
@@ -686,7 +736,9 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       text={
                         playerId === -1
                           ? "game.playing.player.2"
-                           : playerId === 0 ? "game.playing.player.ennemy" : "game.playing.player.me"
+                          : playerId === 0
+                          ? "game.playing.player.ennemy"
+                          : "game.playing.player.me"
                       }
                       svg={<UserOctagonSVG />}
                       bottomrightB={0}
@@ -826,14 +878,21 @@ const MidDivTopBar = styled.div`
   flex-direction: row;
   justify-content: space-between;
   padding-bottom: 1rem;
+  align-items: center;
 `
-const MidDivGame = styled.div`
+
+interface MidDivGameProps {
+  centered: boolean
+}
+
+const MidDivGame = styled.div<MidDivGameProps>`
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: row;
   justify-content: center;
   overflow-y: auto;
+  align-items: ${({ centered }) => (centered ? "center" : "unset")};
 `
 const BoardingDiv = styled.div`
   display: flex;
@@ -867,6 +926,7 @@ const MidDivRightSection = styled.div`
   align-items: center;
   margin: auto;
 `
+
 const PadPreview = styled.div`
   border: 2px solid ${colors.nevadaGold};
   box-shadow: 0px 0px 10px 2px ${colors.nevadaGold};
@@ -888,21 +948,34 @@ const PadRow = styled.div`
   margin-bottom: 5px;
   align-items: center;
 `
-const StyledPad2SVG = styled(Pad2SVG)`
+
+interface SvgsPreviewProps {
+  rotation: number
+}
+
+const StyledPad2SVG = styled(Pad2SVG)<SvgsPreviewProps>`
   width: 100px;
   height: 50px;
+  transition-duration: 0.2s;
+  transform: ${({ rotation }) => (rotation ? "rotate(90deg)" : ``)};
 `
-const StyledPad3SVG = styled(Pad3SVG)`
+const StyledPad3SVG = styled(Pad3SVG)<SvgsPreviewProps>`
   width: 150px;
   height: 50px;
+  transition-duration: 0.2s;
+  transform: ${({ rotation }) => (rotation ? "rotate(90deg)" : ``)};
 `
-const StyledPad4SVG = styled(Pad4SVG)`
+const StyledPad4SVG = styled(Pad4SVG)<SvgsPreviewProps>`
   width: 100px;
   height: 100px;
+  transition-duration: 0.2s;
+  transform: ${({ rotation }) => (rotation ? "rotate(90deg)" : ``)};
 `
-const StyledPad6SVG = styled(Pad6SVG)`
+const StyledPad6SVG = styled(Pad6SVG)<SvgsPreviewProps>`
   width: 150px;
   height: 100px;
+  transition-duration: 0.2s;
+  transform: ${({ rotation }) => (rotation ? "rotate(90deg)" : ``)};
 `
 const UserInfosRow = styled.div`
   display: flex;

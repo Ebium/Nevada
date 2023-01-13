@@ -15,6 +15,7 @@ export const translations = {
   "button.game.join": "Rejoindre",
   "button.game.create": "Créer une partie",
   "button.game.forfait": "Déclarer forfait",
+  "button.game.leave": "Quitter",
 
   "header.title": "Nevada",
   "header.log-in": "Connexion",
@@ -118,6 +119,8 @@ export const translations = {
   "home.center.card.ranking.title": "Classement top joueurs",
 
   "game.code": "Code de la partie : {data}",
+  "game.wait-2-users": "En attente d'un deuxième joueur ...",
+
   "game.boarding.title1": "Vous avez été tiré au sort pour proposer un plateau pour cette partie, que souhaitez-vous faire ?",
   "game.boarding.title2": "Votre adversaire compose le plateau !",
   "game.boarding.build": "Construire mon propre plateau",
@@ -130,6 +133,7 @@ export const translations = {
   "game.building.pad.preview": "Aperçu de la plaquette actuelle",
   "game.building.pad.select": "Sélectionnez une des plaquettes restantes",
   "game.building.pad.remaining": "Restant : {data}",
+  "game.building.building": "Le joueur 1 compose le plateau",
 
   "game.playing.player-start.yes": "Vous avez été tiré au sort pour commencer en premier !",
   "game.playing.player-start.no": "Votre adversaire commence en premier !",

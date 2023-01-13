@@ -20,4 +20,7 @@ MONGO_URI="mongodb+srv://nevadadb:nevadadb@nevadacluster.ynopy0q.mongodb.net/nev
 JWT_SECRET='Z6sqxPOSgUu_2lIF32xAiQ'
 STRIPE_PRIVATE_KEY="sk_test_51LrLO9JE1Vl9aUiyElWtRFhpLB7oDE5YwmL8h1YFgniEhyugNAiUhlFBzg8qLusFLIzchw9SdDF0QFRlKVudQcDB00T9BwLpiT"
 ```
-- Aller dans le dossier dev, et lancer npm run dev pour démarer le serveur
+- Aller dans le dossier dev, et lancer npm run dev pour démarer l'application
+
+- URL de l'application côté client : http://localhost:3000/nevada
+- URL de l'application côté serveur : http://localhost:5050
