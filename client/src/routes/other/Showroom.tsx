@@ -7,7 +7,6 @@ import { colors } from "../../components/styles/design.config"
 import { NVButton } from "../../components/styles/NVButton"
 import { NVSpacer } from "../../components/styles/NVSpacer"
 import { NVText } from "../../components/styles/NVText"
-import { getDonateAmountUrl } from "../../utils/Donation"
 
 export const Showroom = () => {
   const navigate = useNavigate()
@@ -93,7 +92,4 @@ const RightDiv = styled.div`
 const RowDiv = styled.div`
   display: flex;
   flex-direction: row;
-`
-const StyledLink = styled.a`
-  text-decoration: none;
 `

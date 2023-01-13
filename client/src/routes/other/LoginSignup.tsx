@@ -16,8 +16,8 @@ import { ChangeEvent, FormEvent, useEffect, useState } from "react"
 import { reloadSocket, socket } from "../../socket-context"
 import { useDispatch } from "react-redux"
 import { updateUserThunk } from "../../store/ducks/User.ducks"
-import bcrypt from "bcryptjs-react";
-import JWT from 'expo-jwt';
+import bcrypt from "bcryptjs-react"
+import JWT from "expo-jwt"
 import env from "react-dotenv"
 import { updateSocketID } from "../../store/ducks/User.ducks"
 
@@ -36,13 +36,15 @@ export const LoginSignup = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitLogin, socket])
 
-
   const setLoginToken = () => {
-    const token = JWT.encode({
-      email: loginEmail,
-      password : loginPassword,
-      isRegistered : true,
-    },env.JWT_SECRET)  
+    const token = JWT.encode(
+      {
+        email: loginEmail,
+        password: loginPassword,
+        isRegistered: true,
+      },
+      env.JWT_SECRET
+    )
     localStorage.setItem("Nevada_Token", token)
   }
 
@@ -65,16 +67,16 @@ export const LoginSignup = () => {
     setLoginPassword(event.target.value)
   }
 
-  socket.on("connect_error", (err:Error)=> {
+  socket.on("connect_error", (err: Error) => {
     localStorage.removeItem("Nevada_Token")
-    if(submitLogin) {
-      alert(err.message) 
+    if (submitLogin) {
+      alert(err.message)
     }
     setSubmitLogin(false)
   })
 
-  socket.on("connect",()=> {
-    if(submitLogin) {
+  socket.on("connect", () => {
+    if (submitLogin) {
       dispatch(updateUserThunk(loginEmail))
       dispatch(updateSocketID(socket.id))
       navigate("/main/home")
@@ -94,26 +96,31 @@ export const LoginSignup = () => {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [submitSignup,socket])
+  }, [submitSignup, socket])
 
-  
   const signupWithToken = async () => {
-    const token = JWT.encode({
-      email: signupEmail,
-      password : bcrypt.hashSync(signupPassword),
-      pseudo : signupPseudo,
-      isRegistered : false,
-    },env.JWT_SECRET) 
+    const token = JWT.encode(
+      {
+        email: signupEmail,
+        password: bcrypt.hashSync(signupPassword),
+        pseudo: signupPseudo,
+        isRegistered: false,
+      },
+      env.JWT_SECRET
+    )
     localStorage.setItem("Nevada_Token", token)
     reloadSocket()
   }
 
   const setSignupToken = () => {
-    const token = JWT.encode({
-      email: signupEmail,
-      password : signupPassword,
-      isRegistered : true,
-    },env.JWT_SECRET) 
+    const token = JWT.encode(
+      {
+        email: signupEmail,
+        password: signupPassword,
+        isRegistered: true,
+      },
+      env.JWT_SECRET
+    )
     localStorage.setItem("Nevada_Token", token)
   }
 
@@ -121,7 +128,7 @@ export const LoginSignup = () => {
     event.preventDefault()
     if (!signupCheckboxCGU) setCGUAlertDisplayed(true)
     else {
-      if(!emailIsValid(signupEmail)) {
+      if (!emailIsValid(signupEmail)) {
         alert("Email format is invalid")
       } else {
         setCGUAlertDisplayed(false)
@@ -143,34 +150,32 @@ export const LoginSignup = () => {
     event: ChangeEvent<HTMLInputElement>
   ) => {
     setSignupPseudo(event.target.value)
-  }    
+  }
 
-    socket.on("connect_error", (err:Error)=> {
-      localStorage.removeItem("Nevada_Token")
-      if(submitSignup) {
-        alert(err.message) 
-      }
-      setSubmitSignup(false)
-    })
+  socket.on("connect_error", (err: Error) => {
+    localStorage.removeItem("Nevada_Token")
+    if (submitSignup) {
+      alert(err.message)
+    }
+    setSubmitSignup(false)
+  })
 
-    socket.on("connect",()=> {
-      if(submitSignup) {
-        setSignupToken()
-        dispatch(updateUserThunk(signupEmail))
-        dispatch(updateSocketID(socket.id))
-        navigate("/main/home")
-      }
-    })
+  socket.on("connect", () => {
+    if (submitSignup) {
+      setSignupToken()
+      dispatch(updateUserThunk(signupEmail))
+      dispatch(updateSocketID(socket.id))
+      navigate("/main/home")
+    }
+  })
 
-
-    //-------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------
 
   //Verify --------------------------------------------------------------------
 
-  const emailIsValid = (email:String) => {
+  const emailIsValid = (email: String) => {
     const emailSplited = email.split("@")
-    if(emailSplited.length!==2)
-      return false
+    if (emailSplited.length !== 2) return false
 
     return emailSplited[1].includes(".")
   }

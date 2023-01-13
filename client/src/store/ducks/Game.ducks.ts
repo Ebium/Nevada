@@ -188,8 +188,6 @@ export function GameReducer(
     case GameActionsEnum.UPDATE_MOVES_HISTORY:
       return { ...state, movesHistory: action.moves, movesCount: action.count }
     case GameActionsEnum.UPDATE_PLAYERS_INFOS:
-      console.log("P1 :", action.p1)
-      console.log(action.p2)
       return {
         ...state,
         player1: {

@@ -99,7 +99,7 @@ export const showPossibleMoves = (cell: Coord, boardArray: boardType) => {
 // Retourne la grille sans les coups possibles de l'ancien coup
 export const removeOldPossibleMoves = (
   previousMove: Coord,
-  boardArray: boardType,
+  boardArray: boardType
 ) => {
   const copy = R.clone(boardArray)
   for (let y = 0; y < 10; y++) {
@@ -152,7 +152,7 @@ export const disablePads = (
 export const enablePads = (
   boardArray: boardType,
   index: number | undefined,
-  pads: Pad[],
+  pads: Pad[]
 ) => {
   const copy = R.clone(boardArray)
   if (index !== undefined) {

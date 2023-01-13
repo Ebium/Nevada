@@ -185,8 +185,6 @@ export const Home = () => {
     if (!gameCode) setGameCodeAlertDisplayed(true)
     else {
       setGameCodeAlertDisplayed(false)
-      console.log("SIUUUUUUUUU")
-      console.log(gameCode)
       socket.emit("Join a room", gameCode)
     }
   }

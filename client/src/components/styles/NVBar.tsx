@@ -36,7 +36,6 @@ export const NVBar = ({
   const hasSvg = svg ? true : false
   const intl = useIntl()
 
-  console.log(clickable)
   return (
     <RowContent clickable={clickable}>
       <StyledSvg

@@ -130,7 +130,6 @@ export const getPlayersCounterThunk = () => (dispatch: Dispatch<AnyAction>) => {
       dispatch(updatePlayersCounterSuccess(data.count))
     })
     .catch((e: AxiosError) => {
-      console.log(e)
       dispatch(updatePlayersCounterFailed())
     })
 }
@@ -143,7 +142,6 @@ export const getGamesCounterThunk = () => (dispatch: Dispatch<AnyAction>) => {
       dispatch(updateGamesCounterSuccess(data.count))
     })
     .catch((e: AxiosError) => {
-      console.log(e)
       dispatch(updateGamesCounterFailed())
     })
 }
@@ -157,7 +155,6 @@ export const getSpectatorsCounterThunk =
         dispatch(updateSpectatorsCounterSuccess(data.count))
       })
       .catch((e: AxiosError) => {
-        console.log(e)
         dispatch(updateSpectatorsCounterFailed())
       })
   }

@@ -12,5 +12,5 @@ export const Profil = () => {
 }
 
 const Content = styled.div`
-height: 100vh;
+  height: 100vh;
 `
