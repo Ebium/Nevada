@@ -181,12 +181,6 @@ export const Home = () => {
     )
   }
 
-
-  const [gameCode, setGameCode] = useState("")
-  const [gameCodeAlertDisplayed, setGameCodeAlertDisplayed] = useState(false)
-  const [a, setA] = useState(true)
-  const [winner, setWinner] = useState("")
-
   const handleGameCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
     setGameCode(event.target.value)
   }
@@ -216,13 +210,7 @@ export const Home = () => {
         }}
       />
 
-      <EndGameModal
-        isDisplayed={a}
-        winner={winner}
-        onClose={() => {
-          setA(!a)
-        }}
-      />
+
 
       <LeftBar>
         <NVSpacer height={1} />

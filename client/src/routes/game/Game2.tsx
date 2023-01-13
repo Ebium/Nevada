@@ -61,6 +61,7 @@ import {
   updateHistoryBoard,
   updateGraphicPads,
 } from "../../store/ducks/Board.ducks"
+import { EndGameModal } from "../../components/EndGameModal"
 
 interface GameProps {
   gameCode: string
@@ -154,7 +155,6 @@ export const Game2 = ({ gameCode }: GameProps) => {
       console.log("uahziruhaiuzhruiahzr")
 
       dispatch(updatePlayersInfos(user1, user2))
-      
     })
   }, [dispatch, droppedCounter])
 
@@ -272,8 +272,18 @@ export const Game2 = ({ gameCode }: GameProps) => {
     socket.emit("update game phase", phase)
   }
 
+  const [endGameModalDisplayed, setEndGameModalDisplayed] = useState(false)
+  const [winner, setWinner] = useState("")
+
   return (
     <Content>
+      <EndGameModal
+        isDisplayed={endGameModalDisplayed}
+        winner={winner}
+        onClose={() => {
+          setEndGameModalDisplayed(!endGameModalDisplayed)
+        }}
+      />
       <LeftBar leftbarcollapsed={leftBarCollapsed ? 1 : 0}>
         <StyledMenuCollapseSVG
           leftbarcollapsed={leftBarCollapsed ? 1 : 0}
@@ -314,7 +324,12 @@ export const Game2 = ({ gameCode }: GameProps) => {
               <BoardingDiv>
                 <MarginAutoDiv>
                   <NVText
-                    text={intl.formatMessage({ id: movesCount % 2 === playerId ? "game.boarding.title1" :  "game.boarding.title2"})}
+                    text={intl.formatMessage({
+                      id:
+                        movesCount % 2 === playerId
+                          ? "game.boarding.title1"
+                          : "game.boarding.title2",
+                    })}
                     textStyle={{
                       color: "nevadaGold",
                       fontSize: 1.5,
