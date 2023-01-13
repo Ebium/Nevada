@@ -31,18 +31,14 @@ export const NVBar = ({
   topleftB = 10,
   bottomrightB = 10,
   bottomleftB = 10,
-  fillsvg,
+  fillsvg
 }: InputProps) => {
   const hasSvg = svg ? true : false
   const intl = useIntl()
 
   return (
     <RowContent clickable={clickable}>
-      <StyledSvg
-        topleftB={topleftB}
-        bottomleftB={bottomleftB}
-        fillsvg={fillsvg}
-      >
+      <StyledSvg topleftB={topleftB} bottomleftB={bottomleftB} fillsvg={fillsvg}>
         {svg ? svg : <DefaultSVG />}
       </StyledSvg>
       <StyledDiv
@@ -114,6 +110,6 @@ const StyledSvg = styled.div<StyledDivProps>`
   border-radius: ${({ bottomleftB, topleftB }) =>
     `${topleftB}px 0 0 ${bottomleftB}px`};
   & path {
-    fill: ${({ fillsvg }) => (fillsvg ? colors[fillsvg] : "white")};
+    fill: ${({fillsvg}) => fillsvg ? colors[fillsvg]: "white"};
   }
 `

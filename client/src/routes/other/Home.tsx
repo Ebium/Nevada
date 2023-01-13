@@ -1,6 +1,6 @@
 import { useIntl } from "react-intl"
 import { useNavigate } from "react-router-dom"
-import styled from "styled-components/macro"
+import styled from "styled-components"
 import { RulesButton } from "../../components/RulesButton"
 import { colors } from "../../components/styles/design.config"
 import { NVButton } from "../../components/styles/NVButton"
@@ -32,8 +32,7 @@ export const Home = () => {
   const navigate = useNavigate()
   const intl = useIntl()
   const dispatch = useDispatch()
-  // const userPseudo = useNevadaSelector((state) => state.user.pseudo)
-  const userPseudo = "tam"
+  const userPseudo = useNevadaSelector((state) => state.user.pseudo)
   const userSocket = useNevadaSelector((state) => state.user.socketId)
   const userPremium = useNevadaSelector((state) => state.user.isPremium)
   const userGamesPlayed = useNevadaSelector((state) => state.user.nbGames)
@@ -58,7 +57,6 @@ export const Home = () => {
   useEffect(() => {
     dispatch(getUsersRankingThunk())
   }, [])
-
   const CenterCard = (props: {
     children: any
     title: string
@@ -220,6 +218,8 @@ export const Home = () => {
         </LeftBarStats>
         {userPseudo ? (
           <>
+            <NVSpacer height={2} />
+
             <LeftBarSpectateGame>
               <NVText
                 text={intl.formatMessage({
@@ -240,6 +240,8 @@ export const Home = () => {
 
               <NVLine width={17} height={0.2} color={"nevadaBlack"} />
             </LeftBarSpectateGame>
+
+            <NVSpacer height={2} />
 
             <LeftBarTrainingMode>
               <NVText
@@ -289,6 +291,7 @@ export const Home = () => {
         </LeftBarButtons>
       </LeftBar>
       <CenterContent>
+        <NVSpacer width={1} />
         <CenterCard title="news">
           <NVText
             text={intl.formatMessage({
@@ -475,69 +478,52 @@ export const Home = () => {
 }
 
 const Content = styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+`
+const LeftBar = styled.div`
+  left: 0;
+  height: 100%;
+  width: 19rem;
+  background-color: ${colors.backgroundGrey};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`
+const LeftBarButtons = styled.div`
+  position: absolute;
+  bottom: 0;
+`
+const CenterContent = styled.div`
+  background-color: ${colors.nevadaBackground};
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-`
-const LeftBar = styled.div`
-  height: 100%;
-  min-width: 17rem;
-  background-color: ${colors.backgroundGrey};
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow: hidden;
-  transition: all 0.1s ease-in-out;
-  @media (max-width: 670px) {
-    min-width: 15rem;
-  }
-`
-const LeftBarButtons = styled.div`
-  position: absolute;
-  bottom: 0;
-  transition: all 0.1s ease-in-out;
-  @media (max-height: 530px) {
-    position: unset;
-    padding-top: 1rem;
-  }
-`
-const CenterContent = styled.div`
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 20rem);
-  grid-template-rows: repeat(auto-fill, 26rem);
-  grid-column-gap: 1rem;
-  grid-row-gap: 5rem;
-  justify-content: center;
-  height: 85%;
-  overflow-y: auto;
+  justify-content: space-between;
 `
 const LeftBarStats = styled.div`
+  width: 100%;
   display: flex;
   justify-content: center;
   flex-direction: column;
 `
 const LeftBarSpectateGame = styled.div`
+  width: 100%;
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding-top: 2rem;
-  @media (max-height: 670px) {
-    display: none;
-  }
 `
 const LeftBarTrainingMode = styled.div`
+  width: 100%;
   display: flex;
   justify-content: center;
   flex-direction: column;
-  padding-top: 2rem;
-  @media (max-height: 830px) {
-    display: none;
-  }
 `
 interface LeftBarRowProps {
   text?: string

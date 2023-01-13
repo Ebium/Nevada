@@ -1,6 +1,5 @@
 import styled from "styled-components/macro"
 import { ReactNode } from "react"
-import { colors } from "./styles/design.config"
 
 export interface BackgroundProps {
   children: ReactNode
@@ -48,5 +47,4 @@ const StyledContent = styled.div<WithCenteredTop>`
   align-items: center;
   overflow: ${({ centeredTop }) => (centeredTop ? "inherit" : "auto")};
   flex-grow: 1;
-  background-color: ${colors.nevadaBackground};
 `
