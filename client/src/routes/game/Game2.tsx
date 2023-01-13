@@ -178,6 +178,11 @@ export const Game2 = ({ gameCode }: GameProps) => {
         )
       )
     })
+
+    socket.on("emit pad rotated", () => {
+      setCurrentPadOrientation(!currentPadOrientation)
+    })
+
   }, [dispatch, droppedCounter, displayed])
 
   const changeCurrentPad = (
@@ -319,17 +324,19 @@ export const Game2 = ({ gameCode }: GameProps) => {
             <StyledNevadaLogo leftbarcollapsed={leftBarCollapsed ? 1 : 0} />
           </LeftBarTopBlock>
 
-          <NVButton
-            disabled={gamePhase === "waiting"}
-            content={intl.formatMessage({ id: "button.game.forfait" })}
-            colorSchem={"red"}
-            onClick={() => {
-              navigate("/main")
-              window.location.reload()
-            }}
-          />
-
-          {gamePhase === "waiting" && (
+          {gamePhase === "playing" ? (
+            <>
+              <NVButton
+                disabled={false}
+                content={intl.formatMessage({ id: "button.game.forfait" })}
+                colorSchem={"red"}
+                onClick={() => {
+                  navigate("/main")
+                  window.location.reload()
+                }}
+              />
+            </>
+          ) : (
             <>
               <NVSpacer height={1} />
 

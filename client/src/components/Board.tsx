@@ -93,6 +93,7 @@ export const Board = () => {
         dispatch(updatePads(pads))
       }
     )
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, board, game, boardIsSet])
 
   //Permet jouer un coup
