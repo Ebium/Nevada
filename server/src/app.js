@@ -147,13 +147,21 @@ io.on("connection", (socket) => {
     if(usersRoom.length>2){
       io.to(usersRoom[0]).emit("retrieve board", socket.id)
     }
+
+    if(playersRoom.length==2) {
+      console.log("aloa : " ,playersRoom)
+      io.to(currentRoomId).emit("2 players", playersRoom)
+    }
+  })
+
+  socket.on("2 players", (players)=> {
+    playersRoom = players
+    gameStarted = true
   })
 
   // client : jeu
   socket.on("GameStarted",async() => {
     io.to(currentRoomId).emit("emitGameStarted")
-    usersRoom =  Array.from(await io.sockets.adapter.rooms.get(currentRoomId))
-    playersRoom = usersRoom.slice(0,2)
 
     gameStarted = true
     const player1 = await findUserBySocketId(playersRoom[0])
@@ -176,6 +184,7 @@ io.on("connection", (socket) => {
 
   //un joueur a gagné la partie
   socket.once("Winner room", async(playerId)=> {
+    console.log(playerId)
     //la partie a commencé
     if(gameStarted && playerId!=-1) {
       const user = await findUserBySocketId(playersRoom[playerId])

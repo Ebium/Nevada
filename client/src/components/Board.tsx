@@ -115,7 +115,15 @@ export const Board = () => {
       alert(message)
       window.location.assign("/nevada/main/home")
     })
+
+    socket.once("2 players", (data)=> {
+      console.log(data)
+      socket.emit("2 players", data)
+     })
+    
   }, [dispatch, board, game, boardIsSet])
+
+
 
   //Permet jouer un coup
   const makeMove = (cell: CellType) => {
