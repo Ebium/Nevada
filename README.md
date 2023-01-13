@@ -1,6 +1,7 @@
-- Installer node avec une version supérieur ou égale à 16.16 https://nodejs.org/fr/download/
-- Télécharger le zip présent dans la zone de dépôt
+- Installer node avec une version supérieure ou égale à 16.16 -> https://nodejs.org/fr/download/
+- Télécharger le zip présent dans la zone de dépôt (moodle)
 - Extraire les fichiers du zip, faire la commande **npm install** dans les dossier client, server, dev ou alors lancer le script npm-i.sh si vous possédez un environnement Linux
+
 - Créer un fichier .env dans le dossier client avec les lignes: 
 
 ``` 
