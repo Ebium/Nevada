@@ -53,7 +53,8 @@ export const Game = () => {
 
   useEffect(() => {
     if (droppedCounter === 17) {
-      dispatch(updateGameStarted(true))
+      socket.emit("GameStarted")
+      // dispatch(updateGameStarted(true))
     } else {
       if (gameStarted) {
         dispatch(updateGameStarted(false))
@@ -235,24 +236,6 @@ export const Game = () => {
     }
   }
 
-  const oui = () => {
-    const test = {
-      x: [1, 2, 3],
-      y: [1, 2],
-      coord: [],
-    }
-
-    // for(let i = 0; i < 10; i++){
-    //   for(let j = 0; j < 10; j++){
-    //     if(test.x.includes(i) && test.y.includes(j)){
-    //       console.log("x: ",i," j: ",j)
-    //     }
-    //   }
-    // }
-
-    console.log([...[test, { x: [3], y: [2], coord: [] }], test])
-  }
-
   return (
     <Content>
       <HeaderButton
@@ -300,13 +283,6 @@ export const Game = () => {
             onClick={() => startGame()}
           >
             StartGame
-          </StyledButton>
-          <HeightSpacer></HeightSpacer>
-          <StyledButton
-            // disabled={!gameStarted}
-            onClick={() => oui()}
-          >
-            oui
           </StyledButton>
         </ColumnStyle>
         <ColumnStyle>

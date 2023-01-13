@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import {
   updateBoardArray,
+  updateBoardState,
   updateHistoryBoard,
 } from "../store/ducks/Board.ducks"
 import {
@@ -17,10 +18,11 @@ import {
   removeOldPossibleMoves,
   showPossibleMoves,
 } from "../utils/Moves"
-import { updateDroppedCounter, updatePadStore } from "../store/ducks/Pad.ducks"
+import { updateDroppedCounter, updatePadState, updatePadStore } from "../store/ducks/Pad.ducks"
 import { useNevadaSelector } from "../store/rootReducer"
 import {
   updateDisabledIndexPads,
+  updateGameState,
   updateGraphicPads,
   updateMovesHistory,
   updatePads,
@@ -48,26 +50,42 @@ export const Board = () => {
   const disabledIndexPads = useNevadaSelector(
     (state) => state.game.disabledIndexPads
   )
+  const game = useNevadaSelector((state) => state.game)
+  const pad = useNevadaSelector((state) => state.pad)
+  const board = useNevadaSelector((state) => state.board)
 
-  const [playerId, setPlayerId] = useState(0)
+  const [playerId, setPlayerId] = useState(-1)
 
   useEffect(() => {
-    console.log("test")
     console.log(socket.id)
 
+    socket.once("retrieve board", (socketId) =>{
+      socket.emit("send board game", board, game, socketId)
+    })
 
-    
+    socket.on("update board game", (board, game) => {
+      console.log("spec qui met à jour")
+      dispatch(updateBoardState(board))
+      dispatch(updateGameState(game))
+    })
+
+    socket.on("emit update game pad board", (game, pad, board) =>{
+      // dispatch(updateBoardState(board))
+      // dispatch(updatePadState(pad))
+      // dispatch(updateGameState(game))
+    })
+
+    socket.on("update playerId", (playId) =>{
+      setPlayerId(playId)
+    })
 
     socket.on("board", (historyBoard, pads, graphicPads, updatedBoard) => {
-      console.log("board oui ouoi ouio")
       dispatch(updateHistoryBoard(historyBoard))
       dispatch(updatePads(pads))
       dispatch(updateGraphicPads(graphicPads))
       dispatch(updateBoardArray(updatedBoard))
     })
-    socket.on("ok", () => {
-      console.log("ok ok")
-    })
+
     socket.on("emitUpdateDisabledIndexPads",(disabledIndexPads) => {
       dispatch(updateDisabledIndexPads(disabledIndexPads))
     })
@@ -77,7 +95,7 @@ export const Board = () => {
       )
       dispatch(updateBoardArray(board))
     })
-  }, [dispatch])
+  }, [dispatch, board, game])
 
   //Permet jouer un coup
   const makeMove = (cell: CellType) => {
@@ -160,11 +178,8 @@ export const Board = () => {
         }
         // faire fin de jeu ici où un truc du genre dispatch ....
       }
-      // dispatch(
-      //   updateMovesHistory(payload.newMovesHistory, payload.movesCount)
-      // )
-      // dispatch(updateBoardArray(boardWithMoves.board))
       socket.emit("MoveHistoryAndBoardArray",payload.newMovesHistory, payload.movesCount, boardWithMoves.board)
+      // socket.emit("update game pad board",  game, pad, board)
     }
     return
   }
@@ -256,7 +271,8 @@ export const Board = () => {
     dispatch(updateDroppedCounter(droppedPadCounter + 1))
     // changer ça ??????????? après dans tous les cas le Joueur 1 contruit 
     // et attends donc pas besoin de faire un socket emit à voir plus tard
-    socket.emit("emitBoard", historyBoard, [...pads, pad], [...graphicPads, graphicPad], updatedBoard)
+    socket.emit("placePad", historyBoard, [...pads, pad], [...graphicPads, graphicPad], updatedBoard)
+    // socket.emit("update game pad board",  game, pad, board)
   }
 
   const updatePadStoreFunction = (padToUpdate: number, by: number) => {
@@ -278,9 +294,7 @@ export const Board = () => {
                 gamestarted={gameStarted}
                 key={cellId}
                 onClick={() => {
-                  console.log("onClick,", cell.x, cell.y)
-                  socket.emit("emitok")
-                  if (!gameStarted) {
+                  if (playerId != -1 && !gameStarted && movesCount % 2 == playerId) {
                     placePad(cell)
                   }
                 }}
@@ -289,7 +303,7 @@ export const Board = () => {
                   <HoleForCellule
                     color={cell.possibleMove ? "green" : cell.holeColor}
                     onClick={()=>{
-                      if (gameStarted) {
+                      if (playerId != -1 && gameStarted && movesCount % 2 == playerId) {
                         makeMove(cell)
                       }
                     }}

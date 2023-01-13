@@ -7,6 +7,7 @@ export const enum BoardActionsEnum {
 
   UPDATE_HISTORY_BOARD = "BOARD/updateHistoryBoard",
 
+  UPDATE_BOARD_STATE = "BOARD/updateBoardState"
 }
 
 export const updateBoardArray = (array: boardType) =>
@@ -24,10 +25,17 @@ export const updateHistoryBoard = (histo: PadHistory[]) =>
     histo,
   } as const)
 
+export const updateBoardState = (boardState: BoardState) =>
+  ({
+    type: BoardActionsEnum.UPDATE_BOARD_STATE,
+    boardState
+  } as const)
+
 type BoardActionsType = ReturnType<
   | typeof updateBoardArray 
   | typeof resetBoardArray 
   | typeof updateHistoryBoard
+  | typeof updateBoardState
 >
 
 let x = -1
@@ -73,6 +81,8 @@ export function BoardReducer(
       return { ...state, array: initialeBoardArray }
     case BoardActionsEnum.UPDATE_HISTORY_BOARD:
       return { ...state, history: action.histo }
+    case BoardActionsEnum.UPDATE_BOARD_STATE:
+      return { ...action.boardState }
     default:
       return { ...state }
   }
