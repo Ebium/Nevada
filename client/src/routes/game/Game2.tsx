@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react"
+import { ReactNode, useEffect, useState } from "react"
 import styled from "styled-components/macro"
 import { colors } from "../../components/styles/design.config"
 import { ReactComponent as MenuCollapseSVG } from "../../assets/menu.svg"
@@ -34,30 +34,217 @@ import {
   StyledWinSerieSVG,
 } from "../../components/styles/CommonSvg"
 import { Board } from "../../components/Board"
+import { useDispatch } from "react-redux"
+import { useNevadaSelector } from "../../store/rootReducer"
+import {
+  GamePhaseType,
+  restartGame,
+  updateGamePhase,
+  updateGameStarted,
+  updatePads,
+  updatePlayersInfos,
+  updatePointEnd,
+} from "../../store/ducks/Game.ducks"
+import { socket } from "../../socket-context"
+import {
+  resetPadStore,
+  updateCurrentPad,
+  updateDroppedCounter,
+  updatePadStore,
+} from "../../store/ducks/Pad.ducks"
+import * as R from "ramda"
 
-export const Game2 = () => {
+import {
+  initialeBoardArray,
+  resetBoardArray,
+  updateBoardArray,
+  updateHistoryBoard,
+  updateGraphicPads,
+} from "../../store/ducks/Board.ducks"
+
+interface GameProps {
+  gameCode: string
+}
+
+export const Game2 = ({ gameCode }: GameProps) => {
   const intl = useIntl()
+  const dispatch = useDispatch()
   const navigate = useNavigate()
-  const [leftBarCollapsed, setLeftBarCollapsed] = useState(false)
+  const droppedCounter = useNevadaSelector((state) => state.pad.droppedCounter)
+  const currentPad = useNevadaSelector((state) => state.pad.current)
+  const padHistory = useNevadaSelector((state) => state.board.history)
+  const board = useNevadaSelector((state) => state.board.array)
+  const padStore = useNevadaSelector((state) => state.pad.padStore)
+  const gameStarted = useNevadaSelector((state) => state.game.started)
+  const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
+  const movesCount = useNevadaSelector((state) => state.game.movesCount)
+  const pads = useNevadaSelector((state) => state.game.pads)
+  const gamePhase = useNevadaSelector((state) => state.game.gamePhase)
+  const graphicPads = useNevadaSelector((state) => state.board.graphicPads)
+  const player1Infos = useNevadaSelector((state) => state.game.player1)
+  const player2Infos = useNevadaSelector((state) => state.game.player2)
+  console.log(player1Infos)
+  console.log(player2Infos)
+  const disabledIndexPads = useNevadaSelector(
+    (state) => state.game.disabledIndexPads
+  )
+  const playerId = useNevadaSelector((state) => state.game.playerId)
 
-  const gameCode = "randomCode"
+  const [leftBarCollapsed, setLeftBarCollapsed] = useState(false)
+  const [users, setUsers] = useState([socket.id])
+
   const [gameType, setGameType] = useState<
     "boarding" | "building" | "playing" | "test" | "finished"
   >("boarding")
+
+  const [currentBuildingPad, setCurrentBuildingPad] = useState<ReactNode>(<></>)
+
+  useEffect(() => {
+    if (droppedCounter === 17) {
+      socket.emit("GameStarted")
+      // dispatch(updateGameStarted(true))
+    } else {
+      if (gameStarted) {
+        dispatch(updateGameStarted(false))
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [droppedCounter])
+
+  useEffect(() => {
+    socket.on("emitGameStarted", () => {
+      dispatch(updateGameStarted(true))
+    })
+
+    socket.on("An user joined the room", (userslist) => {
+      setUsers(userslist)
+    })
+
+    socket.on("An user has left the room", (userslist) => {
+      setUsers(userslist)
+    })
+
+    socket.on("emit update game phase", (phase) => {
+      dispatch(updateGamePhase(phase))
+    })
+
+    socket.on(
+      "undo board",
+      (historyBoard, pads, graphicPads, updatedBoard, updatedPadStore) => {
+        dispatch(updateHistoryBoard(historyBoard))
+        dispatch(updatePads(pads))
+        dispatch(updateGraphicPads(graphicPads))
+        dispatch(updateBoardArray(updatedBoard))
+        dispatch(updatePadStore(updatedPadStore))
+        dispatch(updateDroppedCounter(droppedCounter - 1))
+      }
+    )
+
+    socket.on("reset board", () => {
+      dispatch(resetBoardArray())
+      dispatch(resetPadStore())
+      dispatch(updateDroppedCounter(0))
+      dispatch(updateHistoryBoard([]))
+    })
+
+    socket.on("players info", (user1, user2) => {
+      console.log("uahziruhaiuzhruiahzr")
+      console.log(user1)
+      console.log(user2)
+      console.log("uahziruhaiuzhruiahzr")
+
+      dispatch(updatePlayersInfos(user1, user2))
+      
+    })
+  }, [dispatch, droppedCounter])
+
+  const changeCurrentPad = (
+    nbTrous: number,
+    orientation: number,
+    color: string
+  ) => {
+    dispatch(
+      updateCurrentPad({
+        label: 0,
+        nbHole: nbTrous,
+        orientation: orientation,
+        color: color,
+      })
+    )
+  }
+
+  const changeOrientation = () => {
+    const setOrientation =
+      currentPad.orientation === 1 ? 0 : currentPad.orientation + 1
+    dispatch(
+      updateCurrentPad({
+        label: currentPad.label,
+        nbHole: currentPad.nbHole,
+        orientation: setOrientation,
+        color: currentPad.color,
+      })
+    )
+  }
+
+  const resetBoard = () => {
+    socket.emit("reset board")
+  }
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(gameCode)
   }
 
   const pickBoardPreset = (presetNum: number) => {
-    console.log("random preset = ", presetNum)
+    if (playerId !== -1 && movesCount % 2 === playerId) {
+      console.log("random preset = ", presetNum)
+    }
   }
 
-  const [currentPad, setCurrentPad] = useState<ReactNode>(<></>)
-  const [nbPad, setNbPad] = useState(17)
-
   const handlePadChoiceClick = (pad: ReactNode) => {
-    setCurrentPad(pad)
+    if (playerId !== -1 && movesCount % 2 === playerId)
+      setCurrentBuildingPad(pad)
+  }
+
+  const undoBoard = () => {
+    if (padHistory.length === 0) return
+    if (!gameStarted) {
+      const updatedBoard = R.clone(board)
+      let updatedHistory = R.clone(padHistory)
+      let updatedDesignPads = R.clone(graphicPads)
+      let updatedPads = R.clone(pads)
+      let updatedPadStore = R.clone(padStore)
+      padHistory[padHistory.length - 1].coord.map(
+        (cell) =>
+          (updatedBoard[cell[0]][cell[1]] =
+            initialeBoardArray[cell[0]][cell[1]])
+      )
+
+      updatedPadStore[
+        padHistory[padHistory.length - 1].coord.length - 1
+      ].remaining =
+        updatedPadStore[padHistory[padHistory.length - 1].coord.length - 1]
+          .remaining + 1
+
+      updatedHistory.pop()
+      updatedDesignPads.pop()
+      updatedPads.pop()
+
+      socket.emit(
+        "undo pad",
+        updatedHistory,
+        updatedPads,
+        updatedDesignPads,
+        updatedBoard,
+        updatedPadStore
+      )
+    }
+  }
+
+  const startGame = () => {
+    console.log("game started")
+    if (!gameStarted) {
+      socket.emit("GameStarted")
+    }
   }
 
   const UserInfoRow = (svg: ReactNode, text: string, data: any) => {
@@ -79,6 +266,10 @@ export const Game2 = () => {
         />
       </UserInfosRow>
     )
+  }
+
+  const handleUpdateGamePhase = (phase: GamePhaseType) => {
+    socket.emit("update game phase", phase)
   }
 
   return (
@@ -103,43 +294,6 @@ export const Game2 = () => {
               navigate("/main")
             }}
           />
-          {/* 
-          <NVSpacer height={3} />
-          <NVButton
-            disabled={false}
-            content={intl.formatMessage({ id: "reset to boarding" })}
-            colorSchem={"gold"}
-            onClick={() => {
-              setGameType("boarding")
-            }}
-          />
-          <NVSpacer height={1} />
-          <NVButton
-            disabled={false}
-            content={intl.formatMessage({ id: "reset to building" })}
-            colorSchem={"gold"}
-            onClick={() => {
-              setGameType("building")
-            }}
-          />
-          <NVSpacer height={1} />
-          <NVButton
-            disabled={false}
-            content={intl.formatMessage({ id: "reset to playing" })}
-            colorSchem={"gold"}
-            onClick={() => {
-              setGameType("playing")
-            }}
-          />
-          <NVSpacer height={1} />
-          <NVButton
-            disabled={false}
-            content={intl.formatMessage({ id: "reset to test" })}
-            colorSchem={"gold"}
-            onClick={() => {
-              setGameType("test")
-            }}
-          /> */}
           <LeftBarButtons>
             <RulesButton />
           </LeftBarButtons>
@@ -155,12 +309,12 @@ export const Game2 = () => {
           />
         </MidDivTopBar>
         <MidDivGame>
-          {gameType === "boarding" ? (
+          {gamePhase === "boarding" ? (
             <>
               <BoardingDiv>
                 <MarginAutoDiv>
                   <NVText
-                    text={intl.formatMessage({ id: "game.boarding.title" })}
+                    text={intl.formatMessage({ id: movesCount % 2 === playerId ? "game.boarding.title1" :  "game.boarding.title2"})}
                     textStyle={{
                       color: "nevadaGold",
                       fontSize: 1.5,
@@ -174,9 +328,9 @@ export const Game2 = () => {
                   <NVBar
                     text="game.boarding.build"
                     data={gameCode}
-                    clickable
+                    clickable={playerId !== -1 && movesCount % 2 === playerId}
                     onClick={() => {
-                      setGameType("building")
+                      handleUpdateGamePhase("building")
                     }}
                     svg={<BoardBuildSVG />}
                   />
@@ -194,7 +348,11 @@ export const Game2 = () => {
                     onClick={() => {
                       pickBoardPreset(1)
                     }}
-                    cursor={"pointer"}
+                    cursor={
+                      playerId !== -1 && movesCount % 2 === playerId
+                        ? "pointer"
+                        : "default"
+                    }
                     height={336}
                     width={336}
                   />
@@ -202,7 +360,11 @@ export const Game2 = () => {
                     onClick={() => {
                       pickBoardPreset(2)
                     }}
-                    cursor={"pointer"}
+                    cursor={
+                      playerId !== -1 && movesCount % 2 === playerId
+                        ? "pointer"
+                        : "default"
+                    }
                     height={336}
                     width={336}
                   />
@@ -210,282 +372,331 @@ export const Game2 = () => {
                     onClick={() => {
                       pickBoardPreset(3)
                     }}
-                    cursor={"pointer"}
+                    cursor={
+                      playerId !== -1 && movesCount % 2 === playerId
+                        ? "pointer"
+                        : "default"
+                    }
                     height={336}
                     width={336}
                   />
                 </PresetsDiv>
               </BoardingDiv>
             </>
-          ) : gameType === "building" ? (
-            <>
-              <MidDivMidSection>
-                <Board />
-              </MidDivMidSection>
-              <NVSpacer width={4} />
-
-              <MidDivRightSection>
-                <RowStyle>
-                  <NVBar
-                    text="game.building.reset"
-                    data={gameCode}
-                    svg={<ResetSVG />}
-                    width={9}
-                    clickable={nbPad !== 17}
-                    fillsvg={nbPad === 17 ? "red" : "green"}
-                  />
-                  <NVSpacer width={1} />
-                  <NVBar
-                    text="game.building.undo"
-                    data={gameCode}
-                    svg={<UndoSVG />}
-                    width={9}
-                    clickable={nbPad !== 17}
-                    fillsvg={nbPad === 17 ? "red" : "green"}
-                  />
-                </RowStyle>
-                <NVSpacer height={1} />
-                <RowStyle>
-                  <NVBar
-                    text="game.building.rotate-pad"
-                    data={gameCode}
-                    svg={<PadRotateSVG />}
-                    width={9}
-                    clickable={nbPad !== 17}
-                    fillsvg={nbPad === 17 || nbPad === 0 ? "red" : "green"}
-                  />
-                  <NVBar
-                    text="game.building.start-game"
-                    data={gameCode}
-                    svg={<GameStartSVG />}
-                    width={9}
-                    clickable={nbPad === 0}
-                    fillsvg={nbPad === 0 ? "green" : "red"}
-                    onClick={() => {
-                      setGameType("playing")
-                      console.log(nbPad)
-                    }}
-                  />
-                </RowStyle>
-                <NVSpacer height={1} />
-                <NVText
-                  text={intl.formatMessage({
-                    id: "game.building.pad.preview",
-                  })}
-                  textStyle={{
-                    color: "white",
-                  }}
-                />
-                <NVSpacer height={1} />
-                <PadPreview>{currentPad}</PadPreview>
-                <NVSpacer height={1} />
-                <NVText
-                  text={intl.formatMessage({
-                    id: "game.building.pad.select",
-                  })}
-                  textStyle={{
-                    color: "white",
-                  }}
-                />
-                <NVSpacer height={1} />
-                <PadsDiv>
-                  <PadRow>
-                    <StyledPad2SVG
-                      onClick={() => {
-                        handlePadChoiceClick(<StyledPad2SVG />)
-                      }}
-                    />
-                    <NVText
-                      text={intl.formatMessage(
-                        {
-                          id: "game.building.pad.remaining",
-                        },
-                        { data: -1 }
-                      )}
-                      textStyle={{
-                        color: "white",
-                      }}
-                    />
-                  </PadRow>
-                  <PadRow>
-                    <StyledPad4SVG
-                      onClick={() => {
-                        handlePadChoiceClick(<StyledPad4SVG />)
-                      }}
-                    />
-                    <NVText
-                      text={intl.formatMessage(
-                        {
-                          id: "game.building.pad.remaining",
-                        },
-                        { data: -1 }
-                      )}
-                      textStyle={{
-                        color: "white",
-                      }}
-                    />
-                  </PadRow>
-                  <PadRow>
-                    <StyledPad3SVG
-                      onClick={() => {
-                        handlePadChoiceClick(<StyledPad3SVG />)
-                        setNbPad(nbPad - 1)
-                      }}
-                    />
-                    <NVText
-                      text={intl.formatMessage(
-                        {
-                          id: "game.building.pad.remaining",
-                        },
-                        { data: -1 }
-                      )}
-                      textStyle={{
-                        color: "white",
-                      }}
-                    />
-                  </PadRow>
-                  <PadRow>
-                    <StyledPad6SVG
-                      onClick={() => {
-                        handlePadChoiceClick(<StyledPad6SVG />)
-                      }}
-                    />
-                    <NVText
-                      text={intl.formatMessage(
-                        {
-                          id: "game.building.pad.remaining",
-                        },
-                        { data: -1 }
-                      )}
-                      textStyle={{
-                        color: "white",
-                      }}
-                    />
-                  </PadRow>
-                </PadsDiv>
-              </MidDivRightSection>
-            </>
-          ) : gameType === "playing" ? (
-            <>
-              <MidDivMidSection>
-                <Board />
-              </MidDivMidSection>
-
-              <NVSpacer width={4} />
-              <MidDivRightSection>
-                <NVText
-                  text={intl.formatMessage(
-                    {
-                      id: "game.playing.actual-turn",
-                    },
-                    { data: "random" }
-                  )}
-                  textStyle={{
-                    color: "nevadaGold",
-                    fontSize: 1.8,
-                  }}
-                />
-                <NVSpacer height={2} />
-                <NVLine width={17} />
-                <NVSpacer height={1} />
-                <NVBar
-                  text="game.playing.player.1"
-                  svg={<UserOctagonSVG />}
-                  bottomrightB={0}
-                  topleftB={0}
-                />
-                <NVSpacer height={0.5} />
-                <NVText
-                  text={"pseudo 1"}
-                  textStyle={{
-                    color: "white",
-                    fontSize: 1.2,
-                    fontWeight: 800,
-                  }}
-                />
-                <NVSpacer height={0.5} />
-
-                {UserInfoRow(
-                  <StyledStatsSVG />,
-                  "game.playing.games.played",
-                  -1
-                )}
-                {UserInfoRow(
-                  <StyledGamesWinSVG />,
-                  "game.playing.games.won",
-                  -1
-                )}
-                {UserInfoRow(
-                  <StyledGamesLostSVG />,
-                  "game.playing.games.lost",
-                  -1
-                )}
-                {UserInfoRow(
-                  <StyledWinSerieSVG />,
-                  "game.playing.games.serie",
-                  -1
-                )}
-                <NVBar
-                  text="game.playing.remaining"
-                  data={-1}
-                  svg={<PionSVG />}
-                  bottomleftB={0}
-                  toprightB={0}
-                />
-
-                <NVSpacer height={1} />
-                <NVLine width={17} />
-                <NVSpacer height={1} />
-
-                <NVBar
-                  text="game.playing.player.2"
-                  svg={<UserOctagonSVG />}
-                  bottomrightB={0}
-                />
-                <NVSpacer height={0.5} />
-                <NVText
-                  text={"pseudo 2"}
-                  textStyle={{
-                    color: "white",
-                    fontSize: 1.2,
-                    fontWeight: 800,
-                  }}
-                />
-                <NVSpacer height={0.5} />
-                {UserInfoRow(
-                  <StyledStatsSVG />,
-                  "game.playing.games.played",
-                  -1
-                )}
-                {UserInfoRow(
-                  <StyledGamesWinSVG />,
-                  "game.playing.games.won",
-                  -1
-                )}
-                {UserInfoRow(
-                  <StyledGamesLostSVG />,
-                  "game.playing.games.lost",
-                  -1
-                )}
-                {UserInfoRow(
-                  <StyledWinSerieSVG />,
-                  "game.playing.games.serie",
-                  -1
-                )}
-                <NVBar
-                  text="game.playing.remaining"
-                  data={-1}
-                  svg={<PionSVG />}
-                  bottomleftB={0}
-                  toprightB={0}
-                />
-                <NVSpacer height={1} />
-                <NVLine width={17} />
-              </MidDivRightSection>
-            </>
           ) : (
             <>
-              <Board />
+              <MidDivMidSection>
+                <Board />
+              </MidDivMidSection>
+              <NVSpacer width={4} />
+
+              <MidDivRightSection>
+                {gamePhase === "building" ? (
+                  <>
+                    <RowStyle>
+                      <NVBar
+                        text="game.building.reset"
+                        svg={<ResetSVG />}
+                        width={9}
+                        clickable={
+                          droppedCounter !== 0 &&
+                          playerId !== -1 &&
+                          movesCount % 2 === playerId
+                        }
+                        onClick={() => {
+                          resetBoard()
+                        }}
+                        fillsvg={droppedCounter === 0 ? "red" : "green"}
+                      />
+                      <NVSpacer width={1} />
+                      <NVBar
+                        text="game.building.undo"
+                        svg={<UndoSVG />}
+                        width={9}
+                        clickable={
+                          droppedCounter !== 0 &&
+                          playerId !== -1 &&
+                          movesCount % 2 === playerId
+                        }
+                        onClick={() => {
+                          undoBoard()
+                        }}
+                        fillsvg={droppedCounter === 0 ? "red" : "green"}
+                      />
+                    </RowStyle>
+                    <NVSpacer height={1} />
+                    <RowStyle>
+                      <NVBar
+                        text="game.building.rotate-pad"
+                        svg={<PadRotateSVG />}
+                        width={9}
+                        clickable={
+                          droppedCounter !== 0 &&
+                          playerId !== -1 &&
+                          movesCount % 2 === playerId
+                        }
+                        onClick={() => changeOrientation()}
+                        fillsvg={
+                          droppedCounter === 17 || droppedCounter === 0
+                            ? "red"
+                            : "green"
+                        }
+                      />
+                      <NVBar
+                        text="game.building.start-game"
+                        svg={<GameStartSVG />}
+                        width={9}
+                        clickable={
+                          droppedCounter === 17 &&
+                          playerId !== -1 &&
+                          movesCount % 2 === playerId
+                        }
+                        fillsvg={droppedCounter === 17 ? "green" : "red"}
+                        onClick={() => {
+                          handleUpdateGamePhase("playing")
+                        }}
+                      />
+                    </RowStyle>
+                    <NVSpacer height={1} />
+                    <NVText
+                      text={intl.formatMessage({
+                        id: "game.building.pad.preview",
+                      })}
+                      textStyle={{
+                        color: "white",
+                      }}
+                    />
+                    <NVSpacer height={1} />
+                    <PadPreview>{currentBuildingPad}</PadPreview>
+                    <NVSpacer height={1} />
+                    <NVText
+                      text={intl.formatMessage({
+                        id: "game.building.pad.select",
+                      })}
+                      textStyle={{
+                        color: "white",
+                      }}
+                    />
+                    <NVSpacer height={1} />
+                    <PadsDiv>
+                      <PadRow>
+                        <StyledPad2SVG
+                          onClick={() => {
+                            handlePadChoiceClick(<StyledPad2SVG />)
+                            changeCurrentPad(2, 1, "green")
+                          }}
+                          cursor={
+                            playerId !== -1 && movesCount % 2 === playerId
+                              ? "pointer"
+                              : "default"
+                          }
+                        />
+                        <NVText
+                          text={intl.formatMessage(
+                            {
+                              id: "game.building.pad.remaining",
+                            },
+                            { data: padStore[1].remaining }
+                          )}
+                          textStyle={{
+                            color: "white",
+                          }}
+                        />
+                      </PadRow>
+                      <PadRow>
+                        <StyledPad4SVG
+                          onClick={() => {
+                            handlePadChoiceClick(<StyledPad4SVG />)
+                            changeCurrentPad(4, 1, "green")
+                          }}
+                          cursor={
+                            playerId !== -1 && movesCount % 2 === playerId
+                              ? "pointer"
+                              : "default"
+                          }
+                        />
+                        <NVText
+                          text={intl.formatMessage(
+                            {
+                              id: "game.building.pad.remaining",
+                            },
+                            { data: padStore[3].remaining }
+                          )}
+                          textStyle={{
+                            color: "white",
+                          }}
+                        />
+                      </PadRow>
+                      <PadRow>
+                        <StyledPad3SVG
+                          onClick={() => {
+                            handlePadChoiceClick(<StyledPad3SVG />)
+                            changeCurrentPad(3, 1, "green")
+                          }}
+                          cursor={
+                            playerId !== -1 && movesCount % 2 === playerId
+                              ? "pointer"
+                              : "default"
+                          }
+                        />
+                        <NVText
+                          text={intl.formatMessage(
+                            {
+                              id: "game.building.pad.remaining",
+                            },
+                            { data: padStore[2].remaining }
+                          )}
+                          textStyle={{
+                            color: "white",
+                          }}
+                        />
+                      </PadRow>
+                      <PadRow>
+                        <StyledPad6SVG
+                          onClick={() => {
+                            handlePadChoiceClick(<StyledPad6SVG />)
+                            changeCurrentPad(6, 1, "green")
+                          }}
+                          cursor={
+                            playerId !== -1 && movesCount % 2 === playerId
+                              ? "pointer"
+                              : "default"
+                          }
+                        />
+                        <NVText
+                          text={intl.formatMessage(
+                            {
+                              id: "game.building.pad.remaining",
+                            },
+                            { data: padStore[5].remaining }
+                          )}
+                          textStyle={{
+                            color: "white",
+                          }}
+                        />
+                      </PadRow>
+                    </PadsDiv>
+                  </>
+                ) : gamePhase === "playing" ? (
+                  <>
+                    <NVText
+                      text={intl.formatMessage(
+                        {
+                          id: "game.playing.actual-turn",
+                        },
+                        {
+                          data:
+                            movesCount % 2 === 0
+                              ? player1Infos.pseudo
+                              : player2Infos.pseudo,
+                        }
+                      )}
+                      textStyle={{
+                        color: "nevadaGold",
+                        fontSize: 1.8,
+                      }}
+                    />
+                    <NVSpacer height={2} />
+                    <NVLine width={17} />
+                    <NVSpacer height={1} />
+                    <NVBar
+                      text="game.playing.player.1"
+                      svg={<UserOctagonSVG />}
+                      bottomrightB={0}
+                      topleftB={0}
+                    />
+                    <NVSpacer height={0.5} />
+                    <NVText
+                      text={player1Infos.pseudo}
+                      textStyle={{
+                        color: "white",
+                        fontSize: 1.2,
+                        fontWeight: 800,
+                      }}
+                    />
+                    <NVSpacer height={0.5} />
+
+                    {UserInfoRow(
+                      <StyledStatsSVG />,
+                      "game.playing.games.played",
+                      player1Infos.nbPlayed
+                    )}
+                    {UserInfoRow(
+                      <StyledGamesWinSVG />,
+                      "game.playing.games.won",
+                      player1Infos.won
+                    )}
+                    {UserInfoRow(
+                      <StyledGamesLostSVG />,
+                      "game.playing.games.lost",
+                      player1Infos.lost
+                    )}
+                    {UserInfoRow(
+                      <StyledWinSerieSVG />,
+                      "game.playing.games.serie",
+                      player1Infos.winStreak
+                    )}
+                    <NVBar
+                      text="game.playing.remaining"
+                      data={-1}
+                      svg={<PionSVG />}
+                      bottomleftB={0}
+                      toprightB={0}
+                    />
+
+                    <NVSpacer height={1} />
+                    <NVLine width={17} />
+                    <NVSpacer height={1} />
+
+                    <NVBar
+                      text="game.playing.player.2"
+                      svg={<UserOctagonSVG />}
+                      bottomrightB={0}
+                    />
+                    <NVSpacer height={0.5} />
+                    <NVText
+                      text={player2Infos.pseudo}
+                      textStyle={{
+                        color: "white",
+                        fontSize: 1.2,
+                        fontWeight: 800,
+                      }}
+                    />
+                    <NVSpacer height={0.5} />
+                    {UserInfoRow(
+                      <StyledStatsSVG />,
+                      "game.playing.games.played",
+                      player2Infos.nbPlayed
+                    )}
+                    {UserInfoRow(
+                      <StyledGamesWinSVG />,
+                      "game.playing.games.won",
+                      player2Infos.won
+                    )}
+                    {UserInfoRow(
+                      <StyledGamesLostSVG />,
+                      "game.playing.games.lost",
+                      player2Infos.lost
+                    )}
+                    {UserInfoRow(
+                      <StyledWinSerieSVG />,
+                      "game.playing.games.serie",
+                      player2Infos.winStreak
+                    )}
+                    <NVBar
+                      text="game.playing.remaining"
+                      data={-1}
+                      svg={<PionSVG />}
+                      bottomleftB={0}
+                      toprightB={0}
+                    />
+                    <NVSpacer height={1} />
+                    <NVLine width={17} />
+                  </>
+                ) : (
+                  <></>
+                )}
+              </MidDivRightSection>
             </>
           )}
         </MidDivGame>
@@ -571,7 +782,6 @@ const MidDiv = styled.div<LeftBarProps>`
   margin: ${({ leftbarcollapsed }) => (leftbarcollapsed ? "3rem" : "1rem")};
   display: flex;
   flex-direction: column;
-  background-color: green;
 `
 const MidDivTopBar = styled.div`
   display: flex;
@@ -641,22 +851,18 @@ const PadRow = styled.div`
   align-items: center;
 `
 const StyledPad2SVG = styled(Pad2SVG)`
-  cursor: pointer;
   width: 100px;
   height: 50px;
 `
 const StyledPad3SVG = styled(Pad3SVG)`
-  cursor: pointer;
   width: 150px;
   height: 50px;
 `
 const StyledPad4SVG = styled(Pad4SVG)`
-  cursor: pointer;
   width: 100px;
   height: 100px;
 `
 const StyledPad6SVG = styled(Pad6SVG)`
-  cursor: pointer;
   width: 150px;
   height: 100px;
 `

@@ -48,7 +48,7 @@ export const Home = () => {
   )
   const gamesCounter = useNevadaSelector((state) => state.general.games)
   const playersRanking = useNevadaSelector((state) => state.user.usersRanking)
-  const baseURL = "http://localhost:3000/nevada/main/game/"
+  const baseURL = "http://localhost:3000/nevada/game/"
 
   const [gameCode, setGameCode] = useState("")
   const [gameCodeAlertDisplayed, setGameCodeAlertDisplayed] = useState(false)
