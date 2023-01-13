@@ -53,20 +53,28 @@ export const Board = () => {
   const game = useNevadaSelector((state) => state.game)
   const board = useNevadaSelector((state) => state.board)
 
+  const [boardIsSet, setBoardIsSet] = useState(false)
   const [playerId, setPlayerId] = useState(-1)
 
   useEffect(() => {
     console.log(socket.id)
 
-    socket.once("retrieve board", (socketId) =>{
+    socket.on("retrieve board", (socketId) =>{
       socket.emit("send board game", board, game, socketId)
     })
 
-    socket.on("update board game", (board, game) => {
-      console.log("spec qui met à jour")
-      dispatch(updateBoardState(board))
-      dispatch(updateGameState(game))
-    })
+    if(boardIsSet == false) {
+      socket.once("update board game", (board, game) => {
+        setBoardIsSet(true)
+        console.log("spec qui met à jour")
+        dispatch(updateBoardState(board))
+        dispatch(updateGameState(game))
+      })
+    }
+
+    /*
+      socket emit si player appuie bouton
+    */
 
     socket.on("emit update game pad board", (game, pad, board) =>{
       // dispatch(updateBoardState(board))
@@ -93,7 +101,21 @@ export const Board = () => {
       dispatch(updateBoardArray(board))
       dispatch(updatePads(pads))
     })
-  }, [dispatch, board, game])
+
+    socket.once("Player abandon", ()=> {
+      //je suis le joueur gagnant
+      if(playerId>=0) {
+        socket.emit("Winner room", playerId)
+      }
+      console.log("joueur abandonné looser")
+      //affichage du joueur gagnant à l'écran
+    })
+
+    socket.on("Room invalid", (message) => {
+      alert(message)
+      window.location.assign("/nevada/main/home")
+    })
+  }, [dispatch, board, game, boardIsSet])
 
   //Permet jouer un coup
   const makeMove = (cell: CellType) => {
@@ -165,12 +187,15 @@ export const Board = () => {
         )
         if (pointsFirstPlayer > pointsSecondPlayer) {
           console.log("Le Joueur rouge est gagnant")
+          socket.emit("Winner room", 0)
         }
         if (pointsFirstPlayer < pointsSecondPlayer) {
           console.log("Le Joueur Bleu est gagnant")
+          socket.emit("Winner room", 1)
         }
         if (pointsFirstPlayer === pointsSecondPlayer) {
           console.log("Les 2 Joueurs sont ex aequo")
+          socket.emit("Winner room", -1)
         }
         // faire fin de jeu ici où un truc du genre dispatch ....
       }
