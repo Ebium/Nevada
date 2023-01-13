@@ -136,6 +136,8 @@ export const translations = {
   "game.playing.actual-turn": "Tour actuel : {data}",
   "game.playing.player.1": "Joueur 1",
   "game.playing.player.2": "Joueur 2",
+  "game.playing.player.me": "Moi",
+  "game.playing.player.ennemy": "Adversaire",
   "game.playing.games.played": "Parties jouées : {data}",
   "game.playing.games.won": "Gagnées : {data}",
   "game.playing.games.lost": "Perdues : {data}",

@@ -104,24 +104,7 @@ export const Board = () => {
       dispatch(updatePads(pads))
     })
 
-    socket.once("Player abandon", ()=> {
-      //je suis le joueur gagnant
-      if(playerId>=0) {
-        socket.emit("Winner room", playerId)
-      }
-      console.log("joueur abandonné looser")
-      //affichage du joueur gagnant à l'écran
-    })
 
-    socket.on("Room invalid", (message) => {
-      alert(message)
-      window.location.assign("/nevada/main/home")
-    })
-
-    socket.once("2 players server side", (data)=> {
-      console.log(data)
-      socket.emit("2 players server side", data)
-     })
     
   }, [dispatch, board, game, boardIsSet])
 

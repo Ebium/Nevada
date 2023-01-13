@@ -6,9 +6,28 @@ const cors = require("cors")
 const products_routes = require("./routes/products.js")
 const users_routes = require("./routes/users.js")
 const general_routes = require("./routes/general.js")
-const { getStripeCheckoutSessionUrl, getStripeCheckoutSessionUrlFromPremiumStripeObject, getStripeCheckoutSessionUrlFromPremiumLifeStripeObject, getStripeCheckoutSessionUrlFromStripeObject } = require("./controllers/payment")
-const { registerValidUser, loginUserAuth, findUserBySocketId, userPayment, userUnsubscribe, updateUser } = require("./controllers/users") 
-const { createRoom, updateANewPlayerRoom, updateAQuitPlayerRoom, clearRooms, roomExist, deleteRoom } = require("./controllers/room.js")
+const {
+  getStripeCheckoutSessionUrl,
+  getStripeCheckoutSessionUrlFromPremiumStripeObject,
+  getStripeCheckoutSessionUrlFromPremiumLifeStripeObject,
+  getStripeCheckoutSessionUrlFromStripeObject,
+} = require("./controllers/payment")
+const {
+  registerValidUser,
+  loginUserAuth,
+  findUserBySocketId,
+  userPayment,
+  userUnsubscribe,
+  updateUser,
+} = require("./controllers/users")
+const {
+  createRoom,
+  updateANewPlayerRoom,
+  updateAQuitPlayerRoom,
+  clearRooms,
+  roomExist,
+  deleteRoom,
+} = require("./controllers/room.js")
 var spectatorsCounter = 0
 
 const PORT = 5050
@@ -34,7 +53,7 @@ const io = socketIo(server, {
  * When we launch the server or reset the server
  * Rooms should not exist
  */
-// clearRooms()
+clearRooms()
 
 /*
  *  client/server : authentification user account request
@@ -115,7 +134,7 @@ io.on("connection", (socket) => {
 io.on("connection", (socket) => {
   var currentRoomId = undefined
   var usersRoom = []
-  var playersRoom =  []
+  var playersRoom = []
   var gameStarted = false
 
   socket.on("Create a new room", async () => {
@@ -124,52 +143,60 @@ io.on("connection", (socket) => {
     else socket.emit("Create a new room", undefined, false)
   })
 
-  socket.on("Join a room", async(roomId) => {
+  socket.on("Join a room", async (roomId) => {
     const roomFound = await roomExist(roomId)
 
     //La room n'existe pas
-    if(roomFound == false) {
-      socket.emit("Room invalid", "This room does not exist or the game finished")
+    if (roomFound == false) {
+      socket.emit(
+        "Room invalid",
+        "This room does not exist or the game finished"
+      )
       return
     }
 
-    const room = await updateANewPlayerRoom({ _id : mongoose.Types.ObjectId(roomId)}, socket.id)
+    const room = await updateANewPlayerRoom(
+      { _id: mongoose.Types.ObjectId(roomId) },
+      socket.id
+    )
 
-    if(room.modifiedCount){
+    if (room.modifiedCount) {
       //mise à jour des données en local
       socket.join(roomId)
-      currentRoomId=roomId;
-      usersRoom =  Array.from(await io.sockets.adapter.rooms.get(currentRoomId))
+      currentRoomId = roomId
+      const allRooms = await io.sockets.adapter.rooms.get(currentRoomId)
+      usersRoom = Array.from(allRooms)
 
       //envoi qu'il a bel et bien rejoint
       socket.emit("Join a room", true, roomId)
-      io.to(currentRoomId).emit("An user joined the room",  usersRoom)
-    } else
-      socket.emit("Join a room", false, "")
+      io.to(currentRoomId).emit("An user joined the room", usersRoom)
+    } else socket.emit("Join a room", false, "")
+
 
     //Si 2 premiers joueurs, mettre à jour le tab des joueurs
-    if(usersRoom.length<=2 && playersRoom.length!=2) {
-      playersRoom = usersRoom.slice(0,2) 
-      socket.emit("update playerId", playersRoom.length-1)
-    } 
+    if (usersRoom.length <= 2 && playersRoom.length != 2) {
+      playersRoom = usersRoom.slice(0, 2)
+      console.log("je rentre avec : ",socket.id)
+      console.log(playersRoom.length)
+      socket.emit("update playerId", (playersRoom.length - 1) )
+    }
 
     //si un spectateur envoie les données du board
-    if(usersRoom.length>2){
+    if (usersRoom.length > 2) {
       io.to(usersRoom[0]).emit("retrieve board", socket.id)
     }
 
-    if(playersRoom.length==2) {
-      console.log("aloa : " ,playersRoom)
+    if (playersRoom.length == 2) {
+      console.log("aloa : ", playersRoom)
       io.to(currentRoomId).emit("2 players server side", playersRoom)
     }
-    
-    if (usersRoom.length >= 2){
+
+    if (usersRoom.length >= 2) {
       const user1 = await findUserBySocketId(usersRoom[0])
       const user2 = await findUserBySocketId(usersRoom[1])
       io.to(currentRoomId).emit("players info", user1, user2)
     }
   })
-
 
   socket.on(
     "placePad",
@@ -203,9 +230,23 @@ io.on("connection", (socket) => {
     io.to(currentRoomId).emit("reset board")
   })
 
-  socket.on("MakeMove",(newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
-    io.to(currentRoomId).emit("emitMakeMove",newMovesHistory, movesCount, board, disabledIndexPads, pads)
-   })
+  socket.on(
+    "MakeMove",
+    (newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
+      io.to(currentRoomId).emit(
+        "emitMakeMove",
+        newMovesHistory,
+        movesCount,
+        board,
+        disabledIndexPads,
+        pads
+      )
+    }
+  )
+
+  socket.on("update current pad", (padName) => {
+    io.to(currentRoomId).emit("emit update current pad", padName)
+  })
 
   socket.on("update game pad board", (game, pad, board) => {
     io.to(currentRoomId).emit("emit update game pad board", game, pad, board)
@@ -215,27 +256,41 @@ io.on("connection", (socket) => {
     io.to(currentRoomId).emit("emit update game phase", phase)
   })
 
-  socket.on("2 players server side", (players)=> {
+  socket.on("2 players server side", (players) => {
     playersRoom = players
     gameStarted = true
   })
 
   socket.on("placePad", (historyBoard, pads, graphicPads, updatedBoard) => {
-    io.to(currentRoomId).emit("board",historyBoard, pads, graphicPads, updatedBoard)
-    
+    io.to(currentRoomId).emit(
+      "board",
+      historyBoard,
+      pads,
+      graphicPads,
+      updatedBoard
+    )
   })
 
-  socket.on("MakeMove",(newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
-    io.to(currentRoomId).emit("emitMakeMove",newMovesHistory, movesCount, board, disabledIndexPads, pads)
+  socket.on(
+    "MakeMove",
+    (newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
+      io.to(currentRoomId).emit(
+        "emitMakeMove",
+        newMovesHistory,
+        movesCount,
+        board,
+        disabledIndexPads,
+        pads
+      )
+    }
+  )
 
-  })
-
-  socket.on("update game pad board",  (game, pad, board) => {
-    io.to(currentRoomId).emit("emit update game pad board",game, pad, board)
+  socket.on("update game pad board", (game, pad, board) => {
+    io.to(currentRoomId).emit("emit update game pad board", game, pad, board)
   })
 
   // client : jeu
-  socket.on("GameStarted",async() => {
+  socket.on("GameStarted", async () => {
     io.to(currentRoomId).emit("emitGameStarted")
 
     gameStarted = true
@@ -245,8 +300,8 @@ io.on("connection", (socket) => {
     var player1Edited = player1
     var player2Edited = player2
 
-    player1Edited.played+=1
-    player2Edited.played+=1
+    player1Edited.played += 1
+    player2Edited.played += 1
 
     await updateUser(player1Edited)
     await updateUser(player2Edited)
@@ -258,16 +313,16 @@ io.on("connection", (socket) => {
   })
 
   //un joueur a gagné la partie
-  socket.once("Winner room", async(playerId)=> {
+  socket.once("Winner room", async (playerId) => {
     deleteRoom(currentRoomId)
 
     //la partie avait commencé
-    if(gameStarted && playerId!=-1) {
+    if (gameStarted && playerId != -1) {
       const user = await findUserBySocketId(playersRoom[playerId])
       var userEdited = user
       userEdited.won += 1
       updateUser(user)
-      io.in(currentRoomId).socketsLeave(currentRoomId);
+      io.in(currentRoomId).socketsLeave(currentRoomId)
     }
   })
 
@@ -277,33 +332,38 @@ io.on("connection", (socket) => {
     io.to(currentRoomId).emit("Player abandon", playersRoom.indexOf(socket.id))
   })
 
-
-  socket.on("disconnect", async()=> {
-    if(currentRoomId!=undefined) {
-      // si c'est un joueur
-      if(playersRoom.includes(socket.id)) {
-        await deleteRoom(currentRoomId)
-        io.to(currentRoomId).emit("Player abandon", playersRoom.indexOf(socket.id))
-      }
-      
-      //envoi à tout le monde qu'un utilisateur s'est déconnecté
-      socket.leave(currentRoomId)
-      await updateAQuitPlayerRoom({ _id : mongoose.Types.ObjectId(currentRoomId)},socket.id)
-      io.to(currentRoomId).emit("An user has left the room",  usersRoom)
-    }
-    
   socket.on("disconnect", async () => {
     if (currentRoomId != undefined) {
+      // si c'est un joueur
+      if (playersRoom.includes(socket.id)) {
+        await deleteRoom(currentRoomId)
+        io.to(currentRoomId).emit(
+          "Player abandon",
+          playersRoom.indexOf(socket.id)
+        )
+      }
+
+      //envoi à tout le monde qu'un utilisateur s'est déconnecté
+      socket.leave(currentRoomId)
       await updateAQuitPlayerRoom(
         { _id: mongoose.Types.ObjectId(currentRoomId) },
         socket.id
       )
-      io.to(currentRoomId).emit(
-        "An user has left the room",
-        Array.from(usersRoom)
-      )
+      io.to(currentRoomId).emit("An user has left the room", usersRoom)
     }
-  })
+
+    socket.on("disconnect", async () => {
+      if (currentRoomId != undefined) {
+        await updateAQuitPlayerRoom(
+          { _id: mongoose.Types.ObjectId(currentRoomId) },
+          socket.id
+        )
+        io.to(currentRoomId).emit(
+          "An user has left the room",
+          Array.from(usersRoom)
+        )
+      }
+    })
   })
 })
 

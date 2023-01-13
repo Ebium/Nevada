@@ -20,7 +20,6 @@ import {
 import { NVInput } from "../../components/styles/NVInput"
 import { ChangeEvent, FormEvent, useEffect, useState } from "react"
 import { NVAlert } from "../../components/styles/NVAlert"
-import { EndGameModal } from "../../components/EndGameModal"
 import { useDispatch } from "react-redux"
 import {
   getGamesCounterThunk,
@@ -29,7 +28,7 @@ import {
 } from "../../store/ducks/General.ducks"
 import { getUsersRankingThunk } from "../../store/ducks/User.ducks"
 import { createRoom, getServerResponse } from "../../utils/Rooms"
-import { socket } from '../../socket-context';
+import { socket } from "../../socket-context"
 
 export const Home = () => {
   const navigate = useNavigate()
@@ -48,7 +47,6 @@ export const Home = () => {
   )
   const gamesCounter = useNevadaSelector((state) => state.general.games)
   const playersRanking = useNevadaSelector((state) => state.user.usersRanking)
-  const baseURL = "http://localhost:3000/nevada/game/"
 
   const [gameCode, setGameCode] = useState("")
   const [gameCodeAlertDisplayed, setGameCodeAlertDisplayed] = useState(false)
@@ -67,13 +65,10 @@ export const Home = () => {
 
     socket.on("Join a room", (joined, roomId) => {
       if (joined && roomId !== "") {
-        window.location.href = baseURL + roomId;
-      }
-      else
-        alert("An internal problem has occurred.");
+        navigate(`/game/${roomId}`)
+      } else alert("An internal problem has occurred.")
     })
-
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const CenterCard = (props: {
@@ -180,8 +175,6 @@ export const Home = () => {
       />
     )
   }
-  const [a, setA] = useState(true)
-  const [winner, setWinner] = useState("")
 
   const handleGameCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
     setGameCode(event.target.value)
@@ -195,9 +188,7 @@ export const Home = () => {
       console.log("SIUUUUUUUUU")
       console.log(gameCode)
       socket.emit("Join a room", gameCode)
-
     }
-
   }
 
   return (
@@ -209,14 +200,6 @@ export const Home = () => {
         })}
         onClose={() => {
           setGameCodeAlertDisplayed(!gameCodeAlertDisplayed)
-        }}
-      />
-
-      <EndGameModal
-        isDisplayed={a}
-        winner={winner}
-        onClose={() => {
-          setA(!a)
         }}
       />
 
@@ -237,7 +220,11 @@ export const Home = () => {
           <NVSpacer height={1} />
           <NVLine width={17} height={0.2} color={"nevadaBlack"} />
           <LeftBarLine schema={1} data={playersCounter} text={"players"} />
-          <LeftBarLine schema={0} data={gamesCounter - playersCounter} text={"games"} />
+          <LeftBarLine
+            schema={0}
+            data={gamesCounter - playersCounter}
+            text={"games"}
+          />
           <LeftBarLine
             schema={1}
             data={spectatorsCounter}
@@ -479,7 +466,11 @@ export const Home = () => {
               <>
                 <NVText
                   text={"Place : " + (index + 1)}
-                  textStyle={{ color: "nevadaGold" }}
+                  textStyle={{
+                    color: "nevadaGold",
+                    fontWeight: 900,
+                    fontSize: 1.2,
+                  }}
                 />
                 <NVText
                   text={value.premium ? `👑 ${value.pseudo}` : value.pseudo}
@@ -578,8 +569,8 @@ const LeftBarRow = styled.div<LeftBarRowProps>`
     schema === 2
       ? colors.nevadaBlue
       : schema
-        ? colors.midGrey
-        : colors.topGrey};
+      ? colors.midGrey
+      : colors.topGrey};
   display: flex;
   align-items: center;
   height: 2.5rem;
