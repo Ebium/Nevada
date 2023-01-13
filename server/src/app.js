@@ -184,8 +184,9 @@ io.on("connection", (socket) => {
 
   //un joueur a gagné la partie
   socket.once("Winner room", async(playerId)=> {
-    console.log(playerId)
-    //la partie a commencé
+    deleteRoom(currentRoomId)
+    
+    //la partie avait commencé
     if(gameStarted && playerId!=-1) {
       const user = await findUserBySocketId(playersRoom[playerId])
       var userEdited = user
