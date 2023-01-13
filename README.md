@@ -6,7 +6,7 @@ Mp Ebium pour avoir access à la bdd
 
 
 - Installer node avec une version supérieur ou égale à 16.16 https://nodejs.org/fr/download/
-- git clone sur notre github https://github.com/Ebium/Nevada
+- télécharger le zip sur notre https://github.com/Ebium/Nevada
 - après le git clone, faire la commande npm install dans le les dossier client, server, dev ou lancer le script npm-i.sh si sur un env Linux
 - créer un fichier .env dans le dossier client avec les lignes: 
 ``` 
