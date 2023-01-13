@@ -6,7 +6,7 @@ const cors = require("cors")
 const products_routes = require("./routes/products.js")
 const users_routes = require("./routes/users.js")
 const general_routes = require("./routes/general.js")
-const { getStripeCheckoutSessionUrl, getStripeCheckoutSessionUrlFromPremiumStripeObject, getStripeCheckoutSessionUrlFromPremiumLifeStripeObject } = require("./controllers/payment")
+const { getStripeCheckoutSessionUrl, getStripeCheckoutSessionUrlFromPremiumStripeObject, getStripeCheckoutSessionUrlFromPremiumLifeStripeObject, getStripeCheckoutSessionUrlFromStripeObject } = require("./controllers/payment")
 const { registerValidUser, loginUserAuth, findUserBySocketId, userPayment, userUnsubscribe, updateUser } = require("./controllers/users") 
 const { createRoom, updateANewPlayerRoom, updateAQuitPlayerRoom, clearRooms, roomExist, deleteRoom } = require("./controllers/room.js")
 var spectatorsCounter = 0
@@ -34,7 +34,7 @@ const io = socketIo(server, {
  * When we launch the server or reset the server
  * Rooms should not exist
  */
-clearRooms()
+// clearRooms()
 
 /*
  *  client/server : authentification user account request

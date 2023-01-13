@@ -45,6 +45,7 @@ const UserPermission = () => {
   useEffect(() => {
     socket.on("connect", () => {
       console.log(socket.id)
+      socket.emit("User become premium")
       dispatch(updateUserThunk(getEmailFromToken()))
       dispatch(updateSocketID(socket.id))
     })
