@@ -21,3 +21,5 @@ STRIPE_PRIVATE_KEY="sk_test_51LrLO9JE1Vl9aUiyElWtRFhpLB7oDE5YwmL8h1YFgniEhyugNAi
 
 - URL de l'application côté client : http://localhost:3000/nevada/
 - URL de l'application côté serveur : http://localhost:5050
+
+- Toutes les modifications demandées ont été effectuées !
