@@ -248,9 +248,10 @@ io.on("connection", (socket) => {
     io.to(currentRoomId).emit("emit update current pad", padName)
   })
 
-  socket.on("update game pad board", (game, pad, board) => {
-    io.to(currentRoomId).emit("emit update game pad board", game, pad, board)
+  socket.on("pad rotated", () => {
+    io.to(currentRoomId).emit("emit pad rotated")
   })
+
 
   socket.on("update game phase", (phase) => {
     io.to(currentRoomId).emit("emit update game phase", phase)
@@ -285,9 +286,6 @@ io.on("connection", (socket) => {
     }
   )
 
-  socket.on("update game pad board", (game, pad, board) => {
-    io.to(currentRoomId).emit("emit update game pad board", game, pad, board)
-  })
 
   // client : jeu
   socket.on("GameStarted", async () => {

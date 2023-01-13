@@ -91,7 +91,7 @@ type GameActionsType = ReturnType<
   | typeof updatePlayersInfos
 >
 
-export type GamePhaseType = "boarding" | "building" | "playing"
+export type GamePhaseType = "waiting" | "boarding" | "building" | "playing"
 
 interface PlayerInfos {
   nbPlayed: number
@@ -152,7 +152,7 @@ export const gameInitialState: GameState = {
   disabledIndexPads: [],
   pointsFirstPlayer: 0,
   pointsSecondPlayer: 0,
-  gamePhase: "boarding",
+  gamePhase: "waiting",
   playerId: -1,
   player1: {
     pseudo: "",
@@ -189,7 +189,7 @@ export function GameReducer(
     case GameActionsEnum.UPDATE_MOVES_HISTORY:
       return { ...state, movesHistory: action.moves, movesCount: action.count }
     case GameActionsEnum.UPDATE_PLAYERS_INFOS:
-      console.log("P1 :",action.p1)
+      console.log("P1 :", action.p1)
       console.log(action.p2)
       return {
         ...state,

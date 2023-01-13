@@ -59,11 +59,11 @@ export const Board = () => {
   useEffect(() => {
     console.log(socket.id)
 
-    socket.on("retrieve board", (socketId) =>{
+    socket.on("retrieve board", (socketId) => {
       socket.emit("send board game", board, game, socketId)
     })
 
-    if(boardIsSet == false) {
+    if (boardIsSet === false) {
       socket.once("update board game", (board, game) => {
         setBoardIsSet(true)
         console.log("spec qui met à jour")
@@ -71,16 +71,6 @@ export const Board = () => {
         dispatch(updateGameState(game))
       })
     }
-
-    /*
-      socket emit si player appuie bouton
-    */
-
-    socket.on("emit update game pad board", (game, pad, board) => {
-      // dispatch(updateBoardState(board))
-      // dispatch(updatePadState(pad))
-      // dispatch(updateGameState(game))
-    })
 
     socket.on(
       "place board",
@@ -94,22 +84,16 @@ export const Board = () => {
       }
     )
 
-
-    socket.on("emitMakeMove",(newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
-      dispatch(
-        updateMovesHistory(newMovesHistory, movesCount)
-      )
-      dispatch(updateDisabledIndexPads(disabledIndexPads))
-      dispatch(updateBoardArray(board))
-      dispatch(updatePads(pads))
-    })
-
-
-    
+    socket.on(
+      "emitMakeMove",
+      (newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
+        dispatch(updateMovesHistory(newMovesHistory, movesCount))
+        dispatch(updateDisabledIndexPads(disabledIndexPads))
+        dispatch(updateBoardArray(board))
+        dispatch(updatePads(pads))
+      }
+    )
   }, [dispatch, board, game, boardIsSet])
-
-
-
 
   //Permet jouer un coup
   const makeMove = (cell: CellType) => {
@@ -131,15 +115,10 @@ export const Board = () => {
             pads
           )
         }
-        
-        boardWithDisabledPad = disablePads(
-          boardWithDisabledPad,
-          padIndex,
-          pads
-        )
+
+        boardWithDisabledPad = disablePads(boardWithDisabledPad, padIndex, pads)
 
         disabledIndexPads.push(padIndex)
-
       } else {
         console.log(
           "LE JEU EST CASSéE OMG OMMGMG OOGMOGMOMMGO MOMGOOMGMOG MOGU MOGU NORDVPN"
@@ -171,7 +150,7 @@ export const Board = () => {
             pointsSecondPlayer += tui.xCoords.length * tui.yCoords.length
           }
         })
-        
+
         //actualisation des variables globales
         dispatch(updatePointEnd(pointsFirstPlayer, pointsSecondPlayer))
 
@@ -195,8 +174,14 @@ export const Board = () => {
         }
         // faire fin de jeu ici où un truc du genre dispatch ....
       }
-      socket.emit("MakeMove",payload.newMovesHistory, payload.movesCount, boardWithMoves.board, disabledIndexPads , pads)
-      // socket.emit("update game pad board",  game, pad, board)
+      socket.emit(
+        "MakeMove",
+        payload.newMovesHistory,
+        payload.movesCount,
+        boardWithMoves.board,
+        disabledIndexPads,
+        pads
+      )
     }
     return
   }
@@ -299,7 +284,6 @@ export const Board = () => {
       updatedBoard,
       updatedPadStore
     )
-    // socket.emit("update game pad board",  game, pad, board)
   }
 
   let cellId = 0
