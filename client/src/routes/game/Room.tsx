@@ -20,9 +20,10 @@ const Room = () => {
     socket.on("Player abandon", (playerId) => {
       //je suis le joueur gagnant
       if (playerId >= 0) {
-        if (playerId == 0)
+        if(playerId==0)
+          socket.emit("Winner room", playerId, game.player2.pseudo)
+        else
           socket.emit("Winner room", playerId, game.player1.pseudo)
-        else socket.emit("Winner room", playerId, game.player2.pseudo)
       }
     })
 
