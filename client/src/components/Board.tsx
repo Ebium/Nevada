@@ -58,12 +58,8 @@ export const Board = () => {
 
   useEffect(() => {
     console.log(socket.id)
-<<<<<<< Updated upstream
 
     socket.on("retrieve board", (socketId) => {
-=======
-    socket.on("retrieve board", (socketId) =>{
->>>>>>> Stashed changes
       socket.emit("send board game", board, game, socketId)
     })
 
@@ -76,15 +72,6 @@ export const Board = () => {
       })
     }
 
-<<<<<<< Updated upstream
-=======
-    socket.on("emit update game pad board", (game, pad, board) => {
-      // dispatch(updateBoardState(board))
-      // dispatch(updatePadState(pad))
-      // dispatch(updateGameState(game))
-    })
-
->>>>>>> Stashed changes
     socket.on(
       "place board",
       (historyBoard, pads, graphicPads, updatedBoard, updatedPadStore) => {
