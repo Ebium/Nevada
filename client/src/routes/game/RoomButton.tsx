@@ -9,7 +9,7 @@ const RoomButton = () => {
     },[])
 
     function createRoom(){
-        socket.emit("Create a new room", localStorage.getItem("Nevada_Token"));
+        socket.emit("Create a new room");
     }
 
     function getServerReponse(){

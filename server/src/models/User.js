@@ -11,10 +11,10 @@ const userSchema = new mongoose.Schema(
     played: { type: Number, default: 0 },
     won: { type: Number, default: 0 },
     winStreak: { type: Number, default: 0 },
-    auth: { type: String, default: "" },
     pseudoColor: { type: String, default: "gold" },
     cusId: { type:String, default: "" },
-    socketId: { type: String, default: ""}
+    socketId: { type: String, default: ""},
+    paidDate : { type : Date, default: "" }
   },
   {
     versionKey: false,

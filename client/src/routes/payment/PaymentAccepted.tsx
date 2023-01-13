@@ -6,11 +6,14 @@ import { NVText } from "../../components/styles/NVText"
 import { NVSpacer } from "../../components/styles/NVSpacer"
 import { NVButton } from "../../components/styles/NVButton"
 import { CGUButton } from "../../components/CGUButton"
+import { socket } from "../../socket-context"
 
 export const PaymentAccepted = () => {
   const navigate = useNavigate()
   const intl = useIntl()
 
+  socket.emit("User become premium")
+  
   return (
     <Content>
       <NVText
@@ -28,7 +31,7 @@ export const PaymentAccepted = () => {
           })}
           colorSchem={"black"}
           onClick={() => {
-            navigate("/main/profil")
+            window.location.assign("/nevada/main/profil")
           }}
         />
         <NVSpacer width={10} />
@@ -39,7 +42,7 @@ export const PaymentAccepted = () => {
           })}
           colorSchem={"black"}
           onClick={() => {
-            navigate("/main/home")
+            window.location.assign("/nevada/main/home")
           }}
         />
       </RowDiv>

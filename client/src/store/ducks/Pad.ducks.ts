@@ -5,6 +5,8 @@ export const enum PadActionsEnum {
   RESET_PAD_STORE = "PAD/resetPadStore",
 
   UPDATE_CURRENT_PAD = "PAD/updateCurrentPad",
+
+  UPDATE_PAD_STATE = "PAD/updatePadState"
 }
 
 export const updateDroppedCounter = (nb: number) =>
@@ -15,12 +17,15 @@ export const resetPadStore = () =>
   ({ type: PadActionsEnum.RESET_PAD_STORE } as const)
 export const updateCurrentPad = (pad: currentPadType) =>
   ({ type: PadActionsEnum.UPDATE_CURRENT_PAD, pad } as const)
+export const updatePadState = (padState: PadState) =>
+  ({ type: PadActionsEnum.UPDATE_PAD_STATE, padState} as const)
 
 type PadActionsType = ReturnType<
   | typeof updateDroppedCounter
   | typeof updatePadStore
   | typeof resetPadStore
   | typeof updateCurrentPad
+  | typeof updatePadState
 >
 
 export interface currentPadType {
@@ -71,6 +76,8 @@ export function PadReducer(
       return { ...state, padStore: initialPadStore }
     case PadActionsEnum.UPDATE_CURRENT_PAD:
       return { ...state, current: action.pad }
+    case PadActionsEnum.UPDATE_PAD_STATE:
+      return { ...action.padState }
     default:
       return { ...state }
   }

@@ -9,6 +9,7 @@ import { colors } from "./styles/design.config"
 import { NVButton } from "./styles/NVButton"
 import { NVText } from "./styles/NVText"
 import { userDisconnect } from "../utils/Deconnection"
+import { NVSpacer } from "./styles/NVSpacer"
 
 export const NevadaHeader = () => {
   const intl = useIntl()
@@ -19,8 +20,8 @@ export const NevadaHeader = () => {
 
   return (
     <Content>
-      <NevadaLogo height={125} width={260} />
-      <CenteredTitle>
+      <StyledNevadaLogo />
+      <NevadaTitle>
         <NVText
           text={intl.formatMessage({ id: "header.title" })}
           textStyle={{
@@ -28,11 +29,14 @@ export const NevadaHeader = () => {
             textTransform: "uppercase",
             fontSize: 4,
             letterSpacing: 2,
+            cursor: "pointer",
+          }}
+          onClick={() => {
+            navigate("/showroom")
           }}
         />
-      </CenteredTitle>
-
-      {!location.pathname.includes("login") && (
+      </NevadaTitle>
+      {!location.pathname.includes("login") ? (
         <ButtonsPannel>
           {userPseudo ? (
             <>
@@ -46,15 +50,15 @@ export const NevadaHeader = () => {
                 }}
               />
               <NVButton
-              disabled={false}
-              content={intl.formatMessage({ id: "header.logout" })}
-              colorSchem={"gold"}
-              onClick={() => {
-                userDisconnect()
-                // navigate("/main/login")
-              }}
-              svg={<StyledLogoutSVG />}
-            />
+                disabled={false}
+                content={intl.formatMessage({ id: "header.logout" })}
+                colorSchem={"gold"}
+                onClick={() => {
+                  userDisconnect()
+                  // navigate("/main/login")
+                }}
+                svg={<StyledLogoutSVG />}
+              />
             </>
           ) : (
             <NVButton
@@ -68,43 +72,47 @@ export const NevadaHeader = () => {
             />
           )}
         </ButtonsPannel>
+      ) : (
+        <>
+          <NVSpacer width={15} />
+        </>
       )}
     </Content>
   )
 }
 
 const Content = styled.div`
+  position: relative;
   background-color: ${colors.nevadaBlack};
-  height: 11rem;
-  width: 100%;
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  padding: 0.5rem 3rem;
+  height: 10rem;
+  box-sizing: border-box;
 `
-
+const NevadaTitle = styled.div``
 const ButtonsPannel = styled.div`
-  margin-right: 10rem;
   display: flex;
   flex-direction: column;
   height: 100%;
   justify-content: space-evenly;
-  z-index: 2;
 `
 
-const CenteredTitle = styled.div`
-  position: absolute;
-  width: 100%;
-  display: flex;
-  justify-content: center;
+const StyledLogoutSVG = styled(LogoutSVG)`
+  & path {
+    fill: black;
+  }
 `
-
-const StyledLogoutSVG= styled(LogoutSVG)`
-& path {
-  fill: black;
-}
+const StyledLoginSVG = styled(LoginSVG)`
+  & path {
+    fill: black;
+  }
 `
-const StyledLoginSVG= styled(LoginSVG)`
-& path {
-  fill: black;
-}
+const StyledNevadaLogo = styled(NevadaLogo)`
+  position: relative;
+  left: -2.5rem;
+  height: 125px;
+  width: 260px;
 `

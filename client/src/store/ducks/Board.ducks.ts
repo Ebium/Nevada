@@ -2,11 +2,12 @@ import { PadHistory } from "../../utils/Moves"
 
 export const enum BoardActionsEnum {
   UPDATE_BOARD_ARRAY = "BOARD/updateBoardArray",
+
   RESET_BOARD_ARRAY = "BOARD/resetBoardArray",
 
   UPDATE_HISTORY_BOARD = "BOARD/updateHistoryBoard",
 
-  INITIALIZE_INITIALBOARD = "BOARD/initializeInitialBoard",
+  UPDATE_BOARD_STATE = "BOARD/updateBoardState"
 }
 
 export const updateBoardArray = (array: boardType) =>
@@ -23,17 +24,18 @@ export const updateHistoryBoard = (histo: PadHistory[]) =>
     type: BoardActionsEnum.UPDATE_HISTORY_BOARD,
     histo,
   } as const)
-export const initializeInitialBoard = (initialBoard: boardType) =>
+
+export const updateBoardState = (boardState: BoardState) =>
   ({
-    type: BoardActionsEnum.INITIALIZE_INITIALBOARD,
-    initialBoard,
+    type: BoardActionsEnum.UPDATE_BOARD_STATE,
+    boardState
   } as const)
 
 type BoardActionsType = ReturnType<
   | typeof updateBoardArray 
   | typeof resetBoardArray 
   | typeof updateHistoryBoard
-  | typeof initializeInitialBoard
+  | typeof updateBoardState
 >
 
 let x = -1
@@ -59,9 +61,6 @@ export interface BoardState {
   status: "idle" | "loading" | "failed"
   array: boardType
   history: PadHistory[]
-  initialBoard: boardType // Contient la grille au début de la partie, elle va permettre de pouvoir 
-                          // remettre les bonnes couleurs de la palette/plaquette/pad 
-                          // pour enlever les couleurs prévisionnels des coups possibles du joueurs
 }
 
 export const boardInitialState: BoardState = {
@@ -69,7 +68,6 @@ export const boardInitialState: BoardState = {
   status: "idle",
   array: initialeBoardArray,
   history: [],
-  initialBoard: initialeBoardArray,
 }
 
 export function BoardReducer(
@@ -83,8 +81,8 @@ export function BoardReducer(
       return { ...state, array: initialeBoardArray }
     case BoardActionsEnum.UPDATE_HISTORY_BOARD:
       return { ...state, history: action.histo }
-    case BoardActionsEnum.INITIALIZE_INITIALBOARD:
-      return { ...state, initialBoard: action.initialBoard }
+    case BoardActionsEnum.UPDATE_BOARD_STATE:
+      return { ...action.boardState }
     default:
       return { ...state }
   }

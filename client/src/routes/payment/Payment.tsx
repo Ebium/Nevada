@@ -9,7 +9,7 @@ import { NVSpacer } from "../../components/styles/NVSpacer"
 import { NVText } from "../../components/styles/NVText"
 import { useNevadaSelector } from "../../store/rootReducer"
 import { getDonateAmountUrl } from "../../utils/Donation"
-import { getPremiumSubscriptionUrl } from "../../utils/Subscription"
+import { getPremiumSubscriptionUrl, getPremiumLifeSubscriptionUrl, requestPremiumUnsubscription } from "../../utils/Subscription"
 
 export const Payment = () => {
   const navigate = useNavigate()
@@ -172,29 +172,30 @@ export const Payment = () => {
           <NVSpacer height={4} />
           <RowDiv>
             <NVButton
-              disabled={false}
+              disabled={!userPseudo}
               content={intl.formatMessage({ id: "payment.choice.1" })}
               colorSchem={"black"}
               onClick={() => {
-                getPremiumSubscriptionUrl()
+                getPremiumSubscriptionUrl(199)
               }}
             />
 
             <NVSpacer width={6} />
 
             <NVButton
-              disabled={false}
+              disabled={!userPseudo}
               content={intl.formatMessage({ id: "payment.choice.2" })}
               colorSchem={"black"}
               onClick={() => {
-                console.log("random")
+                getPremiumLifeSubscriptionUrl(1999)
+                console.log("sub prem")
               }}
             />
 
             <NVSpacer width={6} />
 
             <NVButton
-              disabled={false}
+              disabled={!userPseudo}
               content={intl.formatMessage({ id: "payment.choice.3" })}
               colorSchem={"black"}
               onClick={() => {
@@ -224,6 +225,7 @@ export const Payment = () => {
             })}
             colorSchem={"black"}
             onClick={() => {
+              requestPremiumUnsubscription()
               console.log("random")
             }}
           />
