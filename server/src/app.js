@@ -9,24 +9,6 @@ const general_routes = require("./routes/general.js")
 const { getStripeCheckoutSessionUrl, getStripeCheckoutSessionUrlFromPremiumStripeObject, getStripeCheckoutSessionUrlFromPremiumLifeStripeObject } = require("./controllers/payment")
 const { registerValidUser, loginUserAuth, findUserBySocketId, userPayment, userUnsubscribe, updateUser } = require("./controllers/users") 
 const { createRoom, updateANewPlayerRoom, updateAQuitPlayerRoom, clearRooms, roomExist, deleteRoom } = require("./controllers/room.js")
-const {
-  getStripeCheckoutSessionUrl,
-  getStripeCheckoutSessionUrlFromPremiumStripeObject,
-  getStripeCheckoutSessionUrlFromPremiumLifeStripeObject,
-} = require("./controllers/payment")
-const {
-  registerValidUser,
-  loginUserAuth,
-  findUserBySocketId,
-  userPayment,
-  userUnsubscribe,
-} = require("./controllers/users")
-const {
-  createRoom,
-  updateANewPlayerRoom,
-  updateAQuitPlayerRoom,
-  clearRooms,
-} = require("./controllers/room.js")
 var spectatorsCounter = 0
 
 const PORT = 5050
@@ -184,8 +166,53 @@ io.on("connection", (socket) => {
     if (usersRoom.length >= 2){
       const user1 = await findUserBySocketId(usersRoom[0])
       const user2 = await findUserBySocketId(usersRoom[1])
-      io.emit("players info", user1, user2)
+      io.to(currentRoomId).emit("players info", user1, user2)
     }
+  })
+
+
+  socket.on(
+    "placePad",
+    (historyBoard, pads, graphicPads, updatedBoard, updatedPadStore) => {
+      io.to(currentRoomId).emit(
+        "place board",
+        historyBoard,
+        pads,
+        graphicPads,
+        updatedBoard,
+        updatedPadStore
+      )
+    }
+  )
+
+  socket.on(
+    "undo pad",
+    (historyBoard, pads, graphicPads, updatedBoard, updatedPadStore) => {
+      io.to(currentRoomId).emit(
+        "undo board",
+        historyBoard,
+        pads,
+        graphicPads,
+        updatedBoard,
+        updatedPadStore
+      )
+    }
+  )
+
+  socket.on("reset board", () => {
+    io.to(currentRoomId).emit("reset board")
+  })
+
+  socket.on("MakeMove",(newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
+    io.to(currentRoomId).emit("emitMakeMove",newMovesHistory, movesCount, board, disabledIndexPads, pads)
+   })
+
+  socket.on("update game pad board", (game, pad, board) => {
+    io.to(currentRoomId).emit("emit update game pad board", game, pad, board)
+  })
+
+  socket.on("update game phase", (phase) => {
+    io.to(currentRoomId).emit("emit update game phase", phase)
   })
 
   socket.on("2 players server side", (players)=> {
@@ -263,7 +290,8 @@ io.on("connection", (socket) => {
       socket.leave(currentRoomId)
       await updateAQuitPlayerRoom({ _id : mongoose.Types.ObjectId(currentRoomId)},socket.id)
       io.to(currentRoomId).emit("An user has left the room",  usersRoom)
-      
+    }
+    
   socket.on("disconnect", async () => {
     if (currentRoomId != undefined) {
       await updateAQuitPlayerRoom(
@@ -275,6 +303,7 @@ io.on("connection", (socket) => {
         Array.from(usersRoom)
       )
     }
+  })
   })
 })
 
@@ -320,53 +349,6 @@ io.on("connection", async (socket) => {
   socket.on("User become premium", async () => {
     const user = await findUserBySocketId(socket.id)
     userPayment(user)
-  })
-})
-
-// client : jeu
-io.on("connection", (socket) => {
-  socket.on(
-    "placePad",
-    (historyBoard, pads, graphicPads, updatedBoard, updatedPadStore) => {
-      io.emit(
-        "place board",
-        historyBoard,
-        pads,
-        graphicPads,
-        updatedBoard,
-        updatedPadStore
-      )
-    }
-  )
-
-  socket.on(
-    "undo pad",
-    (historyBoard, pads, graphicPads, updatedBoard, updatedPadStore) => {
-      io.emit(
-        "undo board",
-        historyBoard,
-        pads,
-        graphicPads,
-        updatedBoard,
-        updatedPadStore
-      )
-    }
-  )
-
-  socket.on("reset board", () => {
-    io.emit("reset board")
-  })
-
-  socket.on("MakeMove",(newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
-    io.emit("emitMakeMove",newMovesHistory, movesCount, board, disabledIndexPads, pads)
-   })
-
-  socket.on("update game pad board", (game, pad, board) => {
-    io.emit("emit update game pad board", game, pad, board)
-  })
-
-  socket.on("update game phase", (phase) => {
-    io.emit("emit update game phase", phase)
   })
 })
 

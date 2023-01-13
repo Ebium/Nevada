@@ -54,6 +54,7 @@ export const Board = () => {
   const game = useNevadaSelector((state) => state.game)
   const board = useNevadaSelector((state) => state.board)
   const playerId = useNevadaSelector((state) => state.game.playerId)
+  const [boardIsSet, setBoardIsSet] = useState(false)
 
   useEffect(() => {
     console.log(socket.id)
