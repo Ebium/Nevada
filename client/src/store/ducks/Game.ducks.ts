@@ -13,6 +13,8 @@ export const enum GameActionsEnum {
   RESTART_GAME = "GAME/restartGame",
 
   UPDATE_POINT_END = "GAME/updatePointEnd",
+
+  UPDATE_GAME_STATE = "GAME/updateGameState",
 }
 
 export const updateGameStarted = (bool: boolean) =>
@@ -54,6 +56,10 @@ export const restartGame = () =>
   ({
     type: GameActionsEnum.RESTART_GAME,
   } as const)
+export const updateGameState = (gameState: GameState) => ({
+  type: GameActionsEnum.UPDATE_GAME_STATE,
+  gameState,
+} as const)
 
 type GameActionsType = ReturnType<
   | typeof updateGameStarted
@@ -63,6 +69,7 @@ type GameActionsType = ReturnType<
   | typeof updateDisabledIndexPads
   | typeof restartGame
   | typeof updatePointEnd
+  | typeof updateGameState
 >
 
 export interface GameState {
@@ -136,6 +143,8 @@ export function GameReducer(
         pointsFirstPlayer: action.pointsFirstPlayer,
         pointsSecondPlayer: action.pointsSecondPlayer,
       }
+    case GameActionsEnum.UPDATE_GAME_STATE:
+      return {...action.gameState}
     default:
       return { ...state }
   }

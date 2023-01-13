@@ -59,10 +59,6 @@ export const routes: RouteObject[] = [
             element: <Profil />,
           },
           {
-            path: "game",
-            element: <Game />,
-          },
-          {
             path: "pay",
             element: <Pay />,
           },
@@ -73,10 +69,6 @@ export const routes: RouteObject[] = [
           {
             path: "createroom",
             element: <RoomButton />,
-          },
-          {
-            path: ":room",
-            element: <Room />,
           },
           {
             path: "*",
@@ -96,6 +88,19 @@ export const routes: RouteObject[] = [
               {
                 path: "paymentAccepted",
                 element: <PaymentAccepted />,
+              },
+              {
+                path: "*",
+                element: <Navigate to={"/not_found"} />,
+              },
+            ],
+          },
+          {
+            path: "game/*",
+            children: [
+              {
+                path: ":room",
+                element: <Room />,
               },
               {
                 path: "*",

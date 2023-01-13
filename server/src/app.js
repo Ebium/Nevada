@@ -37,7 +37,7 @@ const io = socketIo(server,{
  * When we launch the server or reset the server
  * Rooms should not exist
  */
-// clearRooms()
+ clearRooms()
 
 /*
  *  client/server : authentification user account request
@@ -101,11 +101,12 @@ io.on("connection",(socket)=>{
  *  client/server : room request
  */
 io.on("connection", (socket) => {
-  var currentRoomId = undefined;
-  var usersRoom = undefined;
+  var currentRoomId = undefined
+  var usersRoom = []
+  var playersRoom =  []
 
-  socket.on("Create a new room", async(player) => {
-    const room = await createRoom({})
+  socket.on("Create a new room", async() => {
+    const room = await createRoom({ red:socket.id , blue:""})
     if(room._id)
       socket.emit("Create a new room", room._id, true)
     else
@@ -114,16 +115,33 @@ io.on("connection", (socket) => {
 
   socket.on("Join a room", async(roomId) => {
     const room = await updateANewPlayerRoom({ _id : mongoose.Types.ObjectId(roomId)}, socket.id)
+    
     if(room.modifiedCount){
-      
       socket.join(roomId)
       currentRoomId=roomId;
-      usersRoom = await io.sockets.adapter.rooms.get(currentRoomId)
-
-      socket.emit("Join a room", true)
-      io.to(currentRoomId).emit("An user joined the room",  Array.from(usersRoom))
+      usersRoom =  Array.from(await io.sockets.adapter.rooms.get(currentRoomId))
+      socket.emit("Join a room", true, roomId)
+      // let ouiOuiArray = Array.from(usersRoom)
+      io.to(currentRoomId).emit("An user joined the room",  usersRoom)
     } else
-      socket.emit("Join a room", false)
+    socket.emit("Join a room", false, "")
+    if(usersRoom.length<=2 && playersRoom.length!==2) {
+      playersRoom = usersRoom.slice(0,2) 
+      socket.emit("update playerId", playersRoom.length-1)
+    } 
+    if(usersRoom.length>2){
+      io.to(usersRoom[0]).emit("retrieve board", socket.id)
+    }
+    
+  })
+  
+  // client : jeu
+  socket.on("GameStarted",() => {
+    io.emit("emitGameStarted")
+  })
+
+  socket.on("send board game", (board, game, socketId) => {
+    io.to(socketId).emit("update board game", board, game)
   })
 
   socket.on("disconnect", async()=> {
@@ -167,6 +185,28 @@ io.on("connection", async(socket) => {
   socket.on("User become premium", async()=> {
     const user = await findUserBySocketId(socket.id)
     userPayment(user)
+  })
+})
+
+// client : jeu
+io.on("connection", (socket) => {
+
+  socket.on("placePad", (historyBoard, pads, graphicPads, updatedBoard) => {
+    io.emit("board",historyBoard, pads, graphicPads, updatedBoard)
+    
+  })
+
+  socket.on("updateDisabledIndexPads", (disabledIndexPads) => {
+    io.emit("emitUpdateDisabledIndexPads",disabledIndexPads)
+  })
+
+  socket.on("MoveHistoryAndBoardArray",(newMovesHistory, movesCount, board) => {
+    io.emit("emitMoveHistoryAndBoardArray",newMovesHistory, movesCount, board)
+
+  })
+
+  socket.on("update game pad board",  (game, pad, board) => {
+    io.emit("emit update game pad board",game, pad, board)
   })
 })
 

@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import styled from "styled-components"
 import * as R from "ramda"
 import { Board } from "../../components/Board"
@@ -11,7 +11,6 @@ import {
 import { useDispatch } from "react-redux"
 import { useNevadaSelector } from "../../store/rootReducer"
 import {
-  initializeInitialBoard,
   resetBoardArray,
   updateBoardArray,
   updateHistoryBoard,
@@ -31,6 +30,7 @@ import {
   removeOldPossibleMoves,
   showPossibleMoves,
 } from "../../utils/Moves"
+import { socket } from "../../socket-context"
 
 export const Game = () => {
   const dispatch = useDispatch()
@@ -44,16 +44,17 @@ export const Game = () => {
   const gameStarted = useNevadaSelector((state) => state.game.started)
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
-  const initialBoard = useNevadaSelector((state) => state.board.initialBoard)
   const pads = useNevadaSelector((state) => state.game.pads)
   const disabledIndexPads = useNevadaSelector(
     (state) => state.game.disabledIndexPads
   )
+  const [users, setUsers] = useState([socket.id])
+
 
   useEffect(() => {
     if (droppedCounter === 17) {
-      dispatch(updateGameStarted(true))
-      dispatch(initializeInitialBoard(board))
+      socket.emit("GameStarted")
+      // dispatch(updateGameStarted(true))
     } else {
       if (gameStarted) {
         dispatch(updateGameStarted(false))
@@ -61,6 +62,24 @@ export const Game = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [droppedCounter])
+
+  const baseURL = "http://localhost:3000/nevada/main/game/"
+  const roomId = window.location.pathname.slice(18);
+
+  useEffect(() => {
+    socket.on("emitGameStarted", () => {
+      dispatch(updateGameStarted(true))
+    })
+
+    socket.on("An user joined the room", (userslist) => {
+      setUsers(userslist)
+    })
+
+    socket.on("An user has left the room", (userslist) => {
+      setUsers(userslist)
+    })
+
+  }, [dispatch])
 
   const updatePadStoreFunction = (padToUpdate: number, by: number) => {
     var updatedPadStore = R.clone(padStore)
@@ -102,7 +121,7 @@ export const Game = () => {
 
   const changeOrientation = () => {
     const setOrientation =
-      currentPad.orientation === 4 ? 1 : currentPad.orientation + 1
+      currentPad.orientation === 1 ? 0 : currentPad.orientation + 1
     dispatch(
       updateCurrentPad({
         label: currentPad.label,
@@ -135,8 +154,8 @@ export const Game = () => {
       let updatedHistory = R.clone(padHistory)
       padHistory[padHistory.length - 1].coord.map(
         (cell) =>
-          (updatedBoard[cell[0]][cell[1]] =
-            initialeBoardArray[cell[0]][cell[1]])
+        (updatedBoard[cell[0]][cell[1]] =
+          initialeBoardArray[cell[0]][cell[1]])
       )
       updatePadStoreFunction(padHistory[padHistory.length - 1].coord.length, +1)
       updatedHistory.pop()
@@ -163,8 +182,7 @@ export const Game = () => {
         boardWithDisabledPad = enablePads(
           boardWithDisabledPad,
           enableIndexPad,
-          pads,
-          initialBoard
+          pads
         )
         disabledIndexPads.pop()
       }
@@ -189,8 +207,7 @@ export const Game = () => {
       // Puis on enlève les coups possibles de l'ancien dernier coup joué
       let updatedBoard = removeOldPossibleMoves(
         move,
-        boardWithDisabledPad,
-        initialBoard
+        boardWithDisabledPad
       )
 
       // On remet à jour la valeur de la case avant l'ancien dernier coup joué
@@ -215,27 +232,8 @@ export const Game = () => {
   const startGame = () => {
     console.log("game started")
     if (!gameStarted) {
-      dispatch(updateGameStarted(true))
-      dispatch(initializeInitialBoard(board))
+      socket.emit("GameStarted")
     }
-  }
-
-  const oui = () => {
-    const test = {
-      x: [1, 2, 3],
-      y: [1, 2],
-      coord: [],
-    }
-
-    // for(let i = 0; i < 10; i++){
-    //   for(let j = 0; j < 10; j++){
-    //     if(test.x.includes(i) && test.y.includes(j)){
-    //       console.log("x: ",i," j: ",j)
-    //     }
-    //   }
-    // }
-
-    console.log([...[test, { x: [3], y: [2], coord: [] }], test])
   }
 
   return (
@@ -285,13 +283,6 @@ export const Game = () => {
             onClick={() => startGame()}
           >
             StartGame
-          </StyledButton>
-          <HeightSpacer></HeightSpacer>
-          <StyledButton
-            // disabled={!gameStarted}
-            onClick={() => oui()}
-          >
-            oui
           </StyledButton>
         </ColumnStyle>
         <ColumnStyle>
@@ -464,6 +455,6 @@ const StyledButton = styled.button`
   cursor: ${({ disabled }) => (disabled ? "not-allowed" : "pointer")};
   :hover {
     box-shadow: ${({ disabled }) =>
-      disabled ? "0px 0px 20px red" : "0px 0px 20px black"};
+    disabled ? "0px 0px 20px red" : "0px 0px 20px black"};
   }
 `
