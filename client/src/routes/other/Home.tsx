@@ -180,10 +180,6 @@ export const Home = () => {
       />
     )
   }
-
-
-  const [gameCode, setGameCode] = useState("")
-  const [gameCodeAlertDisplayed, setGameCodeAlertDisplayed] = useState(false)
   const [a, setA] = useState(true)
   const [winner, setWinner] = useState("")
 

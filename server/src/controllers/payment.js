@@ -28,6 +28,17 @@ const createStripeCoupon = () => {
   });
 }
 
+
+/* 
+ *  Get Payment Link of a Stripe Object
+ */
+async function getStripeCheckoutSessionUrlFromStripeObject(stripeObject){
+  return stripe.checkout.sessions.create(stripeObject).then((stripeData) => {
+    return stripeData.url;
+  })
+}
+
+
 /* 
  *  Get Payment Link of a Premium Stripe Object
  */
@@ -197,6 +208,7 @@ const requestPremiumLifeSubscriptionStripeObject = (sub, cusId) => {
 
 module.exports = { 
   getStripeCheckoutSessionUrl,
+  getStripeCheckoutSessionUrlFromStripeObject,
   getStripeCheckoutSessionUrlFromPremiumStripeObject,
   getStripeCheckoutSessionUrlFromPremiumLifeStripeObject,
   createStripeCustomer,
