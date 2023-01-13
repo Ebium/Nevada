@@ -150,13 +150,27 @@ io.on("connection", (socket) => {
 
     if(playersRoom.length==2) {
       console.log("aloa : " ,playersRoom)
-      io.to(currentRoomId).emit("2 players", playersRoom)
+      io.to(currentRoomId).emit("2 players server side", playersRoom)
     }
   })
 
-  socket.on("2 players", (players)=> {
+  socket.on("2 players server side", (players)=> {
     playersRoom = players
     gameStarted = true
+  })
+
+  socket.on("placePad", (historyBoard, pads, graphicPads, updatedBoard) => {
+    io.to(currentRoomId).emit("board",historyBoard, pads, graphicPads, updatedBoard)
+    
+  })
+
+  socket.on("MakeMove",(newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
+    io.to(currentRoomId).emit("emitMakeMove",newMovesHistory, movesCount, board, disabledIndexPads, pads)
+
+  })
+
+  socket.on("update game pad board",  (game, pad, board) => {
+    io.to(currentRoomId).emit("emit update game pad board",game, pad, board)
   })
 
   // client : jeu
@@ -185,7 +199,7 @@ io.on("connection", (socket) => {
   //un joueur a gagné la partie
   socket.once("Winner room", async(playerId)=> {
     deleteRoom(currentRoomId)
-    
+
     //la partie avait commencé
     if(gameStarted && playerId!=-1) {
       const user = await findUserBySocketId(playersRoom[playerId])
@@ -252,24 +266,6 @@ io.on("connection", async(socket) => {
   socket.on("User become premium", async()=> {
     const user = await findUserBySocketId(socket.id)
     userPayment(user)
-  })
-})
-
-// client : jeu
-io.on("connection", (socket) => {
-
-  socket.on("placePad", (historyBoard, pads, graphicPads, updatedBoard) => {
-    io.emit("board",historyBoard, pads, graphicPads, updatedBoard)
-    
-  })
-
-  socket.on("MakeMove",(newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
-    io.emit("emitMakeMove",newMovesHistory, movesCount, board, disabledIndexPads, pads)
-
-  })
-
-  socket.on("update game pad board",  (game, pad, board) => {
-    io.emit("emit update game pad board",game, pad, board)
   })
 })
 

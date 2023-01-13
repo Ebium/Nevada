@@ -116,9 +116,9 @@ export const Board = () => {
       window.location.assign("/nevada/main/home")
     })
 
-    socket.once("2 players", (data)=> {
+    socket.once("2 players server side", (data)=> {
       console.log(data)
-      socket.emit("2 players", data)
+      socket.emit("2 players server side", data)
      })
     
   }, [dispatch, board, game, boardIsSet])
