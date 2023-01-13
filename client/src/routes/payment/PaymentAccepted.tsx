@@ -1,5 +1,4 @@
 import { useIntl } from "react-intl"
-import { useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import { colors } from "../../components/styles/design.config"
 import { NVText } from "../../components/styles/NVText"
@@ -9,11 +8,10 @@ import { CGUButton } from "../../components/CGUButton"
 import { socket } from "../../socket-context"
 
 export const PaymentAccepted = () => {
-  const navigate = useNavigate()
   const intl = useIntl()
 
   socket.emit("User become premium")
-  
+
   return (
     <Content>
       <NVText

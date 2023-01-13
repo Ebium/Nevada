@@ -9,7 +9,11 @@ import { NVSpacer } from "../../components/styles/NVSpacer"
 import { NVText } from "../../components/styles/NVText"
 import { useNevadaSelector } from "../../store/rootReducer"
 import { getDonateAmountUrl } from "../../utils/Donation"
-import { getPremiumSubscriptionUrl, getPremiumLifeSubscriptionUrl, requestPremiumUnsubscription } from "../../utils/Subscription"
+import {
+  getPremiumSubscriptionUrl,
+  getPremiumLifeSubscriptionUrl,
+  requestPremiumUnsubscription,
+} from "../../utils/Subscription"
 
 export const Payment = () => {
   const navigate = useNavigate()
@@ -188,7 +192,6 @@ export const Payment = () => {
               colorSchem={"black"}
               onClick={() => {
                 getPremiumLifeSubscriptionUrl(1999)
-                console.log("sub prem")
               }}
             />
 
@@ -226,7 +229,6 @@ export const Payment = () => {
             colorSchem={"black"}
             onClick={() => {
               requestPremiumUnsubscription()
-              console.log("random")
             }}
           />
         </>

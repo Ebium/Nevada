@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { useNavigate, useRoutes } from "react-router-dom"
+import { useRoutes } from "react-router-dom"
 import { StyledToastContainer } from "./components/other/Toaster"
 import { IntlProvider } from "react-intl"
 import { routes } from "./routes/router"
@@ -39,19 +39,17 @@ export const CustomIntlProvider = ({ children }: ChildrenProp) => (
 // dans le cas contraire, on ne faire rien du tout
 
 const UserPermission = () => {
-  const navigate = useNavigate()
   const dispatch = useDispatch()
 
   useEffect(() => {
     socket.on("connect", () => {
-      console.log(socket.id)
       socket.emit("User become premium")
       dispatch(updateUserThunk(getEmailFromToken()))
       dispatch(updateSocketID(socket.id))
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-  
+
   // mettre un setter avec les différents champs de connexion
   // si personne est co , alors le useeffect fera une redirection
 

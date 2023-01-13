@@ -1,12 +1,10 @@
 import { Navigate, RouteObject } from "react-router-dom"
-import { Game } from "./game/Game"
 import { Layout } from "../Layout"
 import { Home } from "./other/Home"
 import { NotFound404 } from "./other/NotFound404"
 import { PaymentRefused } from "./payment/PaymentRefused"
 import { PaymentAccepted } from "./payment/PaymentAccepted"
 import { Payment } from "./payment/Payment"
-import Pay from "../Paiement/Pay"
 import { Showroom } from "./other/Showroom"
 import { Main } from "../components/Main"
 import RoomButton from "./game/RoomButton"
@@ -14,8 +12,6 @@ import Room from "./game/Room"
 import { Profil } from "./other/Profil"
 import { LoginSignup } from "./other/LoginSignup"
 import { CGU } from "./other/CGU"
-import { Temp } from "./other/Temp"
-import { Game2 } from "./game/Game2"
 
 export const routes: RouteObject[] = [
   {
@@ -60,16 +56,8 @@ export const routes: RouteObject[] = [
             element: <Home />,
           },
           {
-            path: "temp",
-            element: <Temp />,
-          },
-          {
             path: "profil",
             element: <Profil />,
-          },
-          {
-            path: "pay",
-            element: <Pay />,
           },
           {
             path: "login",

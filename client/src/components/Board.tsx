@@ -26,7 +26,6 @@ import {
   updateGameState,
   updateMovesHistory,
   updatePads,
-  updatePlayerId,
   updatePointEnd,
 } from "../store/ducks/Game.ducks"
 import { Pad2, Pad3, Pad4, Pad6 } from "./GraphicPads"
@@ -57,8 +56,6 @@ export const Board = () => {
   const [boardIsSet, setBoardIsSet] = useState(false)
 
   useEffect(() => {
-    console.log(socket.id)
-
     socket.on("retrieve board", (socketId) => {
       socket.emit("send board game", board, game, socketId)
     })
@@ -66,7 +63,6 @@ export const Board = () => {
     if (boardIsSet === false) {
       socket.once("update board game", (board, game) => {
         setBoardIsSet(true)
-        console.log("spec qui met à jour")
         dispatch(updateBoardState(board))
         dispatch(updateGameState(game))
       })
@@ -93,7 +89,7 @@ export const Board = () => {
         dispatch(updatePads(pads))
       }
     )
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, board, game, boardIsSet])
 
   //Permet jouer un coup
@@ -107,7 +103,6 @@ export const Board = () => {
       let padIndex = getPadIndex({ x: cell.x, y: cell.y }, pads)
 
       if (padIndex !== -1) {
-        console.log(disabledIndexPads)
         if (disabledIndexPads.length > 1) {
           let enablePadIndex = disabledIndexPads.shift()
           boardWithDisabledPad = enablePads(
@@ -121,9 +116,6 @@ export const Board = () => {
 
         disabledIndexPads.push(padIndex)
       } else {
-        console.log(
-          "LE JEU EST CASSéE OMG OMMGMG OOGMOGMOMMGO MOMGOOMGMOG MOGU MOGU NORDVPN"
-        )
         return
       }
       // Si un coup a déjà été joué, on enlève les anciens coup possible, sinon on ne fait rien
@@ -138,8 +130,6 @@ export const Board = () => {
       // Puis on met à jour les coups possibles pour le coup joué
       let boardWithMoves = showPossibleMoves(cell, boardWithoutPreviousMoves)
       if (boardWithMoves.possibleMoves === 0 || movesCount > 60) {
-        console.log("game end")
-        console.log(pads)
         let pointsFirstPlayer = 0
         let pointsSecondPlayer = 0
 
@@ -155,22 +145,13 @@ export const Board = () => {
         //actualisation des variables globales
         dispatch(updatePointEnd(pointsFirstPlayer, pointsSecondPlayer))
 
-        console.log(
-          "Premier Joueur :",
-          pointsFirstPlayer,
-          "Second Joueur :",
-          pointsSecondPlayer
-        )
         if (pointsFirstPlayer > pointsSecondPlayer) {
-          console.log("Le Joueur rouge est gagnant")
           socket.emit("Winner room", 0, game.player1)
         }
         if (pointsFirstPlayer < pointsSecondPlayer) {
-          console.log("Le Joueur Bleu est gagnant")
           socket.emit("Winner room", 1, game.player2)
         }
         if (pointsFirstPlayer === pointsSecondPlayer) {
-          console.log("Les 2 Joueurs sont ex aequo")
           socket.emit("Winner room", -1)
         }
         // faire fin de jeu ici où un truc du genre dispatch ....

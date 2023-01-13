@@ -39,13 +39,11 @@ import { useDispatch } from "react-redux"
 import { useNevadaSelector } from "../../store/rootReducer"
 import {
   GamePhaseType,
-  restartGame,
   updateGamePhase,
   updateGameStarted,
   updatePads,
   updatePlayerId,
   updatePlayersInfos,
-  updatePointEnd,
 } from "../../store/ducks/Game.ducks"
 import { socket } from "../../socket-context"
 import {
@@ -63,7 +61,6 @@ import {
   updateHistoryBoard,
   updateGraphicPads,
 } from "../../store/ducks/Board.ducks"
-import { truncate } from "fs"
 
 interface GameProps {
   gameCode: string
@@ -79,22 +76,16 @@ export const Game2 = ({ gameCode }: GameProps) => {
   const board = useNevadaSelector((state) => state.board.array)
   const padStore = useNevadaSelector((state) => state.pad.padStore)
   const gameStarted = useNevadaSelector((state) => state.game.started)
-  const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
   const pads = useNevadaSelector((state) => state.game.pads)
   const gamePhase = useNevadaSelector((state) => state.game.gamePhase)
   const graphicPads = useNevadaSelector((state) => state.board.graphicPads)
   const player1Infos = useNevadaSelector((state) => state.game.player1)
   const player2Infos = useNevadaSelector((state) => state.game.player2)
-  const userPseudo = useNevadaSelector((state) => state.user.pseudo)
 
-  const disabledIndexPads = useNevadaSelector(
-    (state) => state.game.disabledIndexPads
-  )
   const playerId = useNevadaSelector((state) => state.game.playerId)
 
   const [leftBarCollapsed, setLeftBarCollapsed] = useState(false)
-  const [users, setUsers] = useState([socket.id])
   const [displayed, setDisplayed] = useState(false)
   const [winner, setWinner] = useState("")
 
@@ -114,7 +105,6 @@ export const Game2 = ({ gameCode }: GameProps) => {
     socket.on("Winner user", (pseudoWinner) => {
       setWinner(pseudoWinner)
       setDisplayed(true)
-      console.log("winner : ", pseudoWinner)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [droppedCounter])
@@ -126,14 +116,6 @@ export const Game2 = ({ gameCode }: GameProps) => {
   useEffect(() => {
     socket.on("emitGameStarted", () => {
       dispatch(updateGameStarted(true))
-    })
-
-    socket.on("An user joined the room", (userslist) => {
-      setUsers(userslist)
-    })
-
-    socket.on("An user has left the room", (userslist) => {
-      setUsers(userslist)
     })
 
     socket.on("emit update game phase", (phase) => {
@@ -183,6 +165,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
       setCurrentPadOrientation(!currentPadOrientation)
     })
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, droppedCounter, displayed])
 
   const changeCurrentPad = (
@@ -300,6 +283,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
         socket.emit("update game phase", "boarding")
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [player1Infos, player2Infos])
 
   return (

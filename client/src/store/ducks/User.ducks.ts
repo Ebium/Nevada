@@ -25,7 +25,7 @@ const updateUserFailed = () =>
 const updateUserLoading = () =>
   ({ type: UserActionsEnum.UPDATE_USER_LOADING } as const)
 
-  const updateUsersRanking = (payload: Array<UserInfos>) =>
+const updateUsersRanking = (payload: Array<UserInfos>) =>
   ({ type: UserActionsEnum.UPDATE_USERS_RANKING, payload } as const)
 
 const updateUsersRankingFailed = () =>
@@ -83,7 +83,7 @@ export const userInitialState: UserState = {
   nbGamesWin: 0,
   winStreak: 0,
   colorPseudo: "gold",
-  usersRanking: []
+  usersRanking: [],
 }
 
 export function UserReducer(
@@ -111,11 +111,11 @@ export function UserReducer(
       return { ...state, status: "failed" }
     case UserActionsEnum.UPDATE_USER_LOADING:
       return { ...state, status: "loading" }
-      case UserActionsEnum.UPDATE_USERS_RANKING:
+    case UserActionsEnum.UPDATE_USERS_RANKING:
       return {
         ...state,
         status: "idle",
-        usersRanking: action.payload
+        usersRanking: action.payload,
       }
     case UserActionsEnum.UPDATE_USERS_RANKING_FAILED:
       return { ...state, status: "failed" }
@@ -132,7 +132,6 @@ export const updateUserThunk =
     return axios
       .get(`/users/${email}`)
       .then(({ data }: AxiosResponse) => {
-        console.log(data)
         const updatedPseudo = data.result.premium
           ? "👑 " + data.result.pseudo
           : data.result.pseudo
@@ -155,18 +154,14 @@ export const updateUserThunk =
       })
   }
 
-  export const getUsersRankingThunk =
-  () => (dispatch: Dispatch<AnyAction>) => {
-    dispatch(updateUsersRankingLoading())
-    return axios
-      .get(`/users/ranking`)
-      .then(({ data }: AxiosResponse) => {
-        console.log(data)
-        dispatch(
-          updateUsersRanking(data)
-        )
-      })
-      .catch((e: AxiosError) => {
-        dispatch(updateUsersRankingFailed())
-      })
-  }
+export const getUsersRankingThunk = () => (dispatch: Dispatch<AnyAction>) => {
+  dispatch(updateUsersRankingLoading())
+  return axios
+    .get(`/users/ranking`)
+    .then(({ data }: AxiosResponse) => {
+      dispatch(updateUsersRanking(data))
+    })
+    .catch((e: AxiosError) => {
+      dispatch(updateUsersRankingFailed())
+    })
+}
