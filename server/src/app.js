@@ -279,6 +279,10 @@ io.on("connection", (socket) => {
   socket.on("update game phase", (phase) => {
     io.emit("emit update game phase", phase)
   })
+
+  socket.on("update current pad", (padName)  => {
+    io.emit("emit update current pad", padName)
+  })
 })
 
 mongoose

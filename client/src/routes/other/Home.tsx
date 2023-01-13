@@ -469,7 +469,7 @@ export const Home = () => {
               <>
                 <NVText
                   text={"Place : " + (index + 1)}
-                  textStyle={{ color: "nevadaGold" }}
+                  textStyle={{ color: "nevadaGold",fontWeight: 900, fontSize: 1.2 }}
                 />
                 <NVText
                   text={value.premium ? `👑 ${value.pseudo}` : value.pseudo}

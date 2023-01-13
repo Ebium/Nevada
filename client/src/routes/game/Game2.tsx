@@ -148,13 +148,23 @@ export const Game2 = ({ gameCode }: GameProps) => {
     })
 
     socket.on("players info", (user1, user2) => {
-      console.log("uahziruhaiuzhruiahzr")
-      console.log(user1)
-      console.log(user2)
-      console.log("uahziruhaiuzhruiahzr")
-
       dispatch(updatePlayersInfos(user1, user2))
-      
+    })
+
+    socket.on("emit update current pad", (pad) => {
+      setCurrentBuildingPad(
+        pad === "pad2" ? (
+          <StyledPad2SVG />
+        ) : pad === "pad3" ? (
+          <StyledPad3SVG />
+        ) : pad === "pad4" ? (
+          <StyledPad4SVG />
+        ) : pad === "pad6" ? (
+          <StyledPad6SVG />
+        ) : (
+          <></>
+        )
+      )
     })
   }, [dispatch, droppedCounter])
 
@@ -200,9 +210,11 @@ export const Game2 = ({ gameCode }: GameProps) => {
     }
   }
 
-  const handlePadChoiceClick = (pad: ReactNode) => {
-    if (playerId !== -1 && movesCount % 2 === playerId)
+  const handlePadChoiceClick = (pad: ReactNode, nbHole: number) => {
+    if (playerId !== -1 && movesCount % 2 === playerId){
       setCurrentBuildingPad(pad)
+      socket.emit("update current pad",`pad${nbHole}`)
+    }
   }
 
   const undoBoard = () => {
@@ -314,7 +326,12 @@ export const Game2 = ({ gameCode }: GameProps) => {
               <BoardingDiv>
                 <MarginAutoDiv>
                   <NVText
-                    text={intl.formatMessage({ id: movesCount % 2 === playerId ? "game.boarding.title1" :  "game.boarding.title2"})}
+                    text={intl.formatMessage({
+                      id:
+                        movesCount % 2 === playerId
+                          ? "game.boarding.title1"
+                          : "game.boarding.title2",
+                    })}
                     textStyle={{
                       color: "nevadaGold",
                       fontSize: 1.5,
@@ -482,7 +499,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       <PadRow>
                         <StyledPad2SVG
                           onClick={() => {
-                            handlePadChoiceClick(<StyledPad2SVG />)
+                            handlePadChoiceClick(<StyledPad2SVG />, 2)
                             changeCurrentPad(2, 1, "green")
                           }}
                           cursor={
@@ -506,7 +523,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       <PadRow>
                         <StyledPad4SVG
                           onClick={() => {
-                            handlePadChoiceClick(<StyledPad4SVG />)
+                            handlePadChoiceClick(<StyledPad4SVG />, 4)
                             changeCurrentPad(4, 1, "green")
                           }}
                           cursor={
@@ -530,7 +547,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       <PadRow>
                         <StyledPad3SVG
                           onClick={() => {
-                            handlePadChoiceClick(<StyledPad3SVG />)
+                            handlePadChoiceClick(<StyledPad3SVG />, 3)
                             changeCurrentPad(3, 1, "green")
                           }}
                           cursor={
@@ -554,7 +571,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
                       <PadRow>
                         <StyledPad6SVG
                           onClick={() => {
-                            handlePadChoiceClick(<StyledPad6SVG />)
+                            handlePadChoiceClick(<StyledPad6SVG />, 6)
                             changeCurrentPad(6, 1, "green")
                           }}
                           cursor={
