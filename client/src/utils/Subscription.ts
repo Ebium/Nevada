@@ -8,40 +8,49 @@ const subscriptionRefusedUrl = `http://localhost:3000/nevada/main/payment/paymen
  * Request to server an url for subscription premium payment
  * and redirect the website to this url
  */ 
-export const getPremiumSubscriptionUrl = async() => {
-    const donateStripeObject = createPremiumSubscriptionStripeObject()
-    socket.emit("Premium subscription", donateStripeObject)
+const getPremiumSubscriptionUrl = async(price:number) => {
+    const subscription = { 
+      success_url : subscriptionAcceptedUrl,
+      cancel_url: subscriptionRefusedUrl,
+      price: price //in cents
+    }
+    socket.emit("Premium subscription", subscription)
     socket.on("Premium subscription", async(redirectionPaymentUrl) => {
        window.location.href = redirectionPaymentUrl
     })
     
 }
 
-/* 
- * Create an Object that will be send to server
- * for Stripe Api request
+/*
+ * Request to server an url for subscription premium LIFE payment
+ * and redirect the website to this url
  */ 
-const createPremiumSubscriptionStripeObject = () => {
-    return {
-        payment_method_types: ['card'],
-        line_items: [
-          {
-            price_data: {
-                product_data : {
-                    name : "Premium subscription",
-                    description : "Devenez premium et obtenez des avantages !"
-                },
-                recurring : {
-                    interval : "month"
-                },
-                unit_amount : 1999, //in cents
-                currency:"eur",
-            },
-            quantity: 1,
-          },
-        ],
-        mode: 'subscription',
-        success_url: subscriptionAcceptedUrl,
-        cancel_url: subscriptionRefusedUrl,
-      }
+const getPremiumLifeSubscriptionUrl = async(price:number) => {
+  // const donateStripeObject = createPremiumSubscriptionStripeObject(price)
+  const payment = { 
+    success_url : subscriptionAcceptedUrl,
+    cancel_url: subscriptionRefusedUrl,
+    price: price //in cents
+  }
+  socket.emit("Premium life subscription", payment)
+  socket.on("Premium life subscription", async(redirectionPaymentUrl) => {
+     window.location.href = redirectionPaymentUrl
+  })
+}
+
+/*
+ * Request to server to unsubscribe 
+ * the premium user
+ */ 
+const requestPremiumUnsubscription = async() => {
+  socket.emit("User unsubscription")
+  socket.on("User unsubscription", () => {
+    window.location.assign("/nevada/main/home")
+ })
+}
+
+export {
+  getPremiumSubscriptionUrl,
+  getPremiumLifeSubscriptionUrl,
+  requestPremiumUnsubscription
 }

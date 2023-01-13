@@ -3,7 +3,7 @@ const User = require("../models/User.js")
 const Stripe = require("stripe")
 const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY)
 const { matchPassword } = require("./password")
-const { createStripeCustomer } = require("./payment")
+const { createStripeCustomer, searchStripePaymentIntentPaidByCusId, searchStripeSubscriptionPaidByCusId, deleteSubscriptionStripeById } = require("./payment")
 
 /* ========================================
     Search functions
@@ -148,7 +148,10 @@ const userExist = async (user) => {
   return errors
 }
 
-//à modifier
+/*
+ * verify if there are a connected socket
+ * => if user is connected
+ */
 const userIsConnected = async (user) => {
   const userDB = await findUserByEmail(user.email)
   if (userDB == null) return false
@@ -203,6 +206,44 @@ const loginUserAuth = async (user) => {
   return await findUserByEmail(user.email)
 }
 
+
+/*
+ * if player paid for premium
+ * update player premium status
+ */
+const userPayment = async(user) => {
+  var userEdited = user
+
+  const paymentIntent = await searchStripePaymentIntentPaidByCusId(user.cusId)
+  const subscription = await searchStripeSubscriptionPaidByCusId(user.cusId)
+
+  //est premium life
+  if(paymentIntent.data[0] != null  && paymentIntent.data[0].amount == 1999) {
+      userEdited.premium = true
+      userEdited.premiumLifeTime = true
+      userEdited.paidDate = Date.now()
+      updateUser(userEdited)
+      return
+  } 
+  
+  //est premium
+  if(subscription.data[0] !=null) {
+      userEdited.premium = true
+      userEdited.paidDate = Date.now()
+      updateUser(userEdited)
+      return
+  } 
+}
+
+const userUnsubscribe = async(user)=> {
+  const subscription = await searchStripeSubscriptionPaidByCusId(user.cusId)
+  var userEdited = user
+  user.premium = false
+
+  deleteSubscriptionStripeById(subscription.data[0].id)
+  updateUser(userEdited)
+}
+
 /*******************************************
     User Object type 
 ********************************************/
@@ -223,5 +264,9 @@ module.exports = {
   registerValidUser,
   get_current_user,
   findUsers,
-  findUsersForRanking,
+  findUserBySocketId,
+  updateUser,
+  userPayment,
+  userUnsubscribe,
+  findUsersForRanking
 }
