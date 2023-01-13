@@ -18,7 +18,7 @@ import {
   removeOldPossibleMoves,
   showPossibleMoves,
 } from "../utils/Moves"
-import { updateDroppedCounter, updatePadState, updatePadStore } from "../store/ducks/Pad.ducks"
+import { updateDroppedCounter, updatePadStore } from "../store/ducks/Pad.ducks"
 import { useNevadaSelector } from "../store/rootReducer"
 import {
   updateDisabledIndexPads,
@@ -51,7 +51,6 @@ export const Board = () => {
     (state) => state.game.disabledIndexPads
   )
   const game = useNevadaSelector((state) => state.game)
-  const pad = useNevadaSelector((state) => state.pad)
   const board = useNevadaSelector((state) => state.board)
 
   const [playerId, setPlayerId] = useState(-1)
@@ -86,14 +85,13 @@ export const Board = () => {
       dispatch(updateBoardArray(updatedBoard))
     })
 
-    socket.on("emitUpdateDisabledIndexPads",(disabledIndexPads) => {
-      dispatch(updateDisabledIndexPads(disabledIndexPads))
-    })
-    socket.on("emitMoveHistoryAndBoardArray",(newMovesHistory, movesCount, board) => {
+    socket.on("emitMakeMove",(newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
       dispatch(
         updateMovesHistory(newMovesHistory, movesCount)
       )
+      dispatch(updateDisabledIndexPads(disabledIndexPads))
       dispatch(updateBoardArray(board))
+      dispatch(updatePads(pads))
     })
   }, [dispatch, board, game])
 
@@ -125,8 +123,6 @@ export const Board = () => {
         )
         disabledIndexPads.push(padIndex)
 
-        dispatch(updateDisabledIndexPads(disabledIndexPads))
-        socket.emit("updateDisabledIndexPads",disabledIndexPads)
       } else {
         console.log(
           "LE JEU EST CASSéE OMG OMMGMG OOGMOGMOMMGO MOMGOOMGMOG MOGU MOGU NORDVPN"
@@ -178,7 +174,7 @@ export const Board = () => {
         }
         // faire fin de jeu ici où un truc du genre dispatch ....
       }
-      socket.emit("MoveHistoryAndBoardArray",payload.newMovesHistory, payload.movesCount, boardWithMoves.board)
+      socket.emit("MakeMove",payload.newMovesHistory, payload.movesCount, boardWithMoves.board, disabledIndexPads , pads)
       // socket.emit("update game pad board",  game, pad, board)
     }
     return
@@ -294,7 +290,7 @@ export const Board = () => {
                 gamestarted={gameStarted}
                 key={cellId}
                 onClick={() => {
-                  if (playerId != -1 && !gameStarted && movesCount % 2 == playerId) {
+                  if (playerId !== -1 && !gameStarted && movesCount % 2 === playerId) {
                     placePad(cell)
                   }
                 }}
@@ -303,7 +299,7 @@ export const Board = () => {
                   <HoleForCellule
                     color={cell.possibleMove ? "green" : cell.holeColor}
                     onClick={()=>{
-                      if (playerId != -1 && gameStarted && movesCount % 2 == playerId) {
+                      if (playerId !== -1 && gameStarted && movesCount % 2 === playerId) {
                         makeMove(cell)
                       }
                     }}

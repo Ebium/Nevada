@@ -34,8 +34,7 @@ export const Home = () => {
   const navigate = useNavigate()
   const intl = useIntl()
   const dispatch = useDispatch()
-  // const userPseudo = useNevadaSelector((state) => state.user.pseudo)
-  const userPseudo = "tam"
+  const userPseudo = useNevadaSelector((state) => state.user.pseudo)
   const userSocket = useNevadaSelector((state) => state.user.socketId)
   const userPremium = useNevadaSelector((state) => state.user.isPremium)
   const userGamesPlayed = useNevadaSelector((state) => state.user.nbGames)
