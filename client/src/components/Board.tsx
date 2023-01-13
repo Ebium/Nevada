@@ -19,11 +19,7 @@ import {
   removeOldPossibleMoves,
   showPossibleMoves,
 } from "../utils/Moves"
-import {
-  updateDroppedCounter,
-  updatePadState,
-  updatePadStore,
-} from "../store/ducks/Pad.ducks"
+import { updateDroppedCounter, updatePadStore } from "../store/ducks/Pad.ducks"
 import { useNevadaSelector } from "../store/rootReducer"
 import {
   updateDisabledIndexPads,
@@ -56,7 +52,6 @@ export const Board = () => {
     (state) => state.game.disabledIndexPads
   )
   const game = useNevadaSelector((state) => state.game)
-  const pad = useNevadaSelector((state) => state.pad)
   const board = useNevadaSelector((state) => state.board)
   const playerId = useNevadaSelector((state) => state.game.playerId)
 
@@ -91,17 +86,17 @@ export const Board = () => {
       }
     )
 
-    socket.on("emitUpdateDisabledIndexPads", (disabledIndexPads) => {
+
+    socket.on("emitMakeMove",(newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
+      dispatch(
+        updateMovesHistory(newMovesHistory, movesCount)
+      )
       dispatch(updateDisabledIndexPads(disabledIndexPads))
+      dispatch(updateBoardArray(board))
+      dispatch(updatePads(pads))
     })
-    socket.on(
-      "emitMoveHistoryAndBoardArray",
-      (newMovesHistory, movesCount, board) => {
-        dispatch(updateMovesHistory(newMovesHistory, movesCount))
-        dispatch(updateBoardArray(board))
-      }
-    )
-  }, [dispatch, board, game, padStore])
+  }, [dispatch, board, game])
+
 
   //Permet jouer un coup
   const makeMove = (cell: CellType) => {
@@ -127,8 +122,6 @@ export const Board = () => {
         boardWithDisabledPad = disablePads(boardWithDisabledPad, padIndex, pads)
         disabledIndexPads.push(padIndex)
 
-        dispatch(updateDisabledIndexPads(disabledIndexPads))
-        socket.emit("updateDisabledIndexPads", disabledIndexPads)
       } else {
         console.log(
           "LE JEU EST CASSéE OMG OMMGMG OOGMOGMOMMGO MOMGOOMGMOG MOGU MOGU NORDVPN"
@@ -180,12 +173,7 @@ export const Board = () => {
         }
         // faire fin de jeu ici où un truc du genre dispatch ....
       }
-      socket.emit(
-        "MoveHistoryAndBoardArray",
-        payload.newMovesHistory,
-        payload.movesCount,
-        boardWithMoves.board
-      )
+      socket.emit("MakeMove",payload.newMovesHistory, payload.movesCount, boardWithMoves.board, disabledIndexPads , pads)
       // socket.emit("update game pad board",  game, pad, board)
     }
     return

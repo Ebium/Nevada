@@ -268,21 +268,9 @@ io.on("connection", (socket) => {
     io.emit("reset board")
   })
 
-  socket.on("updateDisabledIndexPads", (disabledIndexPads) => {
-    io.emit("emitUpdateDisabledIndexPads", disabledIndexPads)
-  })
-
-  socket.on(
-    "MoveHistoryAndBoardArray",
-    (newMovesHistory, movesCount, board) => {
-      io.emit(
-        "emitMoveHistoryAndBoardArray",
-        newMovesHistory,
-        movesCount,
-        board
-      )
-    }
-  )
+  socket.on("MakeMove",(newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
+    io.emit("emitMakeMove",newMovesHistory, movesCount, board, disabledIndexPads, pads)
+   })
 
   socket.on("update game pad board", (game, pad, board) => {
     io.emit("emit update game pad board", game, pad, board)

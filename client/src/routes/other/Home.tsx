@@ -227,7 +227,7 @@ export const Home = () => {
           <NVSpacer height={1} />
           <NVLine width={17} height={0.2} color={"nevadaBlack"} />
           <LeftBarLine schema={1} data={playersCounter} text={"players"} />
-          <LeftBarLine schema={0} data={gamesCounter} text={"games"} />
+          <LeftBarLine schema={0} data={gamesCounter - playersCounter} text={"games"} />
           <LeftBarLine
             schema={1}
             data={spectatorsCounter}
