@@ -20,6 +20,7 @@ import {
 import { NVInput } from "../../components/styles/NVInput"
 import { ChangeEvent, FormEvent, useEffect, useState } from "react"
 import { NVAlert } from "../../components/styles/NVAlert"
+import { EndGameModal } from "../../components/EndGameModal"
 import { useDispatch } from "react-redux"
 import {
   getGamesCounterThunk,
@@ -181,6 +182,11 @@ export const Home = () => {
   }
 
 
+  const [gameCode, setGameCode] = useState("")
+  const [gameCodeAlertDisplayed, setGameCodeAlertDisplayed] = useState(false)
+  const [a, setA] = useState(true)
+  const [winner, setWinner] = useState("")
+
   const handleGameCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
     setGameCode(event.target.value)
   }
@@ -207,6 +213,14 @@ export const Home = () => {
         })}
         onClose={() => {
           setGameCodeAlertDisplayed(!gameCodeAlertDisplayed)
+        }}
+      />
+
+      <EndGameModal
+        isDisplayed={a}
+        winner={winner}
+        onClose={() => {
+          setA(!a)
         }}
       />
 

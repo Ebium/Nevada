@@ -45,6 +45,9 @@ export const Game = () => {
   const gameStarted = useNevadaSelector((state) => state.game.started)
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
+  const pointsFirstPlayer = useNevadaSelector((state) => state.game.pointsFirstPlayer)
+  const pointsSecondPlayer = useNevadaSelector((state) => state.game.pointsSecondPlayer)
+  
   const pads = useNevadaSelector((state) => state.game.pads)
   const disabledIndexPads = useNevadaSelector(
     (state) => state.game.disabledIndexPads
@@ -218,6 +221,19 @@ export const Game = () => {
     console.log("game started")
     if (!gameStarted) {
       socket.emit("GameStarted")
+    }
+  }
+  
+  //fonction retournant le pseudo du gagnant (temporaire)
+  const endGame = () => {
+    if (pointsFirstPlayer>pointsSecondPlayer){
+      return ""
+    }
+    if (pointsFirstPlayer<pointsSecondPlayer){
+      return ""
+    }
+    else{
+      return ""
     }
   }
 

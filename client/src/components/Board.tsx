@@ -118,8 +118,13 @@ export const Board = () => {
             pads
           )
         }
+        
+        boardWithDisabledPad = disablePads(
+          boardWithDisabledPad,
+          padIndex,
+          pads
+        )
 
-        boardWithDisabledPad = disablePads(boardWithDisabledPad, padIndex, pads)
         disabledIndexPads.push(padIndex)
 
       } else {
@@ -153,7 +158,8 @@ export const Board = () => {
             pointsSecondPlayer += tui.xCoords.length * tui.yCoords.length
           }
         })
-
+        
+        //actualisation des variables globales
         dispatch(updatePointEnd(pointsFirstPlayer, pointsSecondPlayer))
 
         console.log(

@@ -94,7 +94,7 @@ export const Game2 = ({ gameCode }: GameProps) => {
   const [users, setUsers] = useState([socket.id])
 
   const [gameType, setGameType] = useState<
-    "boarding" | "building" | "playing" | "test"
+    "boarding" | "building" | "playing" | "test" | "finished"
   >("boarding")
 
   const [currentBuildingPad, setCurrentBuildingPad] = useState<ReactNode>(<></>)
