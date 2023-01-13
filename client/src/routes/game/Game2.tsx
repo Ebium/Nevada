@@ -99,10 +99,8 @@ export const Game2 = ({ gameCode }: GameProps) => {
   const [winner, setWinner] = useState("")
 
   const [currentBuildingPad, setCurrentBuildingPad] = useState<ReactNode>(<></>)
-<<<<<<< Updated upstream
   const [currentPadOrientation, setCurrentPadOrientation] =
     useState<boolean>(false)
-=======
 
   useEffect(() => {
     if (droppedCounter === 17) {
@@ -120,17 +118,13 @@ export const Game2 = ({ gameCode }: GameProps) => {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [droppedCounter])
->>>>>>> Stashed changes
 
   socket.on("update playerId", (playId) => {
     dispatch(updatePlayerId(playId))
   })
 
   useEffect(() => {
-<<<<<<< Updated upstream
-=======
  
->>>>>>> Stashed changes
     socket.on("emitGameStarted", () => {
       dispatch(updateGameStarted(true))
     })
@@ -186,15 +180,8 @@ export const Game2 = ({ gameCode }: GameProps) => {
       )
     })
 
-<<<<<<< Updated upstream
-    socket.on("emit pad rotated", () => {
-      setCurrentPadOrientation(!currentPadOrientation)
-    })
-  }, [dispatch, droppedCounter])
-=======
     
   }, [dispatch, droppedCounter, displayed])
->>>>>>> Stashed changes
 
   const changeCurrentPad = (
     nbTrous: number,
