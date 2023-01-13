@@ -1,12 +1,11 @@
 import { GraphicPad, Move, Pad } from "../../utils/Moves"
+import { UserInfos } from "./User.ducks"
 export const enum GameActionsEnum {
   UPDATE_GAME_STARTED = "GAME/updateGameStarted",
 
   UPDATE_MOVES_HISTORY = "GAME/updateMovesHistory",
 
   UPDATE_PADS = "GAME/updatePads",
-
-  UPDATE_GRAPHIC_PADS = "GAME/updateGraphicPads",
 
   UPDATE_DISABLED_INDEX_PADS = "GAME/updateDisabledIndexPads",
 
@@ -15,12 +14,29 @@ export const enum GameActionsEnum {
   UPDATE_POINT_END = "GAME/updatePointEnd",
 
   UPDATE_GAME_STATE = "GAME/updateGameState",
+
+  UPDATE_GAME_PHASE = "GAME/updateGamePhase",
+
+  UPDATE_PLAYER_ID = "GAME/updatePlayerId",
+
+  UPDATE_PLAYERS_INFOS = "GAME/updatePlayersInfos",
 }
 
 export const updateGameStarted = (bool: boolean) =>
   ({
     type: GameActionsEnum.UPDATE_GAME_STARTED,
     bool,
+  } as const)
+export const updatePlayersInfos = (p1: any, p2: any) =>
+  ({
+    type: GameActionsEnum.UPDATE_PLAYERS_INFOS,
+    p1,
+    p2,
+  } as const)
+export const updatePlayerId = (id: number) =>
+  ({
+    type: GameActionsEnum.UPDATE_PLAYER_ID,
+    id,
   } as const)
 export const updateMovesHistory = (moves: Move[], count: number) =>
   ({
@@ -42,11 +58,6 @@ export const updatePads = (pads: Pad[]) =>
     type: GameActionsEnum.UPDATE_PADS,
     pads,
   } as const)
-export const updateGraphicPads = (graphicPads: GraphicPad[]) =>
-  ({
-    type: GameActionsEnum.UPDATE_GRAPHIC_PADS,
-    graphicPads,
-  } as const)
 export const updateDisabledIndexPads = (disabledIndexPads: number[]) =>
   ({
     type: GameActionsEnum.UPDATE_DISABLED_INDEX_PADS,
@@ -56,21 +67,39 @@ export const restartGame = () =>
   ({
     type: GameActionsEnum.RESTART_GAME,
   } as const)
-export const updateGameState = (gameState: GameState) => ({
-  type: GameActionsEnum.UPDATE_GAME_STATE,
-  gameState,
-} as const)
+export const updateGameState = (gameState: GameState) =>
+  ({
+    type: GameActionsEnum.UPDATE_GAME_STATE,
+    gameState,
+  } as const)
+export const updateGamePhase = (gamePhase: GamePhaseType) =>
+  ({
+    type: GameActionsEnum.UPDATE_GAME_PHASE,
+    gamePhase,
+  } as const)
 
 type GameActionsType = ReturnType<
   | typeof updateGameStarted
   | typeof updateMovesHistory
   | typeof updatePads
-  | typeof updateGraphicPads
   | typeof updateDisabledIndexPads
   | typeof restartGame
   | typeof updatePointEnd
   | typeof updateGameState
+  | typeof updateGamePhase
+  | typeof updatePlayerId
+  | typeof updatePlayersInfos
 >
+
+export type GamePhaseType = "boarding" | "building" | "playing"
+
+interface PlayerInfos {
+  nbPlayed: number
+  won: number
+  lost: number
+  pseudo: string
+  winStreak: number
+}
 
 export interface GameState {
   started: boolean
@@ -97,8 +126,22 @@ export interface GameState {
    * lorsque la taille dépasse 2, le premier arrivé quitte la file
    *  FIFO
    * */
-  graphicPads: GraphicPad[]
-  // Contient le tableau des palettes designées
+
+  gamePhase: GamePhaseType
+  // Etat de la partie actuelle
+
+  playerId: number
+  /* id du joueur actuel représentant son état dans la partie:
+   * -1 : spectateur
+   * 0 : joueur 1
+   * 1 : joueur 2
+   */
+
+  player1: PlayerInfos
+  // infos du joueur 1 de la partie
+
+  player2: PlayerInfos
+  // infos du joueur 2 de la partie
 }
 
 export const gameInitialState: GameState = {
@@ -109,7 +152,22 @@ export const gameInitialState: GameState = {
   disabledIndexPads: [],
   pointsFirstPlayer: 0,
   pointsSecondPlayer: 0,
-  graphicPads: [],
+  gamePhase: "boarding",
+  playerId: -1,
+  player1: {
+    pseudo: "",
+    nbPlayed: 0,
+    won: 0,
+    lost: 0,
+    winStreak: 0,
+  },
+  player2: {
+    pseudo: "",
+    nbPlayed: 0,
+    won: 0,
+    lost: 0,
+    winStreak: 0,
+  },
 }
 
 export function GameReducer(
@@ -127,14 +185,31 @@ export function GameReducer(
         movesHistory: [],
         pads: [],
         disabledIndexPads: [],
-        graphicPads: [],
       }
     case GameActionsEnum.UPDATE_MOVES_HISTORY:
       return { ...state, movesHistory: action.moves, movesCount: action.count }
+    case GameActionsEnum.UPDATE_PLAYERS_INFOS:
+      console.log("P1 :",action.p1)
+      console.log(action.p2)
+      return {
+        ...state,
+        player1: {
+          nbPlayed: action.p1.played,
+          won: action.p1.won,
+          lost: action.p1.played - action.p1.won,
+          pseudo: action.p1.pseudo,
+          winStreak: action.p1.winStreak,
+        },
+        player2: {
+          nbPlayed: action.p2.played,
+          won: action.p2.won,
+          lost: action.p2.played - action.p2.won,
+          pseudo: action.p2.pseudo,
+          winStreak: action.p2.winStreak,
+        },
+      }
     case GameActionsEnum.UPDATE_PADS:
       return { ...state, pads: action.pads }
-    case GameActionsEnum.UPDATE_GRAPHIC_PADS:
-      return { ...state, graphicPads: action.graphicPads }
     case GameActionsEnum.UPDATE_DISABLED_INDEX_PADS:
       return { ...state, disabledIndexPads: action.disabledIndexPads }
     case GameActionsEnum.UPDATE_POINT_END:
@@ -144,7 +219,11 @@ export function GameReducer(
         pointsSecondPlayer: action.pointsSecondPlayer,
       }
     case GameActionsEnum.UPDATE_GAME_STATE:
-      return {...action.gameState}
+      return { ...action.gameState }
+    case GameActionsEnum.UPDATE_GAME_PHASE:
+      return { ...state, gamePhase: action.gamePhase }
+    case GameActionsEnum.UPDATE_PLAYER_ID:
+      return { ...state, playerId: action.id }
     default:
       return { ...state }
   }

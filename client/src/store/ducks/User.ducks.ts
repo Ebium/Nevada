@@ -44,7 +44,7 @@ type UserActionsType = ReturnType<
   | typeof updateUsersRankingLoading
 >
 
-interface UserInfos {
+export interface UserInfos {
   pseudo: string
   email: string
   createdAt: string

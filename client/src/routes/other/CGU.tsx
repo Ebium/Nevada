@@ -116,6 +116,7 @@ const Content = styled.div`
   width: 100vw;
   height: 100vh;
   background-color: ${colors.nevadaBackground};
+  overflow: auto;
 `
 
 const RowStyle = styled.div`

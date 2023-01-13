@@ -1,4 +1,4 @@
-import { PadHistory } from "../../utils/Moves"
+import { GraphicPad, PadHistory } from "../../utils/Moves"
 
 export const enum BoardActionsEnum {
   UPDATE_BOARD_ARRAY = "BOARD/updateBoardArray",
@@ -7,9 +7,16 @@ export const enum BoardActionsEnum {
 
   UPDATE_HISTORY_BOARD = "BOARD/updateHistoryBoard",
 
-  UPDATE_BOARD_STATE = "BOARD/updateBoardState"
+  UPDATE_BOARD_STATE = "BOARD/updateBoardState",
+
+  UPDATE_GRAPHIC_PADS = "GAME/updateGraphicPads",
 }
 
+export const updateGraphicPads = (graphicPads: GraphicPad[]) =>
+  ({
+    type: BoardActionsEnum.UPDATE_GRAPHIC_PADS,
+    graphicPads,
+  } as const)
 export const updateBoardArray = (array: boardType) =>
   ({
     type: BoardActionsEnum.UPDATE_BOARD_ARRAY,
@@ -28,20 +35,21 @@ export const updateHistoryBoard = (histo: PadHistory[]) =>
 export const updateBoardState = (boardState: BoardState) =>
   ({
     type: BoardActionsEnum.UPDATE_BOARD_STATE,
-    boardState
+    boardState,
   } as const)
 
 type BoardActionsType = ReturnType<
-  | typeof updateBoardArray 
-  | typeof resetBoardArray 
+  | typeof updateBoardArray
+  | typeof resetBoardArray
   | typeof updateHistoryBoard
   | typeof updateBoardState
+  | typeof updateGraphicPads
 >
 
 let x = -1
 let y = -1
 
-const initialeBoardArray = Array(10)
+export const initialeBoardArray = Array(10)
   .fill(0)
   .map(() => {
     x++
@@ -61,6 +69,8 @@ export interface BoardState {
   status: "idle" | "loading" | "failed"
   array: boardType
   history: PadHistory[]
+  graphicPads: GraphicPad[]
+  // Contient le tableau des palettes designées
 }
 
 export const boardInitialState: BoardState = {
@@ -68,6 +78,7 @@ export const boardInitialState: BoardState = {
   status: "idle",
   array: initialeBoardArray,
   history: [],
+  graphicPads: [],
 }
 
 export function BoardReducer(
@@ -78,7 +89,9 @@ export function BoardReducer(
     case BoardActionsEnum.UPDATE_BOARD_ARRAY:
       return { ...state, array: action.array }
     case BoardActionsEnum.RESET_BOARD_ARRAY:
-      return { ...state, array: initialeBoardArray }
+      return { ...state, array: initialeBoardArray, graphicPads: [] }
+    case BoardActionsEnum.UPDATE_GRAPHIC_PADS:
+      return { ...state, graphicPads: action.graphicPads }
     case BoardActionsEnum.UPDATE_HISTORY_BOARD:
       return { ...state, history: action.histo }
     case BoardActionsEnum.UPDATE_BOARD_STATE:

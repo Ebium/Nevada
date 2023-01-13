@@ -1,5 +1,5 @@
 import { socket } from '../socket-context';
-const baseURL = "http://localhost:3000/nevada/main/game/"
+const baseURL = "http://localhost:3000/nevada/game/"
 
 export const createRoom = () => {
     socket.emit("Create a new room", localStorage.getItem("Nevada_Token"));

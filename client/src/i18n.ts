@@ -118,7 +118,8 @@ export const translations = {
   "home.center.card.ranking.title": "Classement top joueurs",
 
   "game.code": "Code de la partie : {data}",
-  "game.boarding.title": "Vous avez été tiré au sort pour proposer un plateau pour cette partie, que souhaitez-vous faire ?",
+  "game.boarding.title1": "Vous avez été tiré au sort pour proposer un plateau pour cette partie, que souhaitez-vous faire ?",
+  "game.boarding.title2": "Votre adversaire compose le plateau !",
   "game.boarding.build": "Construire mon propre plateau",
   "game.boarding.preset": "Choisir un plateau dans la liste ci-dessous",
 
