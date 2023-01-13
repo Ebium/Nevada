@@ -5,6 +5,7 @@ import {
   updateBoardArray,
   updateBoardState,
   updateHistoryBoard,
+  updateGraphicPads,
 } from "../store/ducks/Board.ducks"
 import {
   CellType,
@@ -23,9 +24,9 @@ import { useNevadaSelector } from "../store/rootReducer"
 import {
   updateDisabledIndexPads,
   updateGameState,
-  updateGraphicPads,
   updateMovesHistory,
   updatePads,
+  updatePlayerId,
   updatePointEnd,
 } from "../store/ducks/Game.ducks"
 import { Pad2, Pad3, Pad4, Pad6 } from "./GraphicPads"
@@ -46,15 +47,13 @@ export const Board = () => {
   const movesHistory = useNevadaSelector((state) => state.game.movesHistory)
   const movesCount = useNevadaSelector((state) => state.game.movesCount)
   const pads = useNevadaSelector((state) => state.game.pads)
-  const graphicPads = useNevadaSelector((state) => state.game.graphicPads)
+  const graphicPads = useNevadaSelector((state) => state.board.graphicPads)
   const disabledIndexPads = useNevadaSelector(
     (state) => state.game.disabledIndexPads
   )
   const game = useNevadaSelector((state) => state.game)
   const board = useNevadaSelector((state) => state.board)
-
-  const [boardIsSet, setBoardIsSet] = useState(false)
-  const [playerId, setPlayerId] = useState(-1)
+  const playerId = useNevadaSelector((state) => state.game.playerId)
 
   useEffect(() => {
     console.log(socket.id)
@@ -76,22 +75,24 @@ export const Board = () => {
       socket emit si player appuie bouton
     */
 
-    socket.on("emit update game pad board", (game, pad, board) =>{
+    socket.on("emit update game pad board", (game, pad, board) => {
       // dispatch(updateBoardState(board))
       // dispatch(updatePadState(pad))
       // dispatch(updateGameState(game))
     })
 
-    socket.on("update playerId", (playId) =>{
-      setPlayerId(playId)
-    })
+    socket.on(
+      "place board",
+      (historyBoard, pads, graphicPads, updatedBoard, updatedPadStore) => {
+        dispatch(updateHistoryBoard(historyBoard))
+        dispatch(updatePads(pads))
+        dispatch(updateGraphicPads(graphicPads))
+        dispatch(updateBoardArray(updatedBoard))
+        dispatch(updateDroppedCounter(droppedPadCounter + 1))
+        dispatch(updatePadStore(updatedPadStore))
+      }
+    )
 
-    socket.on("board", (historyBoard, pads, graphicPads, updatedBoard) => {
-      dispatch(updateHistoryBoard(historyBoard))
-      dispatch(updatePads(pads))
-      dispatch(updateGraphicPads(graphicPads))
-      dispatch(updateBoardArray(updatedBoard))
-    })
 
     socket.on("emitMakeMove",(newMovesHistory, movesCount, board, disabledIndexPads, pads) => {
       dispatch(
@@ -125,6 +126,7 @@ export const Board = () => {
 
 
 
+
   //Permet jouer un coup
   const makeMove = (cell: CellType) => {
     const payload = playMove(cell, movesCount, movesHistory, boardArray, pads)
@@ -146,11 +148,7 @@ export const Board = () => {
           )
         }
 
-        boardWithDisabledPad = disablePads(
-          boardWithDisabledPad,
-          padIndex,
-          pads
-        )
+        boardWithDisabledPad = disablePads(boardWithDisabledPad, padIndex, pads)
         disabledIndexPads.push(padIndex)
 
       } else {
@@ -163,9 +161,9 @@ export const Board = () => {
       const boardWithoutPreviousMoves =
         movesHistory.length > 1
           ? removeOldPossibleMoves(
-            movesHistory[movesHistory.length - 2],
-            boardWithDisabledPad
-          )
+              movesHistory[movesHistory.length - 2],
+              boardWithDisabledPad
+            )
           : boardWithDisabledPad
 
       // Puis on met à jour les coups possibles pour le coup joué
@@ -216,7 +214,8 @@ export const Board = () => {
   // Permet de placer une tuile
   const placePad = (cell: CellType) => {
     if (currentPad.nbHole === 0 || cell.isFilled) return
-    let dx = 0, dy = 0
+    let dx = 0,
+      dy = 0
     const calculatedOrientation = currentPad.orientation
     const padNum = currentPad.nbHole
     const updatedBoard = R.clone(boardArray)
@@ -296,19 +295,21 @@ export const Board = () => {
     pad.yCoords = Array.from(ySet)
 
     historyBoard.push(padHistory)
-    updatePadStoreFunction(padNum, -1)
-    dispatch(updateDroppedCounter(droppedPadCounter + 1))
-    // changer ça ??????????? après dans tous les cas le Joueur 1 contruit 
-    // et attends donc pas besoin de faire un socket emit à voir plus tard
-    socket.emit("placePad", historyBoard, [...pads, pad], [...graphicPads, graphicPad], updatedBoard)
-    // socket.emit("update game pad board",  game, pad, board)
-  }
 
-  const updatePadStoreFunction = (padToUpdate: number, by: number) => {
-    var updatedPadStore = R.clone(padStore)
-    updatedPadStore[padToUpdate - 1].remaining =
-      updatedPadStore[padToUpdate - 1].remaining + by
-    dispatch(updatePadStore(updatedPadStore))
+    let updatedPadStore = R.clone(padStore)
+    updatedPadStore[padNum - 1].remaining =
+      updatedPadStore[padNum - 1].remaining - 1
+    // changer ça ??????????? après dans tous les cas le Joueur 1 contruit
+    // et attends donc pas besoin de faire un socket emit à voir plus tard
+    socket.emit(
+      "placePad",
+      historyBoard,
+      [...pads, pad],
+      [...graphicPads, graphicPad],
+      updatedBoard,
+      updatedPadStore
+    )
+    // socket.emit("update game pad board",  game, pad, board)
   }
 
   let cellId = 0
@@ -323,22 +324,28 @@ export const Board = () => {
                 gamestarted={gameStarted}
                 key={cellId}
                 onClick={() => {
-                  if (playerId !== -1 && !gameStarted && movesCount % 2 === playerId) {
+                  if (
+                    playerId !== -1 &&
+                    !gameStarted &&
+                    movesCount % 2 === playerId
+                  ) {
                     placePad(cell)
                   }
                 }}
               >
-                {cell.isFilled ? (
+                {cell.isFilled && (
                   <HoleForCellule
                     color={cell.possibleMove ? "green" : cell.holeColor}
-                    onClick={()=>{
-                      if (playerId !== -1 && gameStarted && movesCount % 2 === playerId) {
+                    onClick={() => {
+                      if (
+                        playerId !== -1 &&
+                        gameStarted &&
+                        movesCount % 2 === playerId
+                      ) {
                         makeMove(cell)
                       }
                     }}
-                  >{cell.x} {cell.y}</HoleForCellule>
-                ) : (
-                  <>{cell.x} {cell.y}</>
+                  ></HoleForCellule>
                 )}
 
                 {graphicPads.map((ah) =>

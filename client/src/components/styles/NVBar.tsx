@@ -36,6 +36,7 @@ export const NVBar = ({
   const hasSvg = svg ? true : false
   const intl = useIntl()
 
+  console.log(clickable)
   return (
     <RowContent clickable={clickable}>
       <StyledSvg
@@ -51,7 +52,9 @@ export const NVBar = ({
         clickable={clickable}
         width={width}
         hasSvg={hasSvg}
-        onClick={onClick}
+        onClick={() => {
+          clickable && onClick && onClick()
+        }}
       >
         <NVText
           text={intl.formatMessage({ id: text }, { data: data })}
@@ -59,7 +62,11 @@ export const NVBar = ({
             color: "topGrey",
             fontWeight: 600,
             fontSize: 0.9,
-            cursor: clickable ? "pointer" : "default",
+            cursor: clickable
+              ? "pointer"
+              : clickable === undefined
+              ? "default"
+              : "not-allowed",
           }}
         />
       </StyledDiv>
@@ -79,7 +86,12 @@ interface StyledDivProps {
 }
 
 const RowContent = styled.div<StyledDivProps>`
-  cursor: ${({ clickable }) => (clickable ? "pointer" : "unset")};
+  cursor: ${({ clickable }) =>
+    clickable
+      ? "pointer"
+      : clickable === undefined
+      ? "default"
+      : "not-allowed"};
   display: flex;
   flex-direction: row;
   height: box-content;

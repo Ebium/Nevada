@@ -11,6 +11,7 @@ import {
 import { useDispatch } from "react-redux"
 import { useNevadaSelector } from "../../store/rootReducer"
 import {
+  initialeBoardArray,
   resetBoardArray,
   updateBoardArray,
   updateHistoryBoard,
@@ -63,7 +64,7 @@ export const Game = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [droppedCounter])
 
-  const baseURL = "http://localhost:3000/nevada/main/game/"
+  const baseURL = "http://localhost:3000/nevada/game/"
   const roomId = window.location.pathname.slice(18);
 
   useEffect(() => {
@@ -87,22 +88,6 @@ export const Game = () => {
       updatedPadStore[padToUpdate - 1].remaining + by
     dispatch(updatePadStore(updatedPadStore))
   }
-
-  var x = -1
-  var y = -1
-
-  const initialeBoardArray = Array(10)
-    .fill(0)
-    .map(() => {
-      x++
-      return new Array(10).fill(0).map(() => {
-        y++
-        if (y === 10) {
-          y = 0
-        }
-        return { x: x, y: y, isFilled: false, color: "" }
-      })
-    })
 
   const changeCurrentPad = (
     nbTrous: number,

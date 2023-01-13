@@ -35,8 +35,17 @@ export const routes: RouteObject[] = [
         element: <CGU />,
       },
       {
-        path: "game2",
-        element: <Game2 />,
+        path: "game/*",
+        children: [
+          {
+            path: ":room",
+            element: <Room />,
+          },
+          {
+            path: "*",
+            element: <Navigate to={"/not_found"} />,
+          },
+        ],
       },
       {
         path: "main/*",
@@ -88,19 +97,6 @@ export const routes: RouteObject[] = [
               {
                 path: "paymentAccepted",
                 element: <PaymentAccepted />,
-              },
-              {
-                path: "*",
-                element: <Navigate to={"/not_found"} />,
-              },
-            ],
-          },
-          {
-            path: "game/*",
-            children: [
-              {
-                path: ":room",
-                element: <Room />,
               },
               {
                 path: "*",
