@@ -7,7 +7,7 @@ React / TypeScript / Express / MongoDB / Stripe : nos serveurs backend - fronten
 
 ---
 
-Accompagnée de son interface graphique, Nevada possède les fonctionnalités suivantes : 
+Accompagnée de son interface graphique moderne, Nevada possède les fonctionnalités suivantes : 
 - s'inscrire en tant qu'utilisateur
 - se connecter afin d'avoir accès à beaucoup plus de contenu
 - devenir premium afin d'accéder à certains avantages
