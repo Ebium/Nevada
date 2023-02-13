@@ -5,6 +5,8 @@
 
 React / TypeScript / Express / MongoDB / Stripe : nos serveurs backend - frontend sont basés sur ces technologies.
 
+---
+
 Accompagnée de son interface graphique, Nevada possède les fonctionnalités suivantes : 
 - s'inscrire en tant qu'utilisateur
 - se connecter afin d'avoir accès à beaucoup plus de contenu
@@ -18,3 +20,15 @@ Je dis **nous** car nous avons été quatres à développer cette application :
 - Lorie Xue : backend
 - Cyril Lin : backend
 - Valentin Fize : ?
+
+---
+
+Comment démarrer l'application ?
+- Installer les packages dans les dossiers dev / client / server : `npm install`
+- Se déplacer dans le dossier dev et lancer la commande : `npm run dev`
+- L'application s'ouvre automatiquement dans votre navigateur par défaut 
+- Si ce n'est pas le cas, l'URL cliente est la suivante : `localhost:3000/nevada`
+
+---
+
+**Have Fun**
