@@ -16,10 +16,10 @@ Accompagnée de son interface graphique moderne, Nevada possède les fonctionnal
 Le Kulami est un jeu de plateau, **nous** avons donc été mis au défi de le réaliser sous forme d'application web.
 
 Je dis **nous** car nous avons été quatres à développer cette application :
-- Erwan Boukerche : frontend ± backend
-- Lorie Xue : backend
-- Cyril Lin : backend
-- Valentin Fize : ?
+- Erwan Boukerche (Ebium) : frontend ± backend
+- Lorie Xue (Myskae) : backend
+- Cyril Lin (HBerg1) : backend
+- Valentin Fize (Kayou17) : ?
 
 ---
 
